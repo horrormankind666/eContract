@@ -286,7 +286,6 @@
     <Content Include="packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\tools\RoslynLatest\vbc.exe" />
     <Content Include="packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\tools\RoslynLatest\VBCSCompiler.exe" />
     <Content Include="PrintContractAdmin.aspx" />
-    <Content Include="README.md" />
     <Content Include="fonts\THSarabun Bold.ttf" />
     <Content Include="fonts\THSarabun BoldItalic.ttf" />
     <Content Include="fonts\THSarabun Italic.ttf" />
@@ -297,6 +296,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Content Include="README.md" />
     <None Include="Scripts\jquery-1.6.4-vsdoc.js" />
     <Content Include="printContract.aspx" />
     <Content Include="Scripts\jquery-1.6.4.js" />
