@@ -299,7 +299,7 @@ namespace eContract
                                         <p style='text-indent: 4em;'>");
             // show student prefile
             _string.Append(@"                   ข้าพเจ้า <span class='indigo-text text-darken-3'><b>" + _stdNameTh + "</b></span>");
-            _string.Append(@"                   เชื่อชาติ <span class='indigo-text text-darken-3'><b> - </b></span>");
+            _string.Append(@"                   เชื้อชาติ <span class='indigo-text text-darken-3'><b> - </b></span>");
             _string.Append(@"                   สัญชาติ <span class='indigo-text text-darken-3'><b>" + _thNationalityName + "</b></span>");
             _string.Append(@"                   ศาสนา <span class='indigo-text text-darken-3'><b> - </b></span>");
             _string.Append(@"                   เกิดเมื่อวันที่ ");
@@ -680,7 +680,7 @@ namespace eContract
                                         <p style='text-indent: 4em;'>");
             // show student prefile
             _string.Append(@"                   ข้าพเจ้า <span class='indigo-text text-darken-3'><b>" + _stdNameTh + "</b></span>");
-            _string.Append(@"                   เชื่อชาติ <span class='indigo-text text-darken-3'><b> - </b></span>");
+            _string.Append(@"                   เชื้อชาติ <span class='indigo-text text-darken-3'><b> - </b></span>");
             _string.Append(@"                   สัญชาติ <span class='indigo-text text-darken-3'><b>" + _thNationalityName + "</b></span>");
             _string.Append(@"                   ศาสนา <span class='indigo-text text-darken-3'><b> - </b></span>");
             _string.Append(@"                   เกิดเมื่อวันที่ ");
@@ -1068,7 +1068,7 @@ namespace eContract
             _string.Append(@"           <div class='section'>
                                         <p style='text-indent: 4em;'>");
             _string.Append(@"                   ข้าพเจ้า <span class='indigo-text text-darken-3'><b>" + _stdNameTh + "</b></span>");
-            _string.Append(@"                   เชื่อชาติ <span class='indigo-text text-darken-3'><b> - </b></span>");
+            _string.Append(@"                   เชื้อชาติ <span class='indigo-text text-darken-3'><b> - </b></span>");
             _string.Append(@"                   สัญชาติ <span class='indigo-text text-darken-3'><b>" + _thNationalityName + "</b></span>");
             _string.Append(@"                   ศาสนา <span class='indigo-text text-darken-3'><b> - </b></span>");
             _string.Append(@"                   เกิดเมื่อวันที่ ");
