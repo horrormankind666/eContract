@@ -63,7 +63,7 @@
                                             <p class='right black-text' style="font-family:TH Sarabun New;font-size:16px"><b>2. แจ้ง Reset สัญญา : เมื่อดำเนินการตามข้อ 1. เรียบร้อยแล้ว ให้ติดต่อ<h8 style="color:red;">กองกฎหมาย</h8>ได้ที่ <h8 style="color:red;">0 2849 62620 2849 6260</h8> หรือ <h8 style="color:red;">LINE Official Account: @csq0251v</h8> เพื่อแจ้ง Reset สัญญาเดิมที่มีข้อมูลไม่ถูกต้อง</b></p>
                                             <p class='right black-text' style="font-family:TH Sarabun New;font-size:16px"><b>3. เข้าทำสัญญาใหม่ : นักศึกษาและบิดามารดา เข้าทำ (1) สัญญาการเป็นนักศึกษา (2) หนังสือแสดงความยินยอมของผู้แทนโดยชอบธรรม และ (3) สัญญาค้ำประกัน ผ่าน http://econtract.mahidol.ac.th/ แทนฉบับเดิมเพื่อเชื่อมโยงข้อมูลที่ถูกต้องในการทำสัญญาฉบับใหม่</b></p>
                                             <p class='center red-text' style="font-family:TH Sarabun New;font-size:25px"><b><u>เมื่อสัญญาเสร็จสมบูรณ์ ระบบแสดงหน้าจอดังนี้</u></b></p>--%>
-                        <p style='text-align: center; font-family: TH Sarabun New; font-size: 22px; color: darkblue; font-weight: bold;'>การทำสัญญาการเป็นนักศึกษาของปีการศึกษา 2567</p>
+                        <div style='text-align: center; font-family: TH Sarabun New; font-size: 25px; color: darkblue; font-weight: bold;'>การทำสัญญาการเป็นนักศึกษาของปีการศึกษา 2567 และนักศึกษาชั้นปีอื่นที่มีการแก้ไขเพิ่มเติมข้อมูล</div>
                         <%--                                        <p style='text-align:center;font-family:TH Sarabun New;font-size:20px;color:darkred;font-weight:bold;'>มหาวิทยาลัยจะปิดระบบการทำสัญญาการเป็นนักศึกษาของปีการศึกษา 2565</p>--%>
                         <%--                                        <p style='text-align:center;font-family:TH Sarabun New;font-size:20px;color:darkred;font-weight:bold;'>ในวันที่ 31 ธันวาคม 2565 เวลา 00.00 น.</p>
                                         <p style='text-align:center;font-family:TH Sarabun New;font-size:20px;color:darkred;font-weight:bold;'>จึงขอให้นักศึกษาและบิดามารดาเข้าทำสัญญาให้แล้วเสร็จภายในกำหนดระยะเวลาดังกล่าว</p>
@@ -71,11 +71,16 @@
                                         <p style='text-align:center;font-family:TH Sarabun New;font-size:18px;color:darkblue;'>ขอให้ติดตามขั้นตอนการทำสัญญาล่าช้า ซึ่งมหาวิทยาลัยจะแจ้งให้ทราบผ่านทางเว็บไซต์นี้ในช่วงเดือนมกราคม 2566 ต่อไป)</p>--%>
                         
                         <%--<p style='text-align: center; font-family: TH Sarabun New; font-size: 20px; color: darkred; font-weight: bold;'>มหาวิทยาลัยมหิดลจะเปิดระบบให้เข้าทำสัญญาการเป็นนักศึกษา</p>--%>
-                        <p style='text-align: center; font-family: TH Sarabun New; font-size: 22px; color: darkred; font-weight: bold;'>มหาวิทยาลัยมหิดลจะเปิดระบบให้เข้าทำสัญญาการเป็นนักศึกษา</p>
-                        <p style='text-align: center; font-family: TH Sarabun New; font-size: 22px; color: darkred; font-weight: bold;'>ตั้งแต่วันจันทร์ที่ 5 สิงหาคม 2567 เวลา 0.00 น. - วันศุกร์ที่ 1 พฤศจิกายน 2567 เวลา 0.00 น.</p>                        
-                        <p style='text-align: center; font-family: TH Sarabun New; font-size: 20px; color: darkblue;'>ขอให้<u>นักศึกษา</u>และ<u>บิดามารดา</u> เข้าทำสัญญาการเป็นนักศึกษา สัญญาค้ำประกัน</p>
-                        <p style='text-align: center; font-family: TH Sarabun New; font-size: 20px; color: darkblue;'>และหนังสือแสดงความยินยอมของผู้แทนโดยชอบธรรม ให้แล้วเสร็จภายในกำหนดระยะเวลาดังกล่าว</p>
-                        <p style='text-align: center; font-family: TH Sarabun New; font-size: 20px; font-weight: bold;'>สอบถามเพิ่มเติม LINE Official Account กองกฎหมาย : @csq0251v ในวันทำการ เวลา 09.00 น. - 17.00 น.</p>
+                        <div style='text-align: center; font-family: TH Sarabun New; font-size: 28px; color: darkred; font-weight: bold; margin-top: 5px;'>มหาวิทยาลัยขยายระยะเวลาการทำสัญญา</div>
+                        <div style='text-align: center; font-family: TH Sarabun New; font-size: 28px; color: darkred; font-weight: bold;'>ตั้งแต่วันจันทร์ที่ 9 ธันวาคม 2567 จนถึงวันศุกร์ที่ 31 มกราคม 2568</div>
+                        <div style='text-align: center; font-family: TH Sarabun New; font-size: 20px; color: darkblue; margin-top: 5px;'>และจะปิดระบบในส่วนของการทำสัญญา ตั้งแต่วันเสาร์ที่ 1 กุมภาพันธ์ 2567 เวลา 00.00 น. เป็นต้นไป</div>
+                        <div style='text-align: center; font-family: TH Sarabun New; font-size: 20px; color: darkblue;'>ขอให้<u>นักศึกษา</u>และ<u>บิดามารดา</u> เข้าทำสัญญาการเป็นนักศึกษา สัญญาค้ำประกัน</div>
+                        <div style='text-align: center; font-family: TH Sarabun New; font-size: 20px; color: darkblue;'>และหนังสือแสดงความยินยอมของผู้แทนโดยชอบธรรม ให้แล้วเสร็จภายในกำหนดระยะเวลาดังกล่าว</div>
+                        <br />
+                        <div style='text-align: center; font-family: TH Sarabun New; font-size: 20px; color: darkgoldenrod; font-weight: bold;'>(ในส่วนของการดาวน์โหลดสัญญา นักศึกษาปัจจุบันทุกชั้นปีสามารถเข้าสู่ระบบเพื่อดาวน์โหลดสัญญาได้จนกว่าจะสำเร็จการศึกษา)</div>
+                        <br />
+                        <div style='text-align: center; font-family: TH Sarabun New; font-size: 20px; font-weight: bold;'>สอบถามเพิ่มเติม/ติดต่อทำสัญญาค้ำประกันกรณีที่ระบบไม่รองรับเงื่อนไขการค้ำประกัน</div>
+                        <div style='text-align: center; font-family: TH Sarabun New; font-size: 20px; font-weight: bold;'>LINE Official Account กองกฎหมาย : @csq0251v ในวันทำการ เวลา 09.00 น. - 17.00 น.</div>
                         <p style='text-align: center; font-family: TH Sarabun New; font-size: 20px; color: darkblue; font-weight: bold;'>...................................................</p>
                         <p style='text-align: center; font-family: TH Sarabun New; font-size: 22px; color: darkblue; font-weight: bold;'>ขั้นตอนการทำสัญญา</p>
                         <p style='font-family: TH Sarabun New; font-size: 18px; color: darkblue; font-weight: bold;'>
