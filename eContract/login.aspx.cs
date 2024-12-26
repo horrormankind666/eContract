@@ -1,171 +1,170 @@
 ﻿using System;
-using System.Data;
 using System.Text;
 using System.Web.UI;
-using System.Web;
 using System.Web.UI.HtmlControls;
-using Microsoft.Owin.Security.OpenIdConnect;
-using Microsoft.Owin.Security;
-using eContract.Models;
 using System.Web.UI.WebControls;
-using System.Security.Policy;
 
-namespace eContract
-{
+namespace eContract {
+    public partial class LoginP : Page {
+        protected void Page_Load(
+            object sender,
+            EventArgs e
+        ) {
+            //string authen = string.Empty;
+            //string username = Request.Form["username"];
+            //string password = Request.Form["studentpassword"];
+            string userID = Request.Form["userid"];
+            string parentpassword = Request.Form["parentpassword"];
+            string userType = Request.Form["usertype"];
+            string acaYear = string.Empty;
 
-
-    public partial class login : System.Web.UI.Page
-    {
-        protected void Page_Load(object sender, EventArgs e)
-        {
-            // ----- prepare default parameter -----------
-            string _authen = string.Empty, _username = string.Empty, _password = string.Empty;
-            string _userid = string.Empty, _parentpassword = string.Empty;
-            string _userType = string.Empty;
-            string _acaYear = string.Empty;
-
-            string _path = Myconfig.GetVirtualPath();
-            StringBuilder _script = new StringBuilder();
-            Myconfig.GetMeteriaUi(Page, _path);
-
-            // ---- post request zone --------------------
-            // get student username and authen password
-            _username = Request.Form["username"];
-            _password = Request.Form["studentpassword"];
-
-            // get parent citizen-id and parent password
-            _userid = Request.Form["userid"];
-            _parentpassword = Request.Form["parentpassword"];
-
-            // get user type (student/parent)
-            _userType = Request.Form["usertype"];
-
-            // ---- display zone -------------------------
+            string path = Myconfig.GetVirtualPath();
+            //StringBuilder script = new StringBuilder();
+            Myconfig.GetMeteriaUi(Page, path);
+           
             HtmlGenericControl navBar = FindControl("navBar") as HtmlGenericControl;
-            navBar.InnerHtml = Myconfig.NavBar(_userType);
+            navBar.InnerHtml = Myconfig.NavBar(userType);
+
             HtmlGenericControl divBanner = FindControl("divBanner") as HtmlGenericControl;
-            divBanner.InnerHtml = ContractUI.Parallaxbanner(_acaYear);
+            divBanner.InnerHtml = ContractUI.Parallaxbanner(acaYear);
+
             HtmlGenericControl divBody = FindControl("divBody") as HtmlGenericControl;
             divBody.InnerHtml = ContractUI.UiLoginForm();
+
             HtmlGenericControl divFooter = FindControl("divFooter") as HtmlGenericControl;
             divFooter.InnerHtml = ContractUI.FooterBanner();
-            HiddenField txtUserTypeActive = ((HiddenField)FindControl("txtUserTypeActive"));
-            txtUserTypeActive.Value = _userType;
 
-            if (IsPostBack)
-            {
-                if (_userType != null)
-                {
-                    //txtUserTypeActive.Value = _userType;
-                    if (_userType == "STUDENT")
-                    {
+            HiddenField txtUserTypeActive = ((HiddenField)FindControl("txtUserTypeActive"));
+            txtUserTypeActive.Value = userType;
+
+            if (IsPostBack) {
+                if (userType != null) {
+                    //txtUserTypeActive.Value = userType;
+                    if (userType == "STUDENT") {
                         GotoPage();
                     }
-                    else
-                    {
-                        // for parent
-                        if (!string.IsNullOrEmpty(_userid) && !string.IsNullOrEmpty(_parentpassword))
-                        {
-                            LoginParent(_userid, _parentpassword, _userType);
+                    else {
+                        //for parent
+                        if (!string.IsNullOrEmpty(userID) &&
+                            !string.IsNullOrEmpty(parentpassword)){
+                            LoginParent(userID, parentpassword, userType);
                         }
                     }
                 }
             }
         }
 
+        /*
+        private void LoginStudent(
+            string username,
+            string password,
+            string userType
+        ) {
+            if (string.IsNullOrEmpty(username)) {
+                throw new ArgumentException($"'{nameof(username)}' cannot be null or empty.", nameof(username));
+            }
 
-        private void LoginStudent(string _username, string _password, string _userType)
-        {
-            StringBuilder _script = new StringBuilder();
-            string _authen;
-            try
-            {
-                // sending webservice
-                //Login.AuthenAD(_username, _password, _userType); // ส่งรหัสให้ AD ตรวจสอบ --> return as cookie --> in class user
-                Login _login = new Login(_userType);
-                _authen = _login.Authen;
+            if (string.IsNullOrEmpty(password)) {
+                throw new ArgumentException($"'{nameof(password)}' cannot be null or empty.", nameof(password));
+            }
 
+            StringBuilder html = new StringBuilder();
+            string authen;
 
-                //_authen = "true";
-                //_authen = "false"; // test code
-                switch (_authen)
-                {
+            try {
+                //sending webservice
+                //Login.AuthenAD(username, password, userType); //ส่งรหัสให้ AD ตรวจสอบ --> return as cookie --> in class user
+                Login login = new Login(userType);
+                authen = login.Authen;
+
+                //authen = "true";
+                //authen = "false"; //test code
+                switch (authen) {
                     case "true":
                         GotoPage();
                         break;
-
                     case "false":
-                        //Login.ClearCookie(_userType);
-                        _script.Append(@"<script type='text/javascript'> ");
-                        _script.Append(@" $('.message').text('" + _login.Message + "');$('#modal1').openModal();");
-                        _script.Append(@" </script>");
-                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajax", _script.ToString(), false);
+                        //Login.ClearCookie(userType);
+                        html.Append(@"
+                            <script type='text/javascript'>
+                                $('.message').text('" + login.Message + @"');
+                                $('#modal1').openModal();
+                            </script>
+                        ");
+
+                        ScriptManager.RegisterStartupScript(this, GetType(), "ajax", html.ToString(), false);
                         break;
                 }
             }
-            catch (Exception _ex)
-            {
-                _script.Append(@"<script type='text/javascript'> ");
-                _script.Append(@" $('.message').html('<p>Code Error : " + _ex.Message.Replace("'", " ") + "</p><p>กรุณาแจ้งปัญหามาที่ e-mail:anussara.wan@mahidol.ac.th พร้อมแนบไฟล์ Print Screen Code Error.</p>');$('#modal1').openModal();");
-                _script.Append(@" </script>");
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajax", _script.ToString(), false);
+            catch (Exception ex) {
+                html.Append(@"
+                    <script type='text/javascript'>
+                        $('.message').html('<p>Code Error : " + ex.Message.Replace("'", " ") + @"</p><p>กรุณาแจ้งปัญหามาที่ e-mail:anussara.wan@mahidol.ac.th พร้อมแนบไฟล์ Print Screen Code Error.</p>');
+                        $('#modal1').openModal();
+                    </script>
+                ");
+
+                ScriptManager.RegisterStartupScript(this, GetType(), "ajax", html.ToString(), false);
             }
         }
+        */
 
+        private void LoginParent(
+            string userID,
+            string password,
+            string userType
+        ) {
+            StringBuilder html = new StringBuilder();
+            //string result = string.Empty;
 
-        private void LoginParent(string _userid, string _password, string _userType)
-        {
-            StringBuilder _script = new StringBuilder();
+            try {
+                Login.AuthenParent(userID, password, userType);
+                Login login = new Login(userType);
+                string authen = login.Authen;
 
-
-            string _result = string.Empty;
-
-
-            try
-            {
-                Login.AuthenParent(_userid, _password, _userType);
-
-                Login _login = new Login(_userType);
-
-                string _authen = _login.Authen;
-
-
-                //_authen = "true";
-                //_authen = "false"; // test code
-                switch (_authen)
-                {
+                //authen = "true";
+                //authen = "false"; //test code
+                switch (authen) {
                     case "true":
                         GotoPage();
                         break;
-
                     case "false":
                         //Login.ClearCookie(_userType);
-                        _script.Append(@"<script type='text/javascript'> ");
-                        _script.Append(@" $('.message').text('" + _login.Message + "');$('#modal1').openModal();");
-                        _script.Append(@" </script>");
-                        ScriptManager.RegisterStartupScript(this, this.GetType(), "ajax", _script.ToString(), false);
+                        html.Append(@"
+                            <script type='text/javascript'>
+                                $('.message').text('" + login.Message + @"');
+                                $('#modal1').openModal();
+                            </script>
+                        ");
+
+                        ScriptManager.RegisterStartupScript(this, GetType(), "ajax", html.ToString(), false);
                         break;
                 }
 
             }
-            catch (Exception _ex)
-            {
-                _script.Append(@"<script type='text/javascript'> ");
-                _script.Append(@" $('.message').html('<p>Code Error : " + _ex.Message.Replace("'", " ") + "</p><p>กรุณาแจ้งปัญหามาที่ e-mail:anussara.wan@mahidol.ac.th พร้อมแนบไฟล์ Print Screen Code Error.</p>');$('#modal1').openModal();");
-                _script.Append(@" </script>");
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "ajax", _script.ToString(), false);
+            catch (Exception ex) {
+                html.Append(@"
+                    <script type='text/javascript'>
+                        $('.message').html('<p>Code Error : " + ex.Message.Replace("'", " ") + @"</p><p>กรุณาแจ้งปัญหามาที่ e-mail:anussara.wan@mahidol.ac.th พร้อมแนบไฟล์ Print Screen Code Error.</p>');
+                        $('#modal1').openModal();
+                    </script>
+                ");
+
+                ScriptManager.RegisterStartupScript(this, GetType(), "ajax", html.ToString(), false);
             }
-
-
         }
 
-        private void GotoPage()
-        {
-            StringBuilder _script = new StringBuilder();
-            _script.Append(@"<script type='text/javascript'> ");
-            _script.Append(@"$('#loginform').prop('action','frmContract.aspx');$('#loginform').submit();");
-            _script.Append(@" </script>");
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "ajax", _script.ToString(), false);
+        private void GotoPage() {
+            StringBuilder html = new StringBuilder();
+            
+            html.Append(@"
+                <script type='text/javascript'>
+                    $('#loginform').prop('action','frmContract.aspx');
+                    $('#loginform').submit();
+                </script>
+            ");
+
+            ScriptManager.RegisterStartupScript(this, GetType(), "ajax", html.ToString(), false);
         }
     }
 }

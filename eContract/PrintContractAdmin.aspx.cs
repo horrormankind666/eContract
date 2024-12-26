@@ -1,3602 +1,3909 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using iTextSharp;
-using System.Text;
-using iTextSharp.text.pdf;
-using System.IO;
-using iTextSharp.text;
-using System.Net;
-using System.Diagnostics.Contracts;
 using System.Data;
+using System.IO;
+using System.Net;
+using System.Web.UI;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 
-namespace eContract
-{
-    public partial class PrintContractAdmin : System.Web.UI.Page
-    {
-        protected void Page_Load(object sender, EventArgs e)
-        {
+namespace eContract {
+    public partial class PrintContractAdmin : Page {
+        protected void Page_Load(
+            object sender,
+            EventArgs e
+        ) {
             string action = "printWarrant";
             DataSet ds = ContractDB.GetListRePrintWarranty("2561", "PYPYB", "");
             
-            if (ds != null )
-            {
+            if (ds != null ) {
                 DataTable dt = ds.Tables[0];
-                foreach (DataRow row in dt.Rows)
-                {
+
+                foreach (DataRow row in dt.Rows) {
                     string studentCode = row["StudentCode"].ToString();
-                    string studentId = row["StudentId"].ToString();
-                    switch (action)
-                    {
+                    string studentID = row["StudentId"].ToString();
+
+                    switch (action) {
                         case "printContract":
                             //Response.Write("printContract"); A
-                            printContractStd(studentId, studentCode);
+                            PrintContractStd(studentID, studentCode);
                             break;
                         case "printConsent":
                             //Response.Write("printConsent"); B
-                            printGarrantee(studentId, "STUDENT", studentCode);
+                            PrintGarrantee(studentID, "STUDENT", studentCode);
                             break;
                         case "printWarrant":
                             //Response.Write("printWarrant"); C
-                            printWarrant(studentId, "STUDENT", studentCode);
+                            PrintWarrant(studentID, "STUDENT", studentCode);
                             break;
                     }
                 }
-
             }
-
         }
-        #region printContractStd
-        /// <summary>
-        /// Author: Anussara Wanwang
-        /// Create date: 11-12-2015
-        /// Description: พิมพ์สัญญานักศึกษา 
-        /// Parameter:n/a
-        /// </summary>
-        public void printContractStd(string _studentId, string _studentCode)
-        {
-            //ในกรณีที่มี file ใน Folder แล้วให้เปิดเลย ไม่ต้องสร้าง pdf ใหม่
-            ContractInfo _ctInfo = new ContractInfo(_studentId);
-            string _contract = Myconfig.CvEmpty(_ctInfo.contractPath, " - ");
-            if (_contract == " - ")
-            {
 
-                StringBuilder _string = new StringBuilder();
-                StudentInfo _stdInfo = new StudentInfo(_studentCode);
-                ParentInfo _parentMInfo = new ParentInfo(_studentId, "M");
-                ParentInfo _parentFInfo = new ParentInfo(_studentId, "F");
+        #region PrintContractStd
+        /*
+        author      : Anussara Wanwang
+        create date : 11-12-2015
+        description : พิมพ์สัญญานักศึกษา 
+        parameter   : n/a
+        */
+        public void PrintContractStd(
+            string studentID,
+            string studentCode
+        ) {
+            //ในกรณีที่มี file ใน folder แล้วให้เปิดเลย ไม่ต้องสร้าง pdf ใหม่
+            ContractInfo ctInfo = new ContractInfo(studentID);
+            string contract = Myconfig.CvEmpty(ctInfo.ContractPath, " - ");
 
-                CurDate _date = new CurDate();
+            if (contract == " - ") {
+                //StringBuilder html = new StringBuilder();
+                StudentInfo stdInfo = new StudentInfo(studentCode);
+                ParentInfo parentMInfo = new ParentInfo(studentID, "M");
+                ParentInfo parentFInfo = new ParentInfo(studentID, "F");
+                //CurDate date = new CurDate();
+                string acaYear = Myconfig.CvEmpty(stdInfo.AcaYear, " - ");
+                SignCEOinfo signInfo = new SignCEOinfo(acaYear);
+                //string dateContract = ctInfo.DateLongContractStudent;
+                string quotaCode = stdInfo.QuotaCode;
+                string signCEO = Myconfig.CvEmpty(signInfo.SignNameCEO, " - ");
+                string signCEOPosition = Myconfig.CvEmpty(signInfo.SignCEOPosition, "-");
+                string fatherName = parentFInfo.FullNameTH;
+                string motherName = parentMInfo.FullNameTH;
+                string idCard = Myconfig.CvEmpty(stdInfo.IDCard, " - ");
+                //string studentCode = Myconfig.CvEmpty(stdInfo.StudentCode, " - ");
+                string stdNameTH = Myconfig.CvEmpty(stdInfo.StdNameTH, " - ");
+                string birthDate = Myconfig.CvEmpty(stdInfo.Birthdate, " - ");
+                string age = Myconfig.CvEmpty(stdInfo.Age, " - ");
+                string moo = Myconfig.CvEmpty(stdInfo.Moo, " - ");
+                string no = Myconfig.CvEmpty(stdInfo.No, " - ");
+                string soi = Myconfig.CvEmpty(stdInfo.Soi, " - ");
+                string road = Myconfig.CvEmpty(stdInfo.Road, " - ");
+                string subdistrict = Myconfig.CvEmpty(stdInfo.SubdistrictNameTH, " - ");
+                string district = Myconfig.CvEmpty(stdInfo.DistrictNameTH, " - ");
+                string province = Myconfig.CvEmpty(stdInfo.ProgramNameTH, " - ");
+                string zipcode = Myconfig.CvEmpty(stdInfo.Zipcode, " - ");
+                string phone = Myconfig.CvEmpty(stdInfo.PhoneNumberStd, " - ");
+                string programCode = Myconfig.CvEmpty(stdInfo.ProgramCode, " - ");
+                string statusContract;
+                string programCodeExtra = "";
+                int checkAcaYear = Convert.ToInt32(acaYear);
 
-                string _acaYear = Myconfig.CvEmpty(_stdInfo.AcaYear, " - ");
-
-                signCEOinfo _signInfo = new signCEOinfo(_acaYear);
-                string _dateContract = _ctInfo.DateLongContractStudent;
-                string _quotaCode = _stdInfo.QuotaCode;
-                string _signCEO, _signCEOPosition;
-                string _fatherName, _motherName;
-                string _idCard, _stdNameTh, _birthDate, _age, _moo, _no, _soi, _road, _subdistrict, _district, _provice, _zipcode, _phone, _ProgramCode, _statusContract;
-                string _programCodeExtra = "";
-                _signCEO = Myconfig.CvEmpty(_signInfo.signNameCEO, " - ");
-                _signCEOPosition = Myconfig.CvEmpty(_signInfo.SignCEOPosition, "-");
-                //_studentCode = Myconfig.CvEmpty(_stdInfo.StudentCode, " - ");
-                _stdNameTh = Myconfig.CvEmpty(_stdInfo.StdNameTh, " - ");
-                _age = Myconfig.CvEmpty(_stdInfo.Age, " - ");
-                _birthDate = Myconfig.CvEmpty(_stdInfo.BirthDate, " - ");
-                _no = Myconfig.CvEmpty(_stdInfo.No, " - ");
-                _moo = Myconfig.CvEmpty(_stdInfo.Moo, " - ");
-                _soi = Myconfig.CvEmpty(_stdInfo.Soi, " - ");
-                _road = Myconfig.CvEmpty(_stdInfo.Road, " - ");
-                _subdistrict = Myconfig.CvEmpty(_stdInfo.ThSubDistrict, " - ");
-                _district = Myconfig.CvEmpty(_stdInfo.ThDistrict, " - ");
-                _provice = Myconfig.CvEmpty(_stdInfo.ThProvince, " - ");
-                _zipcode = Myconfig.CvEmpty(_stdInfo.ZipCode, " - ");
-                _phone = Myconfig.CvEmpty(_stdInfo.phoneSTD, " - ");
-                _idCard = Myconfig.CvEmpty(_stdInfo.IdCard, " - ");
-                _ProgramCode = Myconfig.CvEmpty(_stdInfo.ProgramCode, " - ");
-                //_ProgramCode = "DTDSB";
-                _fatherName = _parentFInfo.FullNameTh;
-                _motherName = _parentMInfo.FullNameTh;
-
-                int _checkAcaYear = Convert.ToInt32(_acaYear);
-                if (_checkAcaYear < 2565)
-                {
-                    _statusContract = "OLD";
+                if (checkAcaYear < 2565) {
+                    statusContract = "OLD";
                 }
-                else
-                {
-                    _statusContract = "NEW";
+                else {
+                    statusContract = "NEW";
                 }
-                //_statusContract = "NEW";
-                string _path = Server.MapPath("~");
-                string _fileTmp = "";
-                //เรียกใช้ file Template
-                switch (_ProgramCode)
-                {
+                
+                string path = Server.MapPath("~");
+                string fileTmp = "";
+
+                //เรียกใช้ file template
+                switch (programCode) {
                     case "SIMDB":
-                        switch (_statusContract)
-                        {
+                        switch (statusContract) {
                             case "OLD":
-                                _fileTmp = _path + "/Template/A_Contract/SIMDB.pdf";
+                                fileTmp = (path + "/Template/A_Contract/SIMDB.pdf");
                                 break;
                             case "NEW":
-                                _fileTmp = _path + "/Template/A_Contract/SIMDBNEW.pdf";
+                                fileTmp = (path + "/Template/A_Contract/SIMDBNEW.pdf");
                                 break;
                         }
                         break;
-
                     case "RAMDB":
-                        switch (_statusContract)
-                        {
+                        switch (statusContract) {
                             case "OLD":
-                                _fileTmp = _path + "/Template/A_Contract/RAMDB.pdf";
+                                fileTmp = (path + "/Template/A_Contract/RAMDB.pdf");
                                 break;
                             case "NEW":
-                                _fileTmp = _path + "/Template/A_Contract/RAMDBNEW.pdf";
+                                fileTmp = (path + "/Template/A_Contract/RAMDBNEW.pdf");
                                 break;
                         }
                         break;
-
                     case "PYPYB":
-                        _fileTmp = _path + "/Template/A_Contract/PYPYB.pdf";
+                        fileTmp = (path + "/Template/A_Contract/PYPYB.pdf");
                         break;
-
                     case "DTDSB":
-                        switch (_statusContract)
-                        {
+                        switch (statusContract) {
                             case "OLD":
-                                _fileTmp = _path + "/Template/A_Contract/DTDSB.pdf";
+                                fileTmp = (path + "/Template/A_Contract/DTDSB.pdf");
                                 break;
                             case "NEW":
-                                _fileTmp = _path + "/Template/A_Contract/DTDSBNEW.pdf";
+                                fileTmp = (path + "/Template/A_Contract/DTDSBNEW.pdf");
                                 break;
                         }
                         break;
                     case "RANSB":
-                        _fileTmp = _path + "/Template/A_Contract/RANSB.pdf";
+                        fileTmp = (path + "/Template/A_Contract/RANSB.pdf");
                         break;
-
                     case "NSNSB":
-                        switch (_quotaCode) // specification nurse program project
-                        {
-                            default: // siriraj hospital
-                                _fileTmp = _path + "/Template/A_Contract/NSNSB.pdf";
+                        //specification nurse program project
+                        switch (quotaCode) {
+                            //siriraj hospital
+                            default: 
+                                fileTmp = (path + "/Template/A_Contract/NSNSB.pdf");
                                 break;
-
-                            case "354": // chula research
-                                _fileTmp = _path + "/Template/A_Contract/NSNSB_CL.pdf";
-                                _programCodeExtra = "_CL";
+                            //chula research
+                            case "354":
+                                fileTmp = (path + "/Template/A_Contract/NSNSB_CL.pdf");
+                                programCodeExtra = "_CL";
                                 break;
-
-                            case "351": // faculty of tropical medicine
-                                _fileTmp = _path + "/Template/A_Contract/NSNSB_TM.pdf";
-                                _programCodeExtra = "_TM";
+                            //faculty of tropical medicine
+                            case "351":
+                                fileTmp = (path + "/Template/A_Contract/NSNSB_TM.pdf");
+                                programCodeExtra = "_TM";
                                 break;
                         }
                         break;
                 }
 
-
-                string _fileName = _studentCode + _ProgramCode + _programCodeExtra + "_A.pdf";
-                string _fileDocument = _path + "/ElectronicContract/" + _fileName;
+                string fileName = (studentCode + programCode + programCodeExtra + "_A.pdf");
+                //string fileDocument = (path + "/ElectronicContract/" + fileName);
 
                 Response.ContentType = "application/pdf";
-                Response.AddHeader("content-disposition", "attachment;filename=" + _studentCode + "_A.pdf");
+                Response.AddHeader("content-disposition", ("attachment;filename=" + studentCode + "_A.pdf"));
                 //Response.Cache.SetCacheability(HttpCacheability.NoCache);
-                //Open the reader
-                PdfReader _reader = new PdfReader(_fileTmp);//file Template
-                                                            //string path = requestObj.PhysicalApplicationPath + "\\electronicContract\\" 
-                DirectoryInfo DirInfo = new DirectoryInfo(Server.MapPath("~/ElectronicContract/" + _acaYear + "/" + _ProgramCode + _programCodeExtra + "/"));  // ต้องเป็นตัวแปรโฟลเดอร์ด้วยนะ
-                if (!DirInfo.Exists)
-                {
-                    //  Response.Write("OK");
-                    DirInfo.Create();
+
+                //open the reader
+                PdfReader reader = new PdfReader(fileTmp); //file Template
+                //string path = (requestObj.PhysicalApplicationPath + "\\electronicContract\\"); 
+                DirectoryInfo dirInfo = new DirectoryInfo(Server.MapPath("~/ElectronicContract/" + acaYear + "/" + programCode + programCodeExtra + "/")); //ต้องเป็นตัวแปรโฟลเดอร์ด้วยนะ
+                
+                if (!dirInfo.Exists) {
+                    //Response.Write("OK");
+                    dirInfo.Create();
                 }
-                Document _document = new Document(PageSize.A4, 10.0F, 10.0F, 100.0F, 0.0F);
-                // open the writer
-                PdfWriter _writer = PdfWriter.GetInstance(_document, new FileStream(Server.MapPath("~/ElectronicContract/" + _acaYear + "/" + _ProgramCode + _programCodeExtra + "/") + _fileName, FileMode.Create));
-                //PdfWriter _writer = PdfWriter.GetInstance(_document, Response.OutputStream);
-                Response.Charset = String.Empty;
+
+                Document document = new Document(PageSize.A4, 10.0F, 10.0F, 100.0F, 0.0F);
+                //open the writer
+                PdfWriter writer = PdfWriter.GetInstance(document, new FileStream((Server.MapPath("~/ElectronicContract/" + acaYear + "/" + programCode + programCodeExtra + "/") + fileName), FileMode.Create));
+                //PdfWriter writer = PdfWriter.GetInstance(document, Response.OutputStream);
+                Response.Charset = string.Empty;
                 Response.ClearContent();
-                _document.Open();
-                int _y = 0;
-                //Configure the content
-                PdfContentByte _cb = _writer.DirectContent;
-                // select the font properties
+                document.Open();
+                int y = 0;
 
-                //Write the text here
-                _cb.BeginText();
+                //configure the content
+                PdfContentByte cb = writer.DirectContent;
+                //select the font properties
 
+                //write the text here
+                cb.BeginText();
 
                 //หน้าที่ 1
-                PdfImportedPage page1 = _writer.GetImportedPage(_reader, 1);//หน้า pdf template 1
-                _cb.AddTemplate(page1, 0, 0);
+                PdfImportedPage page1 = writer.GetImportedPage(reader, 1); //หน้า pdf template 1
+                cb.AddTemplate(page1, 0, 0);
 
-                if (_ProgramCode == "SIMDB")
-                {
-                    if (_statusContract == "OLD")
-                    {// acaYear < 2565
-                        BaseFont _bf = BaseFont.CreateFont(_path + "\\fonts\\THSarabun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                        //ContractId
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                                //Current Date
-                        _y = 670;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayStd, 418, _y, 0);//Date
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThStd, 460, _y, 0);//Month
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThStd, 523, _y, 0);//Year
-                                                                                                      //Name-LastName
-                        _y = 532;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 100, _y, 0);
-                        //bithDate,Age
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _birthDate, 360, _y, 0);//วัน/เดือน/ปี เกิด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 523, _y, 0);//อายุ
-                                                                                         //No,Moo,Soi
-                        _y = 508;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 160, _y, 0);//บ้านเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 265, _y, 0);//หมู่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 360, _y, 0);//ตรอก/ซอย
-                                                                                         //road,subdistrict,district
-                        _y = 484;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 75, _y, 0);//ถนน
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 230, _y, 0);//ตำบล/แขวง
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 405, _y, 0);//อำเภอ/เขต
-                                                                                              //provice,zipcode,phone
-                        _y = 460;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 95, _y, 0);//จังหวัด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 300, _y, 0);//รหัสไปรษณีย์
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 420, _y, 0);//เบอร์โทรศัพท์
-                                                                                           //IdCard Student
-                        _y = 437;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 180, _y, 0);//รหัสบัตรประชาชนนักศึกษา
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fatherName, 340, _y, 0);//ชื่อบิดา  
-                        _y = 415;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _motherName, 100, _y, 0);//ชื่อมารดา
-                        _cb.EndText();
+                if (programCode == "SIMDB") {
+                    //acayear < 2565
+                    if (statusContract == "OLD") {
+                        BaseFont bf = BaseFont.CreateFont((path + "\\fonts\\THSarabun.ttf"), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+
+                        //contract ID
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                               
+                        //current date
+                        y = 670;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayStd, 418, y, 0); //date
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHStd, 460, y, 0); //month
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHStd, 523, y, 0); //year
+                                                                                                      
+                        //fullname
+                        y = 532;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 100, y, 0);
+                        //bithdate, age
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, birthDate, 360, y, 0); //วัน/เดือน/ปี เกิด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 523, y, 0); //อายุ
+                                                                                         
+                        //no, moo, soi
+                        y = 508;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 160, y, 0); //บ้านเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 265, y, 0); //หมู่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 360, y, 0); //ตรอก/ซอย
+                                                                                         
+                        //road, subdistrict, district
+                        y = 484;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 75, y, 0); //ถนน
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 230, y, 0); //ตำบล/แขวง
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 405, y, 0); //อำเภอ/เขต
+                                                                                              
+                        //province, zipcode, phone
+                        y = 460;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 95, y, 0); //จังหวัด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 300, y, 0); //รหัสไปรษณีย์
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 420, y, 0); //เบอร์โทรศัพท์
+                                                                                           
+                        //ID card student
+                        y = 437;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 180, y, 0); //รหัสบัตรประชาชนนักศึกษา
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fatherName, 340, y, 0); //ชื่อบิดา  
+
+                        y = 415;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, motherName, 100, y, 0); //ชื่อมารดา
+
+                        cb.EndText();
+
                         //ขึ้นหน้าใหม่
-                        _document.NewPage();
-                        _cb.BeginText();
+                        document.NewPage();
+                        cb.BeginText();
+
                         //หน้าที่ 2
-                        PdfImportedPage page2 = _writer.GetImportedPage(_reader, 2);//หน้า pdf template 2
-                        _cb.AddTemplate(page2, 0, 0);
-                        //ContractId
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                        _cb.EndText();
+                        PdfImportedPage page2 = writer.GetImportedPage(reader, 2); //หน้า pdf template 2
+                        cb.AddTemplate(page2, 0, 0);
+
+                        //contract ID
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+
+                        cb.EndText();
+
                         //ขึ้นหน้าใหม่
-                        _document.NewPage();
-                        _cb.BeginText();
+                        document.NewPage();
+                        cb.BeginText();
+
                         //หน้าที่ 3
-                        PdfImportedPage page3 = _writer.GetImportedPage(_reader, 3);//หน้า pdf template 2
-                        _cb.AddTemplate(page3, 0, 0);
-                        //ContractId
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                                //ลายเซ็นนักศึกษา
-                        _y = 482;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 335, _y, 0);//ชื่อนักศึกษา
-                                                                                               //อธิการบดี
-                        _y = 443;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _signCEO, 335, _y, 0);//ชื่ออธิการบดี
-                        _y = 420;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _signCEOPosition, 335, _y, 0);//ตำแหน่งอธิการบดี
+                        PdfImportedPage page3 = writer.GetImportedPage(reader, 3); //หน้า pdf template 2
+                        cb.AddTemplate(page3, 0, 0);
+
+                        //contract ID
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                                
+                        //ลายเซ็นนักศึกษา
+                        y = 482;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 335, y, 0); //ชื่อนักศึกษา
+                                                                                               
+                        //อธิการบดี
+                        y = 443;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, signCEO, 335, y, 0); //ชื่ออธิการบดี
+
+                        y = 420;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, signCEOPosition, 335, y, 0); //ตำแหน่งอธิการบดี
                     }
-                    else
-                    {// acayear >= 2565 
-                        BaseFont _bf = BaseFont.CreateFont(_path + "\\fonts\\THSarabun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                        _y = 746;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 439, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                                //Current Date
-                        _y = 651;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayStd, 348, _y, 0);//Date
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThStd, 406, _y, 0);//Month
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThStd, 510, _y, 0);//Year
-                                                                                                      //Name-LastName
-                        _y = 506;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 188, _y, 0);
-                        //ethnicity, nationality, religion, birthDate
-                        _y = 488;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "-", 148, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdInfo.thNationalityName, 238, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "-", 341, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _birthDate, 427, _y, 0);//วัน/เดือน/ปี เกิด
-                                                                                               //Age, No, Moo, Soi
-                        _y = 471;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 112, _y, 0);//อายุ
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 239, _y, 0);//บ้านเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 317, _y, 0);//หมู่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 397, _y, 0);//ตรอก/ซอย
-                                                                                         //Road,subdistrict
-                        _y = 452;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 115, _y, 0);//ถนน
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 352, _y, 0);//ตำบล/แขวง
-                                                                                                 //district, provice, zipcode
-                        _y = 435;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 144, _y, 0);//อำเภอ/เขต
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 299, _y, 0);//จังหวัด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 496, _y, 0);//รหัสไปรษณีย์
-                                                                                             //phone, IdCard Student
-                        _y = 417;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 137, _y, 0);//เบอร์โทรศัพท์
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 423, _y, 0);//รหัสบัตรประชาชนนักศึกษา
-                                                                                            //_cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fatherName, 400, _y, 0);//ชื่อบิดา  
-                                                                                            //_y = 417;
-                                                                                            //_cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _motherName, 150, _y, 0);//ชื่อมารดา
+                    else {
+                        //acayear >= 2565 
+                        BaseFont bf = BaseFont.CreateFont((path + "\\fonts\\THSarabun.ttf"), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
 
-                        //YearEntry
-                        _y = 291;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdInfo.AcaYear, 95, _y, 0);//ปีการศึกษา
-                        _cb.EndText();
+                        y = 746;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 439, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                                
+                        //current date
+                        y = 651;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayStd, 348, y, 0); //date
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHStd, 406, y, 0); //month
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHStd, 510, y, 0); //year
+                                                                                                      
+                        //fullname
+                        y = 506;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 188, y, 0);
+                        
+                        //ethnicity, nationality, religion, birthdate
+                        y = 488;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "-", 148, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdInfo.NationalityNameTH, 238, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "-", 341, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, birthDate, 427, y, 0); //วัน/เดือน/ปี เกิด
+                                                                                               
+                        //age, no, moo, soi
+                        y = 471;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 112, y, 0); //อายุ
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 239, y, 0); //บ้านเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 317, y, 0); //หมู่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 397, y, 0); //ตรอก/ซอย
+                                                                                         
+                        //road, subdistrict
+                        y = 452;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 115, y, 0); //ถนน
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 352, y, 0); //ตำบล/แขวง
+                                                                                                 
+                        //district, province, zipcode
+                        y = 435;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 144, y, 0); //อำเภอ/เขต
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 299, y, 0); //จังหวัด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 496, y, 0); //รหัสไปรษณีย์
+                                                                                             
+                        //phone, ID card student
+                        y = 417;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 137, y, 0); //เบอร์โทรศัพท์
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 423, y, 0); //รหัสบัตรประชาชนนักศึกษา
+                        //cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fatherName, 400, y, 0); //ชื่อบิดา  
+
+                        //y = 417;
+                        //cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, motherName, 150, y, 0); //ชื่อมารดา
+
+                        //year entry
+                        y = 291;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdInfo.AcaYear, 95, y, 0); //ปีการศึกษา
+
+                        cb.EndText();
+
                         //ขึ้นหน้าใหม่
-                        _document.NewPage();
-                        _cb.BeginText();
+                        document.NewPage();
+                        cb.BeginText();
 
                         //หน้าที่ 2
-                        PdfImportedPage page2 = _writer.GetImportedPage(_reader, 2);//หน้า pdf template 2
-                        _cb.AddTemplate(page2, 0, 0);
-                        //ContractId
-                        _y = 746;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 439, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                        _cb.EndText();
+                        PdfImportedPage page2 = writer.GetImportedPage(reader, 2); //หน้า pdf template 2
+                        cb.AddTemplate(page2, 0, 0);
+
+                        //contract ID
+                        y = 746;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 439, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+
+                        cb.EndText();
+
                         //ขึ้นหน้าใหม่
-                        _document.NewPage();
-                        _cb.BeginText();
+                        document.NewPage();
+                        cb.BeginText();
 
                         //หน้าที่ 3
-                        PdfImportedPage page3 = _writer.GetImportedPage(_reader, 3);//หน้า pdf template 2
-                        _cb.AddTemplate(page3, 0, 0);
+                        PdfImportedPage page3 = writer.GetImportedPage(reader, 3); //หน้า pdf template 2
+                        cb.AddTemplate(page3, 0, 0);
 
-                        //ContractId
-                        _y = 746;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 439, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
+                        //contract ID
+                        y = 746;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 439, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
 
-                        //WarrantyBy
-                        _y = 688;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        if (_ctInfo.WarrantBy == "F")
-                        {//Father
+                        //warranty by
+                        y = 688;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
 
-                            _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fatherName, 328, _y, 0);
+                        //father
+                        if (ctInfo.WarrantBy == "F") {
+                            cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fatherName, 328, y, 0);
                         }
-                        else if (_ctInfo.WarrantBy == "M")
-                        {//Mother
-                            _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _motherName, 328, _y, 0);
-                        }
-                        else
-                        {
-                            _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "บุคคลอื่น", 328, _y, 0);
+                        else {
+                            //mother
+                            if (ctInfo.WarrantBy == "M") {
+                                cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, motherName, 328, y, 0);
+                            }
+                            else {
+                                cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "บุคคลอื่น", 328, y, 0);
+                            }
                         }
 
                         //ลายเซ็นนักศึกษา
-                        _y = 471;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 210, _y, 0);//ชื่อนักศึกษา
-                                                                                               //อธิการบดี
-                        _y = 417;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _signCEO, 210, _y, 0);//ชื่ออธิการบดี
-                                                                                             //_y = 459;
-                                                                                             //_cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _signCEOPosition, 350, _y, 0);//ตำแหน่งอธิการบดี
+                        y = 471;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 210, y, 0); //ชื่อนักศึกษา
+                                                                                               
+                        //อธิการบดี
+                        y = 417;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, signCEO, 210, y, 0); //ชื่ออธิการบดี
+                                                                                             
+                        //y = 459;
+                        //cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, signCEOPosition, 350, y, 0); //ตำแหน่งอธิการบดี
                     }
-                    _cb.EndText();
+
+                    cb.EndText();
                 }
-                else if (_ProgramCode == "RAMDB")
-                {
-                    if (_statusContract == "OLD")
-                    {// acaYear < 2565
-                        BaseFont _bf = BaseFont.CreateFont(_path + "\\fonts\\THSarabun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                        //ContractId
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                                //Current Date
-                        _y = 670;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayStd, 418, _y, 0);//Date
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThStd, 460, _y, 0);//Month
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThStd, 523, _y, 0);//Year
-                                                                                                      //Name-LastName
-                        _y = 532;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 100, _y, 0);
-                        //bithDate,Age
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _birthDate, 360, _y, 0);//วัน/เดือน/ปี เกิด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 523, _y, 0);//อายุ
-                                                                                         //No,Moo,Soi
-                        _y = 508;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 160, _y, 0);//บ้านเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 265, _y, 0);//หมู่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 360, _y, 0);//ตรอก/ซอย
-                                                                                         //road,subdistrict,district
-                        _y = 484;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 75, _y, 0);//ถนน
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 230, _y, 0);//ตำบล/แขวง
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 405, _y, 0);//อำเภอ/เขต
-                                                                                              //provice,zipcode,phone
-                        _y = 460;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 95, _y, 0);//จังหวัด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 300, _y, 0);//รหัสไปรษณีย์
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 420, _y, 0);//เบอร์โทรศัพท์
-                                                                                           //IdCard Student
-                        _y = 437;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 180, _y, 0);//รหัสบัตรประชาชนนักศึกษา
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fatherName, 340, _y, 0);//ชื่อบิดา  
-                        _y = 415;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _motherName, 100, _y, 0);//ชื่อมารดา
-                        _cb.EndText();
+                
+                if (programCode == "RAMDB") {
+                    //acayear < 2565
+                    if (statusContract == "OLD") {
+                        BaseFont bf = BaseFont.CreateFont((path + "\\fonts\\THSarabun.ttf"), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                        
+                        //contract ID
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                                
+                        //current date
+                        y = 670;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayStd, 418, y, 0); //date
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHStd, 460, y, 0); //month
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHStd, 523, y, 0); //year
+                                                                                                      
+                        //fullname
+                        y = 532;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 100, y, 0);
+                        //bithdate, age
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, birthDate, 360, y, 0); //วัน/เดือน/ปี เกิด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 523, y, 0); //อายุ
+                                                                                         
+                        //no, moo, soi
+                        y = 508;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 160, y, 0); //บ้านเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 265, y, 0); //หมู่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 360, y, 0); //ตรอก/ซอย
+                                                                                         
+                        //road, subdistrict, district
+                        y = 484;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 75, y, 0); //ถนน
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 230, y, 0); //ตำบล/แขวง
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 405, y, 0); //อำเภอ/เขต
+                                                                                              
+                        //province, zipcode, phone
+                        y = 460;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 95, y, 0); //จังหวัด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 300, y, 0); //รหัสไปรษณีย์
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 420, y, 0); //เบอร์โทรศัพท์
+                                                                                           
+                        //ID card student
+                        y = 437;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 180, y, 0); //รหัสบัตรประชาชนนักศึกษา
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fatherName, 340, y, 0); //ชื่อบิดา  
+                        
+                        y = 415;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, motherName, 100, y, 0); //ชื่อมารดา
+
+                        cb.EndText();
+
                         //ขึ้นหน้าใหม่
-                        _document.NewPage();
-                        _cb.BeginText();
+                        document.NewPage();
+                        cb.BeginText();
+
                         //หน้าที่ 2
-                        PdfImportedPage page2 = _writer.GetImportedPage(_reader, 2);//หน้า pdf template 2
-                        _cb.AddTemplate(page2, 0, 0);
-                        //ContractId
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                        _cb.EndText();
+                        PdfImportedPage page2 = writer.GetImportedPage(reader, 2); //หน้า pdf template 2
+                        cb.AddTemplate(page2, 0, 0);
+
+                        //contract ID
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                        
+                        cb.EndText();
+                        
                         //ขึ้นหน้าใหม่
-                        _document.NewPage();
-                        _cb.BeginText();
+                        document.NewPage();
+                        cb.BeginText();
+
                         //หน้าที่ 3
-                        PdfImportedPage page3 = _writer.GetImportedPage(_reader, 3);//หน้า pdf template 2
-                        _cb.AddTemplate(page3, 0, 0);
-                        //ContractId
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                                //ลายเซ็นนักศึกษา
-                        _y = 279;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 335, _y, 0);//ชื่อนักศึกษา
-                                                                                               //อธิการบดี
-                        _y = 241;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _signCEO, 335, _y, 0);//ชื่ออธิการบดี
-                        _y = 218;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _signCEOPosition, 335, _y, 0);//ตำแหน่งอธิการบดี
+                        PdfImportedPage page3 = writer.GetImportedPage(reader, 3); //หน้า pdf template 2
+                        cb.AddTemplate(page3, 0, 0);
+
+                        //contract ID
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                                
+                        //ลายเซ็นนักศึกษา
+                        y = 279;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 335, y, 0); //ชื่อนักศึกษา
+                                                                                               
+                        //อธิการบดี
+                        y = 241;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, signCEO, 335, y, 0); //ชื่ออธิการบดี
+                        
+                        y = 218;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, signCEOPosition, 335, y, 0); //ตำแหน่งอธิการบดี
                     }
-                    else
-                    {// acayear >= 2565 
-                        BaseFont _bf = BaseFont.CreateFont(_path + "\\fonts\\THSarabun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                        _y = 746;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 439, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                                //Current Date
-                        _y = 651;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayStd, 348, _y, 0);//Date
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThStd, 406, _y, 0);//Month
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThStd, 510, _y, 0);//Year
-                                                                                                      //Name-LastName
-                        _y = 506;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 188, _y, 0);
-                        //ethnicity, nationality, religion, birthDate
-                        _y = 488;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "-", 148, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdInfo.thNationalityName, 238, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "-", 341, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _birthDate, 427, _y, 0);//วัน/เดือน/ปี เกิด
-                                                                                               //Age, No, Moo, Soi
-                        _y = 471;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 112, _y, 0);//อายุ
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 239, _y, 0);//บ้านเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 317, _y, 0);//หมู่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 397, _y, 0);//ตรอก/ซอย
-                                                                                         //Road,subdistrict
-                        _y = 452;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 115, _y, 0);//ถนน
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 352, _y, 0);//ตำบล/แขวง
-                                                                                                 //district, provice, zipcode
-                        _y = 435;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 144, _y, 0);//อำเภอ/เขต
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 299, _y, 0);//จังหวัด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 496, _y, 0);//รหัสไปรษณีย์
-                                                                                             //phone, IdCard Student
-                        _y = 417;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 137, _y, 0);//เบอร์โทรศัพท์
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 423, _y, 0);//รหัสบัตรประชาชนนักศึกษา
-                                                                                            //_cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fatherName, 400, _y, 0);//ชื่อบิดา  
-                                                                                            //_y = 417;
-                                                                                            //_cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _motherName, 150, _y, 0);//ชื่อมารดา
+                    else {
+                        //acayear >= 2565 
+                        BaseFont bf = BaseFont.CreateFont((path + "\\fonts\\THSarabun.ttf"), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                        
+                        y = 746;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 439, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                                
+                        //current date
+                        y = 651;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayStd, 348, y, 0); //date
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHStd, 406, y, 0); //month
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHStd, 510, y, 0); //year
+                                                                                                      
+                        //fullname
+                        y = 506;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 188, y, 0);
 
-                        //YearEntry
-                        _y = 291;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdInfo.AcaYear, 95, _y, 0);//ปีการศึกษา
-                        _cb.EndText();
+                        //ethnicity, nationality, religion, birthdate
+                        y = 488;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "-", 148, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdInfo.NationalityNameTH, 238, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "-", 341, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, birthDate, 427, y, 0); //วัน/เดือน/ปี เกิด
+                                                                                               
+                        //age, no, moo, soi
+                        y = 471;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 112, y, 0); //อายุ
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 239, y, 0); //บ้านเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 317, y, 0); //หมู่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 397, y, 0); //ตรอก/ซอย
+                                                                                         
+                        //road, subdistrict
+                        y = 452;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 115, y, 0); //ถนน
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 352, y, 0); //ตำบล/แขวง
+                                                                                                 
+                        //district, province, zipcode
+                        y = 435;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 144, y, 0); //อำเภอ/เขต
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 299, y, 0); //จังหวัด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 496, y, 0); //รหัสไปรษณีย์
+                                                                                             
+                        //phone, ID card student
+                        y = 417;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 137, y, 0); //เบอร์โทรศัพท์
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 423, y, 0); //รหัสบัตรประชาชนนักศึกษา
+                        //cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fatherName, 400, y, 0); //ชื่อบิดา  
+
+                        //y = 417;
+                        //cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, motherName, 150, y, 0); //ชื่อมารดา
+
+                        //year entry
+                        y = 291;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdInfo.AcaYear, 95, y, 0); //ปีการศึกษา
+
+                        cb.EndText();
+
                         //ขึ้นหน้าใหม่
-                        _document.NewPage();
-                        _cb.BeginText();
+                        document.NewPage();
+                        cb.BeginText();
 
                         //หน้าที่ 2
-                        PdfImportedPage page2 = _writer.GetImportedPage(_reader, 2);//หน้า pdf template 2
-                        _cb.AddTemplate(page2, 0, 0);
-                        //ContractId
-                        _y = 746;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 439, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                        _cb.EndText();
+                        PdfImportedPage page2 = writer.GetImportedPage(reader, 2); //หน้า pdf template 2
+                        cb.AddTemplate(page2, 0, 0);
+
+                        //contract ID
+                        y = 746;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 439, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+
+                        cb.EndText();
+
                         //ขึ้นหน้าใหม่
-                        _document.NewPage();
-                        _cb.BeginText();
+                        document.NewPage();
+                        cb.BeginText();
 
                         //หน้าที่ 3
-                        PdfImportedPage page3 = _writer.GetImportedPage(_reader, 3);//หน้า pdf template 2
-                        _cb.AddTemplate(page3, 0, 0);
+                        PdfImportedPage page3 = writer.GetImportedPage(reader, 3); //หน้า pdf template 2
+                        cb.AddTemplate(page3, 0, 0);
 
-                        //ContractId
-                        _y = 746;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 439, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
+                        //contract ID
+                        y = 746;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 439, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
 
-                        //WarrantyBy
-                        _y = 688;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        if (_ctInfo.WarrantBy == "F")
-                        {//Father
+                        //warranty by
+                        y = 688;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
 
-                            _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fatherName, 328, _y, 0);
+                        //father
+                        if (ctInfo.WarrantBy == "F") {
+                            cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fatherName, 328, y, 0);
                         }
-                        else if (_ctInfo.WarrantBy == "M")
-                        {//Mother
-                            _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _motherName, 328, _y, 0);
-                        }
-                        else
-                        {
-                            _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "บุคคลอื่น", 328, _y, 0);
+                        else {
+                            //mother
+                            if (ctInfo.WarrantBy == "M") {
+                                cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, motherName, 328, y, 0);
+                            }
+                            else {
+                                cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "บุคคลอื่น", 328, y, 0);
+                            }
                         }
 
                         //ลายเซ็นนักศึกษา
-                        _y = 471;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 210, _y, 0);//ชื่อนักศึกษา
-                                                                                               //อธิการบดี
-                        _y = 417;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _signCEO, 210, _y, 0);//ชื่ออธิการบดี
-                                                                                             //_y = 459;
-                                                                                             //_cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _signCEOPosition, 350, _y, 0);//ตำแหน่งอธิการบดี
+                        y = 471;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 210, y, 0); //ชื่อนักศึกษา
+                                                                                               
+                        //อธิการบดี
+                        y = 417;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, signCEO, 210, y, 0); //ชื่ออธิการบดี
+                                                                                             
+                        //y = 459;
+                        //cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, signCEOPosition, 350, y, 0); //ตำแหน่งอธิการบดี
                     }
-                    _cb.EndText();
 
+                    cb.EndText();
                 }
-                else if (_ProgramCode == "PYPYB")
-                {
-                    BaseFont _bf = BaseFont.CreateFont(_path + "\\fonts\\THSarabun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                    //ContractId
-                    _y = 745;
-                    _cb.SetFontAndSize(_bf, 10);
-                    _cb.SetColorFill(BaseColor.GRAY);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                            //Current Date
-                    _y = 673;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.SetColorFill(BaseColor.BLACK);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayStd, 400, _y, 0);//Date
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThStd, 450, _y, 0);//Month
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThStd, 515, _y, 0);//Year
-                                                                                                  //Name-LastName
-                    _y = 533;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 100, _y, 0);
-                    //bithDate,Age
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _birthDate, 360, _y, 0);//วัน/เดือน/ปี เกิด
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 515, _y, 0);//อายุ
-                                                                                     //No,Moo,Soi
-                    _y = 510;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 160, _y, 0);//บ้านเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 265, _y, 0);//หมู่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 360, _y, 0);//ตรอก/ซอย
-                                                                                     //road,subdistrict,district
-                    _y = 486;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 75, _y, 0);//ถนน
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 230, _y, 0);//ตำบล/แขวง
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 405, _y, 0);//อำเภอ/เขต
-                                                                                          //provice,zipcode,phone
-                    _y = 464;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 95, _y, 0);//จังหวัด
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 300, _y, 0);//รหัสไปรษณีย์
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 420, _y, 0);//เบอร์โทรศัพท์
-                                                                                       //IdCard Student
-                    _y = 440;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 180, _y, 0);//รหัสบัตรประชาชนนักศึกษา
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fatherName, 340, _y, 0);//ชื่อบิดา  
-                    _y = 417;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _motherName, 100, _y, 0);//ชื่อมารดา
-                    _cb.EndText();
-                    //ขึ้นหน้าใหม่
-                    _document.NewPage();
-                    _cb.BeginText();
-                    //หน้าที่ 2
-                    PdfImportedPage page2 = _writer.GetImportedPage(_reader, 2);//หน้า pdf template 2
-                    _cb.AddTemplate(page2, 0, 0);
-                    //ContractId
-                    _y = 745;
-                    _cb.SetFontAndSize(_bf, 10);
-                    _cb.SetColorFill(BaseColor.GRAY);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                    _cb.EndText();
-                    //ขึ้นหน้าใหม่
-                    _document.NewPage();
-                    _cb.BeginText();
-                    //หน้าที่ 3
-                    PdfImportedPage page3 = _writer.GetImportedPage(_reader, 3);//หน้า pdf template 2
-                    _cb.AddTemplate(page3, 0, 0);
-                    //ContractId
-                    _y = 745;
-                    _cb.SetFontAndSize(_bf, 10);
-                    _cb.SetColorFill(BaseColor.GRAY);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                            //ลายเซ็นนักศึกษา
-                    _y = 445;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.SetColorFill(BaseColor.BLACK);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 335, _y, 0);//ชื่อนักศึกษา
-                                                                                           //อธิการบดี
-                    _y = 405;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _signCEO, 335, _y, 0);//ชื่ออธิการบดี
-                    _y = 382;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _signCEOPosition, 335, _y, 0);//ตำแหน่งอธิการบดี
-                    _cb.EndText();
-                }
-                else if (_ProgramCode == "DTDSB")
-                {
-                    if (_statusContract == "OLD")
-                    {// acaYear < 2565
-                        BaseFont _bf = BaseFont.CreateFont(_path + "\\fonts\\THSarabun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                        //ContractId
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                                //Current Date
-                        _y = 672;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayStd, 418, _y, 0);//Date
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThStd, 460, _y, 0);//Month
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThStd, 523, _y, 0);//Year
-                                                                                                      //Name-LastName
-                        _y = 534;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 150, _y, 0);
-                        //bithDate,Age
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _birthDate, 360, _y, 0);//วัน/เดือน/ปี เกิด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 523, _y, 0);//อายุ
-                                                                                         //No,Moo,Soi
-                        _y = 510;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 180, _y, 0);//บ้านเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 280, _y, 0);//หมู่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 400, _y, 0);//ตรอก/ซอย
-                                                                                         //road,subdistrict,district
-                        _y = 486;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 75, _y, 0);//ถนน
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 230, _y, 0);//ตำบล/แขวง
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 405, _y, 0);//อำเภอ/เขต
-                                                                                              //provice,zipcode,phone
-                        _y = 465;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 120, _y, 0);//จังหวัด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 280, _y, 0);//รหัสไปรษณีย์
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 410, _y, 0);//เบอร์โทรศัพท์
-                                                                                           //IdCard Student
-                        _y = 440;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 180, _y, 0);//รหัสบัตรประชาชนนักศึกษา
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fatherName, 400, _y, 0);//ชื่อบิดา  
-                        _y = 417;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _motherName, 150, _y, 0);//ชื่อมารดา
-                        _cb.EndText();
-                        //ขึ้นหน้าใหม่
-                        _document.NewPage();
-                        _cb.BeginText();
-                        //หน้าที่ 2
-                        PdfImportedPage page2 = _writer.GetImportedPage(_reader, 2);//หน้า pdf template 2
-                        _cb.AddTemplate(page2, 0, 0);
-                        //ContractId
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                        _cb.EndText();
-                        //ขึ้นหน้าใหม่
-                        _document.NewPage();
-                        _cb.BeginText();
-                        //หน้าที่ 3
-                        PdfImportedPage page3 = _writer.GetImportedPage(_reader, 3);//หน้า pdf template 2
-                        _cb.AddTemplate(page3, 0, 0);
+                
+                if (programCode == "PYPYB") {
+                    BaseFont bf = BaseFont.CreateFont((path + "\\fonts\\THSarabun.ttf"), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
 
-                        //ContractId
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                                //ลายเซ็นนักศึกษา
-                        _y = 520;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 350, _y, 0);//ชื่อนักศึกษา
-                                                                                               //อธิการบดี
-                        _y = 482;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _signCEO, 350, _y, 0);//ชื่ออธิการบดี
-                        _y = 459;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _signCEOPosition, 350, _y, 0);//ตำแหน่งอธิการบดี
-                    }
-                    else
-                    {// acayear >= 2565 
-                        BaseFont _bf = BaseFont.CreateFont(_path + "\\fonts\\THSarabun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                        _y = 746;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 439, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                                //Current Date
-                        _y = 651;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayStd, 348, _y, 0);//Date
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThStd, 406, _y, 0);//Month
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThStd, 510, _y, 0);//Year
-                                                                                                      //Name-LastName
-                        _y = 506;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 188, _y, 0);
-                        //ethnicity, nationality, religion, birthDate
-                        _y = 488;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "-", 148, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdInfo.thNationalityName, 238, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "-", 341, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _birthDate, 427, _y, 0);//วัน/เดือน/ปี เกิด
-                                                                                               //Age, No, Moo, Soi
-                        _y = 471;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 112, _y, 0);//อายุ
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 239, _y, 0);//บ้านเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 317, _y, 0);//หมู่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 397, _y, 0);//ตรอก/ซอย
-                                                                                         //Road,subdistrict
-                        _y = 452;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 115, _y, 0);//ถนน
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 352, _y, 0);//ตำบล/แขวง
-                                                                                                 //district, provice, zipcode
-                        _y = 435;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 144, _y, 0);//อำเภอ/เขต
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 299, _y, 0);//จังหวัด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 496, _y, 0);//รหัสไปรษณีย์
-                                                                                             //phone, IdCard Student
-                        _y = 417;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 137, _y, 0);//เบอร์โทรศัพท์
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 423, _y, 0);//รหัสบัตรประชาชนนักศึกษา
-                                                                                            //_cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fatherName, 400, _y, 0);//ชื่อบิดา  
-                                                                                            //_y = 417;
-                                                                                            //_cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _motherName, 150, _y, 0);//ชื่อมารดา
+                    //contract ID
+                    y = 745;
+                    cb.SetFontAndSize(bf, 10);
+                    cb.SetColorFill(BaseColor.GRAY);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                            
+                    //current date
+                    y = 673;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.SetColorFill(BaseColor.BLACK);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayStd, 400, y, 0); //date
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHStd, 450, y, 0); //month
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHStd, 515, y, 0); //year
+                                                                                                  
+                    //fullname
+                    y = 533;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 100, y, 0);
+                    //bithdate, age
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, birthDate, 360, y, 0); //วัน/เดือน/ปี เกิด
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 515, y, 0); //อายุ
+                                                                                     
+                    //no, moo, soi
+                    y = 510;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 160, y, 0); //บ้านเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 265, y, 0); //หมู่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 360, y, 0); //ตรอก/ซอย
+                                                                                    
+                    //road, subdistrict, district
+                    y = 486;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 75, y, 0); //ถนน
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 230, y, 0); //ตำบล/แขวง
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 405, y, 0); //อำเภอ/เขต
+                                                                                          
+                    //province, zipcode, phone
+                    y = 464;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 95, y, 0); //จังหวัด
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 300, y, 0); //รหัสไปรษณีย์
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 420, y, 0); //เบอร์โทรศัพท์
+                                                                                       
+                    //ID card student
+                    y = 440;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 180, y, 0); //รหัสบัตรประชาชนนักศึกษา
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fatherName, 340, y, 0); //ชื่อบิดา  
 
-                        //YearEntry
-                        _y = 291;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdInfo.AcaYear, 95, _y, 0);//ปีการศึกษา
-                        _cb.EndText();
-                        //ขึ้นหน้าใหม่
-                        _document.NewPage();
-                        _cb.BeginText();
+                    y = 417;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, motherName, 100, y, 0); //ชื่อมารดา
 
-                        //หน้าที่ 2
-                        PdfImportedPage page2 = _writer.GetImportedPage(_reader, 2);//หน้า pdf template 2
-                        _cb.AddTemplate(page2, 0, 0);
-                        //ContractId
-                        _y = 746;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 439, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                        _cb.EndText();
-                        //ขึ้นหน้าใหม่
-                        _document.NewPage();
-                        _cb.BeginText();
-
-                        //หน้าที่ 3
-                        PdfImportedPage page3 = _writer.GetImportedPage(_reader, 3);//หน้า pdf template 2
-                        _cb.AddTemplate(page3, 0, 0);
-
-                        //ContractId
-                        _y = 746;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 439, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-
-                        //WarrantyBy
-                        _y = 688;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        if (_ctInfo.WarrantBy == "F")
-                        {//Father
-
-                            _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fatherName, 328, _y, 0);
-                        }
-                        else if (_ctInfo.WarrantBy == "M")
-                        {//Mother
-                            _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _motherName, 328, _y, 0);
-                        }
-                        else
-                        {
-                            _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "บุคคลอื่น", 328, _y, 0);
-                        }
-
-                        //ลายเซ็นนักศึกษา
-                        _y = 471;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 210, _y, 0);//ชื่อนักศึกษา
-                                                                                               //อธิการบดี
-                        _y = 417;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _signCEO, 210, _y, 0);//ชื่ออธิการบดี
-                                                                                             //_y = 459;
-                                                                                             //_cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _signCEOPosition, 350, _y, 0);//ตำแหน่งอธิการบดี
-                    }
-                    _cb.EndText();
-                }
-                else if (_ProgramCode == "RANSB")
-                {
-                    BaseFont _bf = BaseFont.CreateFont(_path + "\\fonts\\THSarabun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                    //ContractId
-                    _y = 745;
-                    _cb.SetFontAndSize(_bf, 10);
-                    _cb.SetColorFill(BaseColor.GRAY);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                            //Current Date
-                    _y = 670;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.SetColorFill(BaseColor.BLACK);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayStd, 418, _y, 0);//Date
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThStd, 460, _y, 0);//Month
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThStd, 523, _y, 0);//Year
-                                                                                                  //Name-LastName
-                    _y = 599;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 100, _y, 0);
-                    //bithDate,Age
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _birthDate, 360, _y, 0);//วัน/เดือน/ปี เกิด
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 523, _y, 0);//อายุ
-                                                                                     //No,Moo,Soi
-                    _y = 578;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 160, _y, 0);//บ้านเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 270, _y, 0);//หมู่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 360, _y, 0);//ตรอก/ซอย
-                                                                                     //road,subdistrict,district
-                    _y = 555;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 75, _y, 0);//ถนน
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 230, _y, 0);//ตำบล/แขวง
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 405, _y, 0);//อำเภอ/เขต
-                                                                                          //provice,zipcode,phone
-                    _y = 529;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 90, _y, 0);//จังหวัด
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 290, _y, 0);//รหัสไปรษณีย์
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 420, _y, 0);//เบอร์โทรศัพท์
-                                                                                       //IdCard Student
-                    _y = 508;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 180, _y, 0);//รหัสบัตรประชาชนนักศึกษา
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fatherName, 400, _y, 0);//ชื่อบิดา  
-                    _y = 485;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _motherName, 150, _y, 0);//ชื่อมารดา
-                    _cb.EndText();
+                    cb.EndText();
 
                     //ขึ้นหน้าใหม่
-                    _document.NewPage();
-                    _cb.BeginText();
+                    document.NewPage();
+                    cb.BeginText();
 
                     //หน้าที่ 2
-                    PdfImportedPage page2 = _writer.GetImportedPage(_reader, 2);//หน้า pdf template 2
-                    _cb.AddTemplate(page2, 0, 0);
-                    //ContractId
-                    _y = 745;
-                    _cb.SetFontAndSize(_bf, 10);
-                    _cb.SetColorFill(BaseColor.GRAY);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                    _cb.EndText();
+                    PdfImportedPage page2 = writer.GetImportedPage(reader, 2); //หน้า pdf template 2
+                    cb.AddTemplate(page2, 0, 0);
+
+                    //contract ID
+                    y = 745;
+                    cb.SetFontAndSize(bf, 10);
+                    cb.SetColorFill(BaseColor.GRAY);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+
+                    cb.EndText();
 
                     //ขึ้นหน้าใหม่
-                    _document.NewPage();
-                    _cb.BeginText();
+                    document.NewPage();
+                    cb.BeginText();
 
                     //หน้าที่ 3
-                    PdfImportedPage page3 = _writer.GetImportedPage(_reader, 3);//หน้า pdf template 2
-                    _cb.AddTemplate(page3, 0, 0);
-                    //ContractId
-                    _y = 745;
-                    _cb.SetFontAndSize(_bf, 10);
-                    _cb.SetColorFill(BaseColor.GRAY);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                            //ลายเซ็นนักศึกษา
-                    _y = 275;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.SetColorFill(BaseColor.BLACK);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 350, _y, 0);//ชื่อนักศึกษา
-                                                                                           //อธิการบดี
-                    _y = 235;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _signCEO, 350, _y, 0);//ชื่ออธิการบดี
-                    _y = 212;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _signCEOPosition, 350, _y, 0);//ตำแหน่งอธิการบดี
-                    _cb.EndText();
+                    PdfImportedPage page3 = writer.GetImportedPage(reader, 3); //หน้า pdf template 2
+                    cb.AddTemplate(page3, 0, 0);
+
+                    //contract ID
+                    y = 745;
+                    cb.SetFontAndSize(bf, 10);
+                    cb.SetColorFill(BaseColor.GRAY);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                            
+                    //ลายเซ็นนักศึกษา
+                    y = 445;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.SetColorFill(BaseColor.BLACK);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 335, y, 0); //ชื่อนักศึกษา
+                                                                                           
+                    //อธิการบดี
+                    y = 405;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, signCEO, 335, y, 0); //ชื่ออธิการบดี
+                    
+                    y = 382;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, signCEOPosition, 335, y, 0); //ตำแหน่งอธิการบดี
+
+                    cb.EndText();
                 }
-                else if (_ProgramCode == "NSNSB")
-                {
-                    BaseFont _bf = BaseFont.CreateFont(_path + "\\fonts\\THSarabun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                    if (_quotaCode == "") // specification nurse program project
-                    {
-                        // siriraj hospital
-                        //-----------------------------------------------------NSNSB
-                        //ContractId 
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                                //Current Date
-                        _y = 670;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayStd, 418, _y, 0);//Date
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThStd, 460, _y, 0);//Month
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThStd, 526, _y, 0);//Year
-                                                                                                      //Name-LastName
-                        _y = 600;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 100, _y, 0);
-                        //bithDate,Age
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _birthDate, 360, _y, 0);//วัน/เดือน/ปี เกิด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 520, _y, 0);//อายุ
-                                                                                         //No,Moo,Soi
-                        _y = 577;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 160, _y, 0);//บ้านเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 260, _y, 0);//หมู่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 360, _y, 0);//ตรอก/ซอย
-                                                                                         //road,subdistrict,district
-                        _y = 554;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 80, _y, 0);//ถนน
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 230, _y, 0);//ตำบล/แขวง
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 405, _y, 0);//อำเภอ/เขต
-                                                                                              //provice,zipcode,phone
-                        _y = 529;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 80, _y, 0);//จังหวัด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 280, _y, 0);//รหัสไปรษณีย์
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 415, _y, 0);//เบอร์โทรศัพท์
-                                                                                           //IdCard Student
-                        _y = 506;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 180, _y, 0);//รหัสบัตรประชาชนนักศึกษา
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fatherName, 340, _y, 0);//ชื่อบิดา  
-                        _y = 482;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _motherName, 100, _y, 0);//ชื่อมารดา
-                        _cb.EndText();
+
+                if (programCode == "DTDSB") {
+                    //acaYear < 2565
+                    if (statusContract == "OLD") {
+                        BaseFont bf = BaseFont.CreateFont((path + "\\fonts\\THSarabun.ttf"), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+
+                        //contract ID
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                                
+                        //current date
+                        y = 672;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayStd, 418, y, 0); //date
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHStd, 460, y, 0); //month
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHStd, 523, y, 0); //year
+                                                                                                      
+                        //fullname
+                        y = 534;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 150, y, 0);
+
+                        //bithdate, age
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, birthDate, 360, y, 0); //วัน/เดือน/ปี เกิด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 523, y, 0); //อายุ
+                                                                                         
+                        //no, moo, soi
+                        y = 510;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 180, y, 0); //บ้านเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 280, y, 0); //หมู่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 400, y, 0); //ตรอก/ซอย
+                                                                                         
+                        //road, subdistrict, district
+                        y = 486;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 75, y, 0); //ถนน
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 230, y, 0); //ตำบล/แขวง
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 405, y, 0); //อำเภอ/เขต
+                                                                                              
+                        //province, zipcode, phone
+                        y = 465;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 120, y, 0); //จังหวัด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 280, y, 0); //รหัสไปรษณีย์
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 410, y, 0); //เบอร์โทรศัพท์
+                                                                                           
+                        //ID card student
+                        y = 440;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 180, y, 0); //รหัสบัตรประชาชนนักศึกษา
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fatherName, 400, y, 0); //ชื่อบิดา  
+                        
+                        y = 417;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, motherName, 150, y, 0); //ชื่อมารดา
+
+                        cb.EndText();
 
                         //ขึ้นหน้าใหม่
-                        _document.NewPage();
-                        _cb.BeginText();
-
+                        document.NewPage();
+                        cb.BeginText();
+                        
                         //หน้าที่ 2
-                        PdfImportedPage page2 = _writer.GetImportedPage(_reader, 2);//หน้า pdf template 2
-                        _cb.AddTemplate(page2, 0, 0);
-                        //ContractId
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                        _cb.EndText();
+                        PdfImportedPage page2 = writer.GetImportedPage(reader, 2); //หน้า pdf template 2
+                        cb.AddTemplate(page2, 0, 0);
+
+                        //contract ID
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                        
+                        cb.EndText();
 
                         //ขึ้นหน้าใหม่
-                        _document.NewPage();
-                        _cb.BeginText();
+                        document.NewPage();
+                        cb.BeginText();
 
                         //หน้าที่ 3
-                        PdfImportedPage page3 = _writer.GetImportedPage(_reader, 3);//หน้า pdf template 2
-                        _cb.AddTemplate(page3, 0, 0);
-                        //ContractId
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                                //ลายเซ็นนักศึกษา
-                        _y = 325;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 350, _y, 0);//ชื่อนักศึกษา
-                                                                                               //อธิการบดี
-                        _y = 285;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _signCEO, 350, _y, 0);//ชื่ออธิการบดี
-                        _y = 262;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _signCEOPosition, 350, _y, 0);//ตำแหน่งอธิการบดี
-                        _cb.EndText();
+                        PdfImportedPage page3 = writer.GetImportedPage(reader, 3); //หน้า pdf template 2
+                        cb.AddTemplate(page3, 0, 0);
+
+                        //contract ID
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                                
+                        //ลายเซ็นนักศึกษา
+                        y = 520;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 350, y, 0); //ชื่อนักศึกษา
+                                                                                               
+                        //อธิการบดี
+                        y = 482;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, signCEO, 350, y, 0); //ชื่ออธิการบดี
+                        
+                        y = 459;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, signCEOPosition, 350, y, 0); //ตำแหน่งอธิการบดี
                     }
-                    else if (_quotaCode == "354")
-                    {
+                    else {
+                        //acayear >= 2565 
+                        BaseFont bf = BaseFont.CreateFont((path + "\\fonts\\THSarabun.ttf"), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                        
+                        y = 746;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 439, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                                
+                        //current date
+                        y = 651;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayStd, 348, y, 0); //date
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHStd, 406, y, 0); //month
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHStd, 510, y, 0); //year
+                                                                                                      
+                        //fullname
+                        y = 506;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 188, y, 0);
 
-                        // chula research
-                        //-----------------------------------------------------NSNSB
-                        //ContractId 
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                                //Current Date
-                        _y = 670;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayStd, 418, _y, 0);//Date
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThStd, 460, _y, 0);//Month
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThStd, 526, _y, 0);//Year
-                                                                                                      //Name-LastName
-                        _y = 577;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 100, _y, 0);
-                        //bithDate,Age
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _birthDate, 360, _y, 0);//วัน/เดือน/ปี เกิด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 520, _y, 0);//อายุ
-                                                                                         //No,Moo,Soi
-                        _y = 554;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 160, _y, 0);//บ้านเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 260, _y, 0);//หมู่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 360, _y, 0);//ตรอก/ซอย
-                                                                                         //road,subdistrict,district
-                        _y = 529;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 80, _y, 0);//ถนน
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 230, _y, 0);//ตำบล/แขวง
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 405, _y, 0);//อำเภอ/เขต
-                                                                                              //provice,zipcode,phone
-                        _y = 506;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 80, _y, 0);//จังหวัด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 280, _y, 0);//รหัสไปรษณีย์
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 415, _y, 0);//เบอร์โทรศัพท์
-                                                                                           //IdCard Student
-                        _y = 482;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 180, _y, 0);//รหัสบัตรประชาชนนักศึกษา
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fatherName, 340, _y, 0);//ชื่อบิดา  
-                        _y = 462;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _motherName, 100, _y, 0);//ชื่อมารดา
-                        _cb.EndText();
+                        //ethnicity, nationality, religion, birthdate
+                        y = 488;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "-", 148, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdInfo.NationalityNameTH, 238, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "-", 341, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, birthDate, 427, y, 0); //วัน/เดือน/ปี เกิด
+                                                                                               
+                        //age, no, moo, soi
+                        y = 471;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 112, y, 0); //อายุ
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 239, y, 0); //บ้านเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 317, y, 0); //หมู่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 397, y, 0); //ตรอก/ซอย
+                                                                                         
+                        //road, subdistrict
+                        y = 452;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 115, y, 0); //ถนน
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 352, y, 0); //ตำบล/แขวง
+                                                                                                 
+                        //district, province, zipcode
+                        y = 435;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 144, y, 0); //อำเภอ/เขต
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 299, y, 0); //จังหวัด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 496, y, 0); //รหัสไปรษณีย์
+                                                                                             
+                        //phone, ID card student
+                        y = 417;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 137, y, 0); //เบอร์โทรศัพท์
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 423, y, 0); //รหัสบัตรประชาชนนักศึกษา
+                        //cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fatherName, 400, y, 0); //ชื่อบิดา  
+
+                        //y = 417;
+                        //cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, motherName, 150, y, 0); //ชื่อมารดา
+
+                        //year entry
+                        y = 291;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdInfo.AcaYear, 95, y, 0); //ปีการศึกษา
+
+                        cb.EndText();
 
                         //ขึ้นหน้าใหม่
-                        _document.NewPage();
-                        _cb.BeginText();
+                        document.NewPage();
+                        cb.BeginText();
 
                         //หน้าที่ 2
-                        PdfImportedPage page2 = _writer.GetImportedPage(_reader, 2);//หน้า pdf template 2
-                        _cb.AddTemplate(page2, 0, 0);
-                        //ContractId
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                        _cb.EndText();
+                        PdfImportedPage page2 = writer.GetImportedPage(reader, 2); //หน้า pdf template 2
+                        cb.AddTemplate(page2, 0, 0);
+
+                        //contract ID
+                        y = 746;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 439, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+
+                        cb.EndText();
 
                         //ขึ้นหน้าใหม่
-                        _document.NewPage();
-                        _cb.BeginText();
+                        document.NewPage();
+                        cb.BeginText();
 
                         //หน้าที่ 3
-                        PdfImportedPage page3 = _writer.GetImportedPage(_reader, 3);//หน้า pdf template 2
-                        _cb.AddTemplate(page3, 0, 0);
-                        //ContractId
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                                //ลายเซ็นนักศึกษา
-                        _y = 325;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 350, _y, 0);//ชื่อนักศึกษา
-                                                                                               //อธิการบดี
-                        _y = 285;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _signCEO, 350, _y, 0);//ชื่ออธิการบดี
-                        _y = 262;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _signCEOPosition, 350, _y, 0);//ตำแหน่งอธิการบดี
-                        _cb.EndText();
+                        PdfImportedPage page3 = writer.GetImportedPage(reader, 3); //หน้า pdf template 2
+                        cb.AddTemplate(page3, 0, 0);
+
+                        //contract ID
+                        y = 746;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 439, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+
+                        //warranty by
+                        y = 688;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+
+                        //father
+                        if (ctInfo.WarrantBy == "F") {
+                            cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fatherName, 328, y, 0);
+                        }
+                        else {
+                            //mother
+                            if (ctInfo.WarrantBy == "M") {                                
+                                cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, motherName, 328, y, 0);
+                            }
+                            else {
+                                cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "บุคคลอื่น", 328, y, 0);
+                            }
+                        }
+
+                        //ลายเซ็นนักศึกษา
+                        y = 471;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 210, y, 0); //ชื่อนักศึกษา
+                                                                                               
+                        //อธิการบดี
+                        y = 417;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, signCEO, 210, y, 0); //ชื่ออธิการบดี
+
+                        //y = 459;
+                        //cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, signCEOPosition, 350, y, 0); //ตำแหน่งอธิการบดี
                     }
-                    else if (_quotaCode == "351")
-                    {
 
-                        // faculty of tropical medicine
-                        //-----------------------------------------------------NSNSB
-                        ////ContractId 
-                        //_cb.SetFontAndSize(_bf, 10);
-                        ////แกน Y
-                        //for (int i = 0; i <= 800; i += 10)
-                        //{
-                        //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", 0, i, 0);
-                        //}
-                        ////แกน X
-                        //for (int i = 600; i >= 0; i -= 10)
-                        //{
-                        //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", i, 820, 270);
-                        //}
-                        //ContractId 
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                                //Current Date
-                        _y = 670;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayStd, 418, _y, 0);//Date
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThStd, 460, _y, 0);//Month
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThStd, 526, _y, 0);//Year
-                                                                                                      //Name-LastName
-                        _y = 577;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 100, _y, 0);
-                        //bithDate,Age
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _birthDate, 360, _y, 0);//วัน/เดือน/ปี เกิด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 520, _y, 0);//อายุ
-                                                                                         //No,Moo,Soi
-                        _y = 554;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 160, _y, 0);//บ้านเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 260, _y, 0);//หมู่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 360, _y, 0);//ตรอก/ซอย
-                                                                                         //road,subdistrict,district
-                        _y = 529;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 80, _y, 0);//ถนน
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 230, _y, 0);//ตำบล/แขวง
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 405, _y, 0);//อำเภอ/เขต
-                                                                                              //provice,zipcode,phone
-                        _y = 506;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 90, _y, 0);//จังหวัด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 280, _y, 0);//รหัสไปรษณีย์
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 415, _y, 0);//เบอร์โทรศัพท์
-                                                                                           //IdCard Student
-                        _y = 483;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 180, _y, 0);//รหัสบัตรประชาชนนักศึกษา
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fatherName, 340, _y, 0);//ชื่อบิดา  
-                        _y = 462;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _motherName, 100, _y, 0);//ชื่อมารดา
-                        _cb.EndText();
+                    cb.EndText();
+                }
+                
+                if (programCode == "RANSB") {
+                    BaseFont bf = BaseFont.CreateFont((path + "\\fonts\\THSarabun.ttf"), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+
+                    //contract ID
+                    y = 745;
+                    cb.SetFontAndSize(bf, 10);
+                    cb.SetColorFill(BaseColor.GRAY);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                            
+                    //current date
+                    y = 670;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.SetColorFill(BaseColor.BLACK);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayStd, 418, y, 0); //date
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHStd, 460, y, 0); //month
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHStd, 523, y, 0); //year
+                                                                                                  
+                    //fullname
+                    y = 599;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 100, y, 0);
+                    
+                    //bithdate, age
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, birthDate, 360, y, 0); //วัน/เดือน/ปี เกิด
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 523, y, 0); //อายุ
+                                                                                     
+                    //no, moo, soi
+                    y = 578;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 160, y, 0); //บ้านเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 270, y, 0); //หมู่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 360, y, 0); //ตรอก/ซอย
+                                                                                     
+                    //road, subdistrict, district
+                    y = 555;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 75, y, 0); //ถนน
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 230, y, 0); //ตำบล/แขวง
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 405, y, 0); //อำเภอ/เขต
+                                                                                          
+                    //province, zipcode, phone
+                    y = 529;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 90, y, 0); //จังหวัด
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 290, y, 0); //รหัสไปรษณีย์
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 420, y, 0); //เบอร์โทรศัพท์
+                                                                                       
+                    //ID card student
+                    y = 508;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 180, y, 0); //รหัสบัตรประชาชนนักศึกษา
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fatherName, 400, y, 0); //ชื่อบิดา  
+                    
+                    y = 485;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, motherName, 150, y, 0); //ชื่อมารดา
+
+                    cb.EndText();
+
+                    //ขึ้นหน้าใหม่
+                    document.NewPage();
+                    cb.BeginText();
+
+                    //หน้าที่ 2
+                    PdfImportedPage page2 = writer.GetImportedPage(reader, 2); //หน้า pdf template 2
+                    cb.AddTemplate(page2, 0, 0);
+
+                    //contract ID
+                    y = 745;
+                    cb.SetFontAndSize(bf, 10);
+                    cb.SetColorFill(BaseColor.GRAY);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+
+                    cb.EndText();
+
+                    //ขึ้นหน้าใหม่
+                    document.NewPage();
+                    cb.BeginText();
+
+                    //หน้าที่ 3
+                    PdfImportedPage page3 = writer.GetImportedPage(reader, 3); //หน้า pdf template 2
+                    cb.AddTemplate(page3, 0, 0);
+
+                    //contract ID
+                    y = 745;
+                    cb.SetFontAndSize(bf, 10);
+                    cb.SetColorFill(BaseColor.GRAY);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                            
+                    //ลายเซ็นนักศึกษา
+                    y = 275;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.SetColorFill(BaseColor.BLACK);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 350, y, 0); //ชื่อนักศึกษา
+                                                                                           
+                    //อธิการบดี
+                    y = 235;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, signCEO, 350, y, 0); //ชื่ออธิการบดี
+                    
+                    y = 212;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, signCEOPosition, 350, y, 0); //ตำแหน่งอธิการบดี
+
+                    cb.EndText();
+                }
+
+                if (programCode == "NSNSB") {
+                    BaseFont bf = BaseFont.CreateFont((path + "\\fonts\\THSarabun.ttf"), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                    //specification nurse program project
+                    //siriraj hospital
+                    if (quotaCode == "")  {                           
+                        //contract ID 
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                                
+                        //current date
+                        y = 670;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayStd, 418, y, 0); //date
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHStd, 460, y, 0); //month
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHStd, 526, y, 0); //year
+                                                                                                      
+                        //fullname
+                        y = 600;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 100, y, 0);
+                        //bithdate, age
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, birthDate, 360, y, 0); //วัน/เดือน/ปี เกิด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 520, y, 0); //อายุ
+                                                                                         
+                        //no, moo, soi
+                        y = 577;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 160, y, 0); //บ้านเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 260, y, 0); //หมู่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 360, y, 0); //ตรอก/ซอย
+                                                                                         
+                        //road, subdistrict, district
+                        y = 554;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 80, y, 0); //ถนน
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 230, y, 0); //ตำบล/แขวง
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 405, y, 0); //อำเภอ/เขต
+                                                                                              
+                        //province, zipcode, phone
+                        y = 529;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 80, y, 0); //จังหวัด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 280, y, 0); //รหัสไปรษณีย์
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 415, y, 0); //เบอร์โทรศัพท์
+                                                                                           
+                        //ID card student
+                        y = 506;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 180, y, 0); //รหัสบัตรประชาชนนักศึกษา
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fatherName, 340, y, 0); //ชื่อบิดา  
+                        
+                        y = 482;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, motherName, 100, y, 0); //ชื่อมารดา
+
+                        cb.EndText();
 
                         //ขึ้นหน้าใหม่
-                        _document.NewPage();
-                        _cb.BeginText();
+                        document.NewPage();
+                        cb.BeginText();
 
                         //หน้าที่ 2
-                        PdfImportedPage page2 = _writer.GetImportedPage(_reader, 2);//หน้า pdf template 2
-                        _cb.AddTemplate(page2, 0, 0);
-                        //ContractId
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                        _cb.EndText();
+                        PdfImportedPage page2 = writer.GetImportedPage(reader, 2); //หน้า pdf template 2
+                        cb.AddTemplate(page2, 0, 0);
+
+                        //contract ID
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+
+                        cb.EndText();
 
                         //ขึ้นหน้าใหม่
-                        _document.NewPage();
-                        _cb.BeginText();
+                        document.NewPage();
+                        cb.BeginText();
 
                         //หน้าที่ 3
-                        PdfImportedPage page3 = _writer.GetImportedPage(_reader, 3);//หน้า pdf template 2
-                        _cb.AddTemplate(page3, 0, 0);
-                        //ContractId
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_A", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                                //ลายเซ็นนักศึกษา
-                        _y = 347;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 350, _y, 0);//ชื่อนักศึกษา
-                                                                                               //อธิการบดี
-                        _y = 307;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _signCEO, 350, _y, 0);//ชื่ออธิการบดี
-                        _y = 284;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _signCEOPosition, 350, _y, 0);//ตำแหน่งอธิการบดี
-                        _cb.EndText();
+                        PdfImportedPage page3 = writer.GetImportedPage(reader, 3); //หน้า pdf template 2
+                        cb.AddTemplate(page3, 0, 0);
+
+                        //contract ID
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                                
+                        //ลายเซ็นนักศึกษา
+                        y = 325;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 350, y, 0); //ชื่อนักศึกษา
+                                                                                               
+                        //อธิการบดี
+                        y = 285;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, signCEO, 350, y, 0); //ชื่ออธิการบดี
+                        
+                        y = 262;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, signCEOPosition, 350, y, 0); //ตำแหน่งอธิการบดี
+
+                        cb.EndText();
+                    }
+
+                    //chula research
+                    if (quotaCode == "354") {
+                        //contract ID 
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                                
+                        //current date
+                        y = 670;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayStd, 418, y, 0); //date
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHStd, 460, y, 0); //month
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHStd, 526, y, 0); //year
+                                                                                                      
+                        //fullname
+                        y = 577;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 100, y, 0);
+                        //bithdate, age
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, birthDate, 360, y, 0); //วัน/เดือน/ปี เกิด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 520, y, 0); //อายุ
+                                                                                         
+                        //no, moo, soi
+                        y = 554;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 160, y, 0); //บ้านเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 260, y, 0); //หมู่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 360, y, 0); //ตรอก/ซอย
+                                                                                         
+                        //road, subdistrict, district
+                        y = 529;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 80, y, 0); //ถนน
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 230, y, 0); //ตำบล/แขวง
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 405, y, 0); //อำเภอ/เขต
+                                                                                              
+                        //province, zipcode, phone
+                        y = 506;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 80, y, 0); //จังหวัด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 280, y, 0); //รหัสไปรษณีย์
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 415, y, 0); //เบอร์โทรศัพท์
+                                                                                          
+                        //ID card student
+                        y = 482;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 180, y, 0); //รหัสบัตรประชาชนนักศึกษา
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fatherName, 340, y, 0); //ชื่อบิดา  
+                        
+                        y = 462;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, motherName, 100, y, 0); //ชื่อมารดา
+
+                        cb.EndText();
+
+                        //ขึ้นหน้าใหม่
+                        document.NewPage();
+                        cb.BeginText();
+
+                        //หน้าที่ 2
+                        PdfImportedPage page2 = writer.GetImportedPage(reader, 2); //หน้า pdf template 2
+                        cb.AddTemplate(page2, 0, 0);
+
+                        //contract ID
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                        
+                        cb.EndText();
+
+                        //ขึ้นหน้าใหม่
+                        document.NewPage();
+                        cb.BeginText();
+
+                        //หน้าที่ 3
+                        PdfImportedPage page3 = writer.GetImportedPage(reader, 3); //หน้า pdf template 2
+                        cb.AddTemplate(page3, 0, 0);
+
+                        //contract ID
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                                
+                        //ลายเซ็นนักศึกษา
+                        y = 325;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 350, y, 0); //ชื่อนักศึกษา
+                                                                                               
+                        //อธิการบดี
+                        y = 285;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, signCEO, 350, y, 0); //ชื่ออธิการบดี
+                        
+                        y = 262;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, signCEOPosition, 350, y, 0); //ตำแหน่งอธิการบดี
+
+                        cb.EndText();
+                    }
+
+                    //faculty of tropical medicine
+                    if (quotaCode == "351") {
+                        //contract ID 
+                        /*
+                        cb.SetFontAndSize(_bf, 10);
+
+                        //แกน Y
+                        for (int i = 0; i <= 800; i += 10) {
+                            cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), 0, i, 0);
+                        }
+
+                        //แกน X
+                        for (int i = 600; i >= 0; i -= 10) {
+                            cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), i, 820, 270);
+                        }
+                        */
+
+                        //contract ID 
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                                
+                        //current date
+                        y = 670;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayStd, 418, y, 0); //date
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHStd, 460, y, 0); //month
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHStd, 526, y, 0); //year
+                                                                                                      
+                        //fullname
+                        y = 577;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 100, y, 0);
+                        //bithDate, age
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, birthDate, 360, y, 0); //วัน/เดือน/ปี เกิด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 520, y, 0); //อายุ
+
+                        //no, moo, soi
+                        y = 554;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 160, y, 0); //บ้านเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 260, y, 0); //หมู่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 360, y, 0); //ตรอก/ซอย
+                                                                                         
+                        //road, subdistrict, district
+                        y = 529;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 80, y, 0); //ถนน
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 230, y, 0); //ตำบล/แขวง
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 405, y, 0); //อำเภอ/เขต
+                                                                                              
+                        //provice, zipcode, phone
+                        y = 506;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 90, y, 0); //จังหวัด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 280, y, 0); //รหัสไปรษณีย์
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 415, y, 0); //เบอร์โทรศัพท์
+                                                                                           
+                        //ID card student
+                        y = 483;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 180, y, 0); //รหัสบัตรประชาชนนักศึกษา
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fatherName, 340, y, 0); //ชื่อบิดา  
+                        
+                        y = 462;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, motherName, 100, y, 0); //ชื่อมารดา
+
+                        cb.EndText();
+
+                        //ขึ้นหน้าใหม่
+                        document.NewPage();
+                        cb.BeginText();
+
+                        //หน้าที่ 2
+                        PdfImportedPage page2 = writer.GetImportedPage(reader, 2); //หน้า pdf template 2
+                        cb.AddTemplate(page2, 0, 0);
+
+                        //contract ID
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+
+                        cb.EndText();
+
+                        //ขึ้นหน้าใหม่
+                        document.NewPage();
+                        cb.BeginText();
+
+                        //หน้าที่ 3
+                        PdfImportedPage page3 = writer.GetImportedPage(reader, 3); //หน้า pdf template 2
+                        cb.AddTemplate(page3, 0, 0);
+
+                        //contract ID
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_A"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                                
+                        //ลายเซ็นนักศึกษา
+                        y = 347;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 350, y, 0); //ชื่อนักศึกษา
+                                                                                               
+                        //อธิการบดี
+                        y = 307;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, signCEO, 350, y, 0); //ชื่ออธิการบดี
+                        
+                        y = 284;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, signCEOPosition, 350, y, 0); //ตำแหน่งอธิการบดี
+
+                        cb.EndText();
                     }
                 }
-                //Close all streams
-                _document.Close();
-                _writer.Close();
-                _reader.Close();
 
-                //update ContractPath
-                string _contractPath = Server.MapPath("~/ElectronicContract/" + _acaYear + "/" + _ProgramCode + _programCodeExtra + "/") + _fileName;
-                ContractDB.SetContractPath(_studentId, _acaYear, _contractPath);
+                document.Close();
+                writer.Close();
+                reader.Close();
 
-
-                FileStream sourceFile = new FileStream((Server.MapPath("~/ElectronicContract/" + _acaYear + "/" + _ProgramCode + _programCodeExtra + "/") + _fileName), FileMode.Open);
+                //update contract path
+                string contractPath = (Server.MapPath("~/ElectronicContract/" + acaYear + "/" + programCode + programCodeExtra + "/") + fileName);
+                ContractDB.SetContractPath(studentID, acaYear, contractPath);
+                FileStream sourceFile = new FileStream((Server.MapPath("~/ElectronicContract/" + acaYear + "/" + programCode + programCodeExtra + "/") + fileName), FileMode.Open);
                 long FileSize;
                 FileSize = sourceFile.Length;
                 byte[] getContent = new byte[(int)FileSize];
+
                 sourceFile.Read(getContent, 0, (int)sourceFile.Length);
                 sourceFile.Close();
                 Response.BinaryWrite(getContent);
             }
-            else
-            {
-                //กรณีมี File สัญญาในระบบแล้ว เปิดอ่านเลย
-
+            else {
+                //กรณีมี file สัญญาในระบบแล้ว เปิดอ่านเลย
                 WebClient client1 = new WebClient();
-                Byte[] buffer1 = client1.DownloadData(_contract);
+                Byte[] buffer1 = client1.DownloadData(contract);
+
                 Response.ContentType = "application/pdf";
                 Response.AddHeader("content-length", buffer1.Length.ToString());
                 Response.BinaryWrite(buffer1);
                 client1.Dispose();
             }
-
         }
-        #endregion printContractStd
 
-        #region printWarrant
-        /// <summary>
-        /// Author: Anussara Wanwang
-        /// Create date:11-12-2015
-        /// Update Date:20-08-2017
-        /// Update Date:07-08-2020
-        /// Description: สัญญาค้ำประกัน และหนังสือให้ความยินยอมของคู่สมรสผู้ค้ำประกัน C
-        /// Parameter:n/a
-        /// </summary>
-        public void printWarrant(string _studentId, string _parentType, string _studentCode)
-        {
-            //ในกรณีที่มี file ใน Folder แล้วให้เปิดเลย ไม่ต้องสร้าง pdf ใหม่
-            ContractInfo _ctInfo = new ContractInfo(_studentId);
-            //string _warran = Myconfig.CvEmpty(_ctInfo.warranPath, " - ");
-            //if (_warran == " - ")
-            //{
-                StudentInfo _stdInfo = new StudentInfo(_studentCode);
-                ParentInfo _parentInfo = new ParentInfo(_studentId, _parentType);
-                ParentInfo _parentMInfo = new ParentInfo(_studentId, "M");
-                ParentInfo _parentFInfo = new ParentInfo(_studentId, "F");
-                string _programCodeExtra = "";
-                CurDate _date = new CurDate();
+        #endregion PrintContractStd
 
-                string _acaYear = Myconfig.CvEmpty(_stdInfo.AcaYear, " - ");
-                string _quotaCode = _stdInfo.QuotaCode;
-                StringBuilder _string = new StringBuilder();
+        #region PrintWarrant
+        /*
+        author      : Anussara Wanwang
+        create date : 11-12-2015
+        update Date : 20-08-2017
+        update Date : 07-08-2020
+        description : สัญญาค้ำประกัน และหนังสือให้ความยินยอมของคู่สมรสผู้ค้ำประกัน C
+        parameter   : n/a
+        */
+        public void PrintWarrant(
+            string studentID,
+            string parentType,
+            string studentCode
+        ) {
+            //ในกรณีที่มี file ใน folder แล้วให้เปิดเลย ไม่ต้องสร้าง pdf ใหม่
+            ContractInfo ctInfo = new ContractInfo(studentID);
+            //string warran = Myconfig.CvEmpty(ctInfo.WarranPath, " - ");
 
-                //ข้อมูลนักศึกษา
-                string _stdNameTh, _programNameTh, _ProgramCode, _studentProgram;
-                _stdNameTh = Myconfig.CvEmpty(_stdInfo.StdNameTh, " - ");
-                _programNameTh = Myconfig.CvEmpty(_stdInfo.ProgramNameTh, " - ");
-                //_studentCode = Myconfig.CvEmpty(_stdInfo.StudentCode, " - ");
-                _ProgramCode = Myconfig.CvEmpty(_stdInfo.ProgramCode, " - ");
-                _studentProgram = Myconfig.CvEmpty(_stdInfo.StrStudentProgram, " - ");
-
-                string _idCard, _fullNameTh, _fullNameMarTh, _age, _moo, _no, _soi, _road, _subdistrict, _thOccupation, _position, _agencyNameTH
-                    , _district, _provice, _zipcode, _phone, _mobile, _assure1 = "", _assure2 = "", _assure3 = "";
-                string _dateContract = _ctInfo.DateLongContractStudent;
-                string _warrantBy = _ctInfo.WarrantBy;
-                string _consentBy = _ctInfo.ConsentBy;
-                string _aliveF = _ctInfo.IsAliveFather;//สถานะพ่อ 1=มีชีวิต , 2 = เสียชีวิต
-                string _aliveM = _ctInfo.IsAliveMother;//สถานะแม่ 1=มีชีวิต , 2 = เสียชีวิต
-                string _marriage = _ctInfo.IsMarriage;//1=สมรส,2=สมรส(ไม่ได้จดทะเบียน),3=บิดามารดาหย่าร้าง
-                string _relationship = _ctInfo.relationship;//เกียวพันกับนักศึกษาโดยเป็น บิดา หรือ มารดา หรือ บุคคลอื่น
+            //if (warran == " - ") {
+                //StringBuilder html = new StringBuilder();
+                StudentInfo stdInfo = new StudentInfo(studentCode);
+                ParentInfo parentInfo = new ParentInfo(studentID, parentType);
+                ParentInfo parentMInfo = new ParentInfo(studentID, "M");
+                ParentInfo parentFInfo = new ParentInfo(studentID, "F");
+                CurDate date = new CurDate();
+                string programCodeExtra;
+                string acaYear = Myconfig.CvEmpty(stdInfo.AcaYear, " - ");
+                string quotaCode = stdInfo.QuotaCode;
+                //string studentCode = Myconfig.CvEmpty(stdInfo.StudentCode, " - ");
+                string stdNameTH = Myconfig.CvEmpty(stdInfo.StdNameTH, " - ");
+                //string programNameTH = Myconfig.CvEmpty(stdInfo.ProgramNameTH, " - ");
+                string programCode = Myconfig.CvEmpty(stdInfo.ProgramCode, " - ");
+                string studentProgram = Myconfig.CvEmpty(stdInfo.StrStudentProgram, " - ");
+                string idCard;
+                string fullNameTH;
+                string fullNameMarTH;
+                string age;
+                string moo;
+                string no;
+                string soi;
+                string road;
+                string subdistrict;
+                string occupationTH;
+                string position;
+                string agencyNameTH;
+                string district;
+                string province;
+                string zipcode;
+                string phone;
+                string mobile;
+                string assure1 = "";
+                string assure2 = "";
+                string assure3 = "";
+                string dateContract = ctInfo.DateLongContractStudent;
+                string warrantBy = ctInfo.WarrantBy;
+                string consentBy = ctInfo.ConsentBy;
+                string aliveF = ctInfo.IsAliveFather; //สถานะพ่อ 1 = มีชีวิต, 2 = เสียชีวิต
+                string aliveM = ctInfo.IsAliveMother; //สถานะแม่ 1 = มีชีวิต, 2 = เสียชีวิต
+                string marriage = ctInfo.IsMarriage; //1 = สมรส, 2 = สมรส(ไม่ได้จดทะเบียน), 3 = บิดามารดาหย่าร้าง
+                string relationship = ctInfo.Relationship; //เกียวพันกับนักศึกษาโดยเป็น บิดา หรือ มารดา หรือ บุคคลอื่น
 
                 //ข้อมูลผู้ค้ำประกัน
-                if (_warrantBy == "M")//มารดาเป็นผู้ค้ำ
-                {
-                    if (_marriage == "1" && _aliveF == "1")
-                    {
-                        _fullNameMarTh = Myconfig.CvEmpty(_parentFInfo.FullNameTh, " - ");
+                //มารดาเป็นผู้ค้ำ
+                if (warrantBy == "M") {
+                    if (marriage == "1" &&
+                        aliveF == "1") {
+                        fullNameMarTH = Myconfig.CvEmpty(parentFInfo.FullNameTH, " - ");
                     }
-                    else
-                    {
-                        _fullNameMarTh = " - ";
+                    else {
+                        fullNameMarTH = " - ";
                     }
 
-                    _fullNameTh = Myconfig.CvEmpty(_parentMInfo.FullNameTh, " - ");
-                    _age = Myconfig.CvEmpty(_parentMInfo.Age, " - ");
-                    _moo = Myconfig.CvEmpty(_parentMInfo.MooPermanent, " - ");
-                    _no = Myconfig.CvEmpty(_parentMInfo.NoPermanent, " - ");
-                    _soi = Myconfig.CvEmpty(_parentMInfo.SoiPermanent, " - ");
-                    _road = Myconfig.CvEmpty(_parentMInfo.RoadPermanent, " - ");
-                    _subdistrict = Myconfig.CvEmpty(_parentMInfo.ThSubdistrictName, " - ");
-                    _district = Myconfig.CvEmpty(_parentMInfo.ThDistrictName, " - ");
-                    _provice = Myconfig.CvEmpty(_parentMInfo.ProvinceNameTH, " - ");
-                    _zipcode = Myconfig.CvEmpty(_parentMInfo.ZipCodePermanent, " - ");
-                    _phone = Myconfig.CvEmpty(_parentMInfo.PhoneNumberPermanent, " - ");
-                    _mobile = Myconfig.CvEmpty(_parentMInfo.MobileNumberPermanent, " - ");
-                    _idCard = Myconfig.CvEmpty(_parentMInfo.IdCard, " - ");
-                    _thOccupation = Myconfig.CvEmpty(_parentMInfo.ThOccupation, " - ");
-                    _position = Myconfig.CvEmpty(_parentMInfo.Position, " - ");
-                    _agencyNameTH = Myconfig.CvEmpty(_parentMInfo.AgencyNameTH, " - ");
+                    fullNameTH = Myconfig.CvEmpty(parentMInfo.FullNameTH, " - ");
+                    age = Myconfig.CvEmpty(parentMInfo.Age, " - ");
+                    moo = Myconfig.CvEmpty(parentMInfo.MooPermanent, " - ");
+                    no = Myconfig.CvEmpty(parentMInfo.NoPermanent, " - ");
+                    soi = Myconfig.CvEmpty(parentMInfo.SoiPermanent, " - ");
+                    road = Myconfig.CvEmpty(parentMInfo.RoadPermanent, " - ");
+                    subdistrict = Myconfig.CvEmpty(parentMInfo.SubdistrictNameTH, " - ");
+                    district = Myconfig.CvEmpty(parentMInfo.DistrictNameTH, " - ");
+                    province = Myconfig.CvEmpty(parentMInfo.ProvinceNameTH, " - ");
+                    zipcode = Myconfig.CvEmpty(parentMInfo.ZipcodePermanent, " - ");
+                    phone = Myconfig.CvEmpty(parentMInfo.PhoneNumberPermanent, " - ");
+                    mobile = Myconfig.CvEmpty(parentMInfo.MobileNumberPermanent, " - ");
+                    idCard = Myconfig.CvEmpty(parentMInfo.IDCard, " - ");
+                    occupationTH = Myconfig.CvEmpty(parentMInfo.OccupationTH, " - ");
+                    position = Myconfig.CvEmpty(parentMInfo.Position, " - ");
+                    agencyNameTH = Myconfig.CvEmpty(parentMInfo.AgencyNameTH, " - ");
+                }
+                else {
+                    //บิดาเป็นผู้ค้ำ
+                    if (warrantBy == "F") {
+                        if (marriage == "1" &&
+                            aliveM == "1") {
+                            fullNameMarTH = Myconfig.CvEmpty(parentMInfo.FullNameTH, " - ");
+                        }
+                        else {
+                            fullNameMarTH = " - ";
+                        }
+
+                        fullNameTH = Myconfig.CvEmpty(parentFInfo.FullNameTH, " - ");
+                        age = Myconfig.CvEmpty(parentFInfo.Age, " - ");
+                        moo = Myconfig.CvEmpty(parentFInfo.MooPermanent, " - ");
+                        no = Myconfig.CvEmpty(parentFInfo.NoPermanent, " - ");
+                        soi = Myconfig.CvEmpty(parentFInfo.SoiPermanent, " - ");
+                        road = Myconfig.CvEmpty(parentFInfo.RoadPermanent, " - ");
+                        subdistrict = Myconfig.CvEmpty(parentFInfo.SubdistrictNameTH, " - ");
+                        district = Myconfig.CvEmpty(parentFInfo.DistrictNameTH, " - ");
+                        province = Myconfig.CvEmpty(parentFInfo.ProvinceNameTH, " - ");
+                        zipcode = Myconfig.CvEmpty(parentFInfo.ZipcodePermanent, " - ");
+                        phone = Myconfig.CvEmpty(parentFInfo.PhoneNumberPermanent, " - ");
+                        mobile = Myconfig.CvEmpty(parentFInfo.MobileNumberPermanent, " - ");
+                        idCard = Myconfig.CvEmpty(parentFInfo.IDCard, " - ");
+                        occupationTH = Myconfig.CvEmpty(parentFInfo.OccupationTH, " - ");
+                        position = Myconfig.CvEmpty(parentFInfo.Position, " - ");
+                        agencyNameTH = Myconfig.CvEmpty(parentFInfo.AgencyNameTH, " - ");
+
+                    }
+                    else {
+                        fullNameTH = " - ";
+                        fullNameMarTH = " - "; //ชื่อคู่สมรส
+                        age = " - ";
+                        moo = " - ";
+                        no = " - ";
+                        soi = " - ";
+                        road = " - ";
+                        subdistrict = " - ";
+                        district = " - ";
+                        province = " - ";
+                        zipcode = " - ";
+                        phone = " - ";
+                        mobile = " - ";
+                        idCard = " - ";
+                        occupationTH = " - ";
+                        position = " - ";
+                        agencyNameTH = " - ";
+                    }
                 }
 
-                else if (_warrantBy == "F")//บิดาเป็นผู้ค้ำ
-                {
-                    if (_marriage == "1" && _aliveM == "1")
-                    {
-                        _fullNameMarTh = Myconfig.CvEmpty(_parentMInfo.FullNameTh, " - ");
-                    }
-                    else
-                    {
-                        _fullNameMarTh = " - ";
-                    }
+                string path = Server.MapPath("~");
+                string fileTmp = "";
 
-                    _fullNameTh = Myconfig.CvEmpty(_parentFInfo.FullNameTh, " - ");
-                    _age = Myconfig.CvEmpty(_parentFInfo.Age, " - ");
-                    _moo = Myconfig.CvEmpty(_parentFInfo.MooPermanent, " - ");
-                    _no = Myconfig.CvEmpty(_parentFInfo.NoPermanent, " - ");
-                    _soi = Myconfig.CvEmpty(_parentFInfo.SoiPermanent, " - ");
-                    _road = Myconfig.CvEmpty(_parentFInfo.RoadPermanent, " - ");
-                    _subdistrict = Myconfig.CvEmpty(_parentFInfo.ThSubdistrictName, " - ");
-                    _district = Myconfig.CvEmpty(_parentFInfo.ThDistrictName, " - ");
-                    _provice = Myconfig.CvEmpty(_parentFInfo.ProvinceNameTH, " - ");
-                    _zipcode = Myconfig.CvEmpty(_parentFInfo.ZipCodePermanent, " - ");
-                    _phone = Myconfig.CvEmpty(_parentFInfo.PhoneNumberPermanent, " - ");
-                    _mobile = Myconfig.CvEmpty(_parentFInfo.MobileNumberPermanent, " - ");
-                    _idCard = Myconfig.CvEmpty(_parentFInfo.IdCard, " - ");
-                    _thOccupation = Myconfig.CvEmpty(_parentFInfo.ThOccupation, " - ");
-                    _position = Myconfig.CvEmpty(_parentFInfo.Position, " - ");
-                    _agencyNameTH = Myconfig.CvEmpty(_parentFInfo.AgencyNameTH, " - ");
-
-                }
-                else
-                {
-                    _fullNameTh = " - ";
-                    _fullNameMarTh = " - ";//ชื่อคู่สมรส
-                    _age = " - ";
-                    _moo = " - ";
-                    _no = " - ";
-                    _soi = " - ";
-                    _road = " - ";
-                    _subdistrict = " - ";
-                    _district = " - ";
-                    _provice = " - ";
-                    _zipcode = " - ";
-                    _phone = " - ";
-                    _mobile = " - ";
-                    _idCard = " - ";
-                    _thOccupation = " - ";
-                    _position = " - ";
-                    _agencyNameTH = " - ";
-                }
-                string _path = Server.MapPath("~");
-                string _fileTmp = "";
-                //เรียกใช้ file Template
-                switch (_ProgramCode)
-                {
+                //เรียกใช้ file template
+                switch (programCode) {
                     case "SIMDB":
-                        _fileTmp = _path + "/Template/C_Warrant/WarrantSIMDB_NEW.pdf";
+                        fileTmp = (path + "/Template/C_Warrant/WarrantSIMDB_NEW.pdf");
                         break;
-
                     case "RAMDB":
-                        _fileTmp = _path + "/Template/C_Warrant/WarrantRAMDB_NEW.pdf";
+                        fileTmp = (path + "/Template/C_Warrant/WarrantRAMDB_NEW.pdf");
                         break;
-
                     case "PYPYB":
-                        _fileTmp = _path + "/Template/C_Warrant/WarrantPYPYB_NEW.pdf";
+                        fileTmp = (path + "/Template/C_Warrant/WarrantPYPYB_NEW.pdf");
                         break;
-
                     case "DTDSB":
-                        _fileTmp = _path + "/Template/C_Warrant/WarrantDTDSB_NEW.pdf";
+                        fileTmp = (path + "/Template/C_Warrant/WarrantDTDSB_NEW.pdf");
                         break;
-
                     case "RANSB":
-                        _fileTmp = _path + "/Template/C_Warrant/WarrantRANSB_NEW.pdf";
+                        fileTmp = (path + "/Template/C_Warrant/WarrantRANSB_NEW.pdf");
                         break;
-
                     case "NSNSB":
-                        _fileTmp = _path + "/Template/C_Warrant/WarrantNSNSB_NEW.pdf";
+                        fileTmp = (path + "/Template/C_Warrant/WarrantNSNSB_NEW.pdf");
                         break;
                 }
 
-                //Folder extra
-                switch (_quotaCode)
-                {
-                    default: // siriraj hospital
-                        _programCodeExtra = "";
+                //folder extra
+                switch (quotaCode) {
+                    //siriraj hospital
+                    default:
+                        programCodeExtra = "";
                         break;
                     case "354":
-                        _programCodeExtra = "_CL";
+                        programCodeExtra = "_CL";
                         break;
                     case "351":
-                        _programCodeExtra = "_TM";
+                        programCodeExtra = "_TM";
                         break;
                 }
-                string _fileName = _studentCode + _ProgramCode + _programCodeExtra + "_C.pdf";
-                string _fileDocument = _path + "/ElectronicContract/" + _fileName;
+
+                string fileName = (studentCode + programCode + programCodeExtra + "_C.pdf");
+                //string fileDocument = (path + "/ElectronicContract/" + fileName);
+
                 Response.ContentType = "application/pdf";
-                Response.AddHeader("content-disposition", "attachment;filename=" + _studentCode + "_C.pdf");
+                Response.AddHeader("content-disposition", ("attachment;filename=" + studentCode + "_C.pdf"));
                 //Response.Cache.SetCacheability(HttpCacheability.NoCache);
-                //Open the reader
-                PdfReader _reader = new PdfReader(_fileTmp);//file Template
-                                                            //string path = requestObj.PhysicalApplicationPath + "\\electronicContract\\" 
-                DirectoryInfo DirInfo = new DirectoryInfo(Server.MapPath("~/ElectronicContract/" + _acaYear + "/" + _ProgramCode + _programCodeExtra + "/"));  // ต้องเป็นตัวแปรโฟลเดอร์ด้วยนะ
-                if (!DirInfo.Exists)
-                {
-                    //  Response.Write("OK");
-                    DirInfo.Create();
+
+                //open the reader
+                PdfReader reader = new PdfReader(fileTmp); //file template
+                //string path = (requestObj.PhysicalApplicationPath + "\\electronicContract\\"); 
+                DirectoryInfo dirInfo = new DirectoryInfo(Server.MapPath("~/ElectronicContract/" + acaYear + "/" + programCode + programCodeExtra + "/")); //ต้องเป็นตัวแปรโฟลเดอร์ด้วยนะ
+
+                if (!dirInfo.Exists) {
+                    //Response.Write("OK");
+                    dirInfo.Create();
                 }
-                Document _document = new Document(PageSize.A4, 10.0F, 10.0F, 100.0F, 0.0F);
-                // open the writer
-                PdfWriter _writer = PdfWriter.GetInstance(_document, new FileStream(Server.MapPath("~/ElectronicContract/" + _acaYear + "/" + _ProgramCode + _programCodeExtra + "/") + _fileName, FileMode.Create));
-                //PdfWriter _writer = PdfWriter.GetInstance(_document, Response.OutputStream);
+
+                Document document = new Document(PageSize.A4, 10.0F, 10.0F, 100.0F, 0.0F);
+                //open the writer
+                PdfWriter writer = PdfWriter.GetInstance(document, new FileStream((Server.MapPath("~/ElectronicContract/" + acaYear + "/" + programCode + programCodeExtra + "/") + fileName), FileMode.Create));
+                //PdfWriter writer = PdfWriter.GetInstance(document, Response.OutputStream);
                 Response.Charset = String.Empty;
                 Response.ClearContent();
-                _document.Open();
-                int _y = 0;
-                //Configure the content
-                PdfContentByte _cb = _writer.DirectContent;
-                // select the font properties
-                BaseFont _bf = BaseFont.CreateFont(_path + "\\fonts\\THSarabun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                //Write the text here
-                _cb.BeginText();
+                document.Open();
+                int y = 0;
+
+                //configure the content
+                PdfContentByte cb = writer.DirectContent;
+                //select the font properties
+                BaseFont bf = BaseFont.CreateFont((path + "\\fonts\\THSarabun.ttf"), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                //write the text here
+                cb.BeginText();
+
                 //หน้าที่ 1
-                PdfImportedPage page1 = _writer.GetImportedPage(_reader, 1);//หน้า pdf template 1
-                _cb.AddTemplate(page1, 0, 0);
+                PdfImportedPage page1 = writer.GetImportedPage(reader, 1); //หน้า pdf template 1
+                cb.AddTemplate(page1, 0, 0);
 
-                if (_ProgramCode == "SIMDB")
-                {
-                    //ContractId 
-                    _y = 745;
-                    _cb.SetFontAndSize(_bf, 10);
-                    _cb.SetColorFill(BaseColor.GRAY);
+                if (programCode == "SIMDB") {
+                    //contract ID 
+                    y = 745;
+                    cb.SetFontAndSize(bf, 10);
+                    cb.SetColorFill(BaseColor.GRAY);
 
-                    ////แกน Y
-                    //for (int i = 0; i <= 800; i += 10)
-                    //{
-                    //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", 0, i, 0);
-                    //}
-                    ////แกน X
-                    //for (int i = 600; i >= 0; i -= 10)
-                    //{
-                    //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", i, 820, 270);
-                    //}
+                    /*
+                    //แกน Y
+                    for (int i = 0; i <= 800; i += 10) {
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), 0, i, 0);
+                    }
 
+                    //แกน X
+                    for (int i = 600; i >= 0; i -= 10) {
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), i, 820, 270);
+                    }
+                    */
 
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_C", 438, _y, 0);//สัญญาเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_C"), 438, y, 0); //สัญญาเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
 
-                    //Current Date
-                    _y = 670;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.SetColorFill(BaseColor.BLACK);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayP1, 390, _y, 0);//Date
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThP1, 435, _y, 0);//Month
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThP1, 515, _y, 0);//Year
+                    //current date
+                    y = 670;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.SetColorFill(BaseColor.BLACK);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayP1, 390, y, 0); //date
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHP1, 435, y, 0); //month
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHP1, 515, y, 0); //year
 
-                    //Name-LastName,age parent
-                    _y = 650;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 180, _y, 0);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 490, _y, 0);
+                    //fullname, age parent
+                    y = 650;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 180, y, 0);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 490, y, 0);
 
-                    //Occupation position agency
-                    _y = 625;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _thOccupation, 80, _y, 0);//อาชีพ
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _thOccupation, 80, _y, 0);//อาชีพ
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _position, 250, _y, 0);//ตำแหน่ง
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _agencyNameTH, 380, _y, 0);//สังกัด
+                    //occupation, position, agency
+                    y = 625;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, occupationTH, 80, y, 0); //อาชีพ
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, occupationTH, 80, y, 0); //อาชีพ
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, position, 250, y, 0); //ตำแหน่ง
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, agencyNameTH, 380, y, 0); //สังกัด
 
-                    //No,Moo,Soi
-                    _y = 600;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 110, _y, 0);//บ้านเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 190, _y, 0);//หมู่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 270, _y, 0);//ตรอก/ซอย
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 410, _y, 0);//ถนน
+                    //no, moo, soi
+                    y = 600;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 110, y, 0); //บ้านเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 190, y, 0); //หมู่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 270, y, 0); //ตรอก/ซอย
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 410, y, 0); //ถนน
 
-                    //subdistrict,district,provice
-                    _y = 578;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 110, _y, 0);//ตำบล/แขวง
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 265, _y, 0);//อำเภอ/เขต
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 400, _y, 0);//จังหวัด
+                    //subdistrict, district, province
+                    y = 578;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 110, y, 0); //ตำบล/แขวง
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 265, y, 0); //อำเภอ/เขต
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 400, y, 0); //จังหวัด
 
-                    //zipcode,phone,mobile
-                    _y = 555;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 110, _y, 0);//รหัสไปรษณีย์
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 250, _y, 0);//เบอร์โทรศัพท์บ้าน
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _mobile, 430, _y, 0);//เบอร์โทรศัพท์มือถือ
+                    //zipcode, phone, mobile
+                    y = 555;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 110, y, 0); //รหัสไปรษณีย์
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 250, y, 0); //เบอร์โทรศัพท์บ้าน
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, mobile, 430, y, 0); //เบอร์โทรศัพท์มือถือ
 
-                    //marrie Name
-                    _y = 530;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 180, _y, 0);//รหัสบัตรประชาชน
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameMarTh, 380, _y, 0);//ชื่อคู่สมรส
+                    //marrie name
+                    y = 530;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 180, y, 0); //รหัสบัตรประชาชน
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameMarTH, 380, y, 0); //ชื่อคู่สมรส
 
-                    //Name Student
-                    _y = 460;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 100, _y, 0);//ชื่อนักศึกษา
+                    //name student
+                    y = 460;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 100, y, 0); //ชื่อนักศึกษา
 
-                    //date Contract
-                    _y = 438;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dateContract, 150, _y, 0);//วันที่ทำสัญญา
-
+                    //date contract
+                    y = 438;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dateContract, 150, y, 0); //วันที่ทำสัญญา
                 }
-                else if (_ProgramCode == "RAMDB")
-                {
+                
+                if (programCode == "RAMDB") {
+                    //contract ID 
+                    y = 745;
+                    cb.SetFontAndSize(bf, 10);
+                    cb.SetColorFill(BaseColor.GRAY);
 
-                    //ContractId 
-                    _y = 745;
-                    _cb.SetFontAndSize(_bf, 10);
-                    _cb.SetColorFill(BaseColor.GRAY);
+                    /*
+                    //แกน Y
+                    for (int i = 0; i <= 800; i += 10) {
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), 0, i, 0);
+                    }
+                    
+                    //แกน X
+                    for (int i = 600; i >= 0; i -= 10) {
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), i, 820, 270);
+                    }
+                    */
 
-                    ////แกน Y
-                    //for (int i = 0; i <= 800; i += 10)
-                    //{
-                    //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", 0, i, 0);
-                    //}
-                    ////แกน X
-                    //for (int i = 600; i >= 0; i -= 10)
-                    //{
-                    //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", i, 820, 270);
-                    //}
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_C"), 438, y, 0); //สัญญาเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
 
+                    //current date
+                    y = 670;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.SetColorFill(BaseColor.BLACK);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayP1, 390, y, 0); //date
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHP1, 435, y, 0); //month
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHP1, 515, y, 0); //year
 
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_C", 438, _y, 0);//สัญญาเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
+                    //fullname, age parent
+                    y = 650;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 180, y, 0);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 490, y, 0);
 
-                    //Current Date
-                    _y = 670;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.SetColorFill(BaseColor.BLACK);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayP1, 390, _y, 0);//Date
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThP1, 435, _y, 0);//Month
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThP1, 515, _y, 0);//Year
+                    //occupation, position, agency
+                    y = 625;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, occupationTH, 80, y, 0); //อาชีพ
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, position, 250, y, 0); //ตำแหน่ง
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, agencyNameTH, 380, y, 0); //สังกัด
 
-                    //Name-LastName,age parent
-                    _y = 650;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 180, _y, 0);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 490, _y, 0);
+                    //no, moo, soi
+                    y = 600;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 110, y, 0); //บ้านเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 190, y, 0); //หมู่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 270, y, 0); //ตรอก/ซอย
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 410, y, 0); //ถนน
 
-                    //Occupation position agency
-                    _y = 625;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _thOccupation, 80, _y, 0);//อาชีพ
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _position, 250, _y, 0);//ตำแหน่ง
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _agencyNameTH, 380, _y, 0);//สังกัด
+                    //subdistrict, district, province
+                    y = 578;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 110, y, 0); //ตำบล/แขวง
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 265, y, 0); //อำเภอ/เขต
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 400, y, 0); //จังหวัด
 
-                    //No,Moo,Soi
-                    _y = 600;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 110, _y, 0);//บ้านเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 190, _y, 0);//หมู่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 270, _y, 0);//ตรอก/ซอย
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 410, _y, 0);//ถนน
+                    //zipcode, phone, mobile
+                    y = 555;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 110, y, 0); //รหัสไปรษณีย์
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 250, y, 0); //เบอร์โทรศัพท์บ้าน
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, mobile, 430, y, 0); //เบอร์โทรศัพท์มือถือ
 
-                    //subdistrict,district,provice
-                    _y = 578;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 110, _y, 0);//ตำบล/แขวง
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 265, _y, 0);//อำเภอ/เขต
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 400, _y, 0);//จังหวัด
+                    //marrie name
+                    y = 530;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 180, y, 0); //รหัสบัตรประชาชน
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameMarTH, 380, y, 0); //ชื่อคู่สมรส
 
-                    //zipcode,phone,mobile
-                    _y = 555;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 110, _y, 0);//รหัสไปรษณีย์
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 250, _y, 0);//เบอร์โทรศัพท์บ้าน
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _mobile, 430, _y, 0);//เบอร์โทรศัพท์มือถือ
+                    //name student
+                    y = 460;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 100, y, 0); //ชื่อนักศึกษา
 
-                    //marrie Name
-                    _y = 530;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 180, _y, 0);//รหัสบัตรประชาชน
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameMarTh, 380, _y, 0);//ชื่อคู่สมรส
-
-                    //Name Student
-                    _y = 460;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 100, _y, 0);//ชื่อนักศึกษา
-
-                    //date Contract
-                    _y = 438;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dateContract, 150, _y, 0);//วันที่ทำสัญญา
-
+                    //date contract
+                    y = 438;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dateContract, 150, y, 0); //วันที่ทำสัญญา
                 }
-                else if (_ProgramCode == "PYPYB")
-                {
-                    //ContractId 
-                    _y = 745;
-                    _cb.SetFontAndSize(_bf, 10);
-                    _cb.SetColorFill(BaseColor.GRAY);
+                
+                if (programCode == "PYPYB") {
+                    //contract ID 
+                    y = 745;
+                    cb.SetFontAndSize(bf, 10);
+                    cb.SetColorFill(BaseColor.GRAY);
 
-                    ////แกน Y
-                    //for (int i = 0; i <= 800; i += 10)
-                    //{
-                    //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", 0, i, 0);
-                    //}
-                    ////แกน X
-                    //for (int i = 600; i >= 0; i -= 10)
-                    //{
-                    //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", i, 820, 270);
-                    //}
+                    /*
+                    //แกน Y
+                    for (int i = 0; i <= 800; i += 10) {
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), 0, i, 0);
+                    }
 
+                    //แกน X
+                    for (int i = 600; i >= 0; i -= 10) {
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), i, 820, 270);
+                    }
+                    */
 
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_C", 438, _y, 0);//สัญญาเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_C"), 438, y, 0); //สัญญาเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
 
-                    //Current Date
-                    _y = 670;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.SetColorFill(BaseColor.BLACK);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayP1, 390, _y, 0);//Date
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThP1, 435, _y, 0);//Month
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThP1, 515, _y, 0);//Year
+                    //current date
+                    y = 670;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.SetColorFill(BaseColor.BLACK);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayP1, 390, y, 0); //date
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHP1, 435, y, 0); //month
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHP1, 515, y, 0); //year
 
-                    //Name-LastName,age parent
-                    _y = 650;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 180, _y, 0);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 490, _y, 0);
+                    //fullname, age parent
+                    y = 650;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 180, y, 0);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 490, y, 0);
 
-                    //Occupation position agency
-                    _y = 625;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _thOccupation, 80, _y, 0);//อาชีพ
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _position, 250, _y, 0);//ตำแหน่ง
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _agencyNameTH, 380, _y, 0);//สังกัด
+                    //occupation, position, agency
+                    y = 625;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, occupationTH, 80, y, 0); //อาชีพ
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, position, 250, y, 0); //ตำแหน่ง
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, agencyNameTH, 380, y, 0); //สังกัด
 
-                    //No,Moo,Soi
-                    _y = 600;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 110, _y, 0);//บ้านเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 190, _y, 0);//หมู่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 270, _y, 0);//ตรอก/ซอย
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 410, _y, 0);//ถนน
+                    //no, moo, soi
+                    y = 600;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 110, y, 0); //บ้านเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 190, y, 0); //หมู่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 270, y, 0); //ตรอก/ซอย
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 410, y, 0); //ถนน
 
-                    //subdistrict,district,provice
-                    _y = 578;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 110, _y, 0);//ตำบล/แขวง
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 265, _y, 0);//อำเภอ/เขต
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 400, _y, 0);//จังหวัด
+                    //subdistrict, district, province
+                    y = 578;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 110, y, 0); //ตำบล/แขวง
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 265, y, 0); //อำเภอ/เขต
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 400, y, 0); //จังหวัด
 
-                    //zipcode,phone,mobile
-                    _y = 555;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 110, _y, 0);//รหัสไปรษณีย์
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 250, _y, 0);//เบอร์โทรศัพท์บ้าน
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _mobile, 430, _y, 0);//เบอร์โทรศัพท์มือถือ
+                    //zipcode, phone, mobile
+                    y = 555;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 110, y, 0); //รหัสไปรษณีย์
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 250, y, 0); //เบอร์โทรศัพท์บ้าน
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, mobile, 430, y, 0); //เบอร์โทรศัพท์มือถือ
 
-                    //marrie Name
-                    _y = 530;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 180, _y, 0);//รหัสบัตรประชาชน
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameMarTh, 380, _y, 0);//ชื่อคู่สมรส
+                    //marrie name
+                    y = 530;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 180, y, 0); //รหัสบัตรประชาชน
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameMarTH, 380, y, 0); //ชื่อคู่สมรส
 
-                    //Name Student
-                    _y = 460;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 100, _y, 0);//ชื่อนักศึกษา
+                    //name student
+                    y = 460;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 100, y, 0); //ชื่อนักศึกษา
 
-                    //date Contract
-                    _y = 438;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dateContract, 150, _y, 0);//วันที่ทำสัญญา
-
+                    //date contract
+                    y = 438;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dateContract, 150, y, 0); //วันที่ทำสัญญา
                 }
-                else if (_ProgramCode == "DTDSB")
-                {
-                    //ContractId 
-                    _y = 745;
-                    _cb.SetFontAndSize(_bf, 10);
-                    _cb.SetColorFill(BaseColor.GRAY);
+                
+                if (programCode == "DTDSB") {
+                    //contract ID 
+                    y = 745;
+                    cb.SetFontAndSize(bf, 10);
+                    cb.SetColorFill(BaseColor.GRAY);
 
-                    ////แกน Y
-                    //for (int i = 0; i <= 800; i += 10)
-                    //{
-                    //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", 0, i, 0);
-                    //}
-                    ////แกน X
-                    //for (int i = 600; i >= 0; i -= 10)
-                    //{
-                    //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", i, 820, 270);
-                    //}
+                    /*
+                    //แกน Y
+                    for (int i = 0; i <= 800; i += 10) {
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), 0, i, 0);
+                    }
 
+                    //แกน X
+                    for (int i = 600; i >= 0; i -= 10) {
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), i, 820, 270);
+                    }
+                    */
 
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_C", 438, _y, 0);//สัญญาเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_C"), 438, y, 0); //สัญญาเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
 
-                    //Current Date
-                    _y = 670;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.SetColorFill(BaseColor.BLACK);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayP1, 390, _y, 0);//Date
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThP1, 435, _y, 0);//Month
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThP1, 515, _y, 0);//Year
+                    //current date
+                    y = 670;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.SetColorFill(BaseColor.BLACK);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayP1, 390, y, 0); //date
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHP1, 435, y, 0); //month
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHP1, 515, y, 0); //year
 
-                    //Name-LastName,age parent
-                    _y = 650;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 180, _y, 0);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 490, _y, 0);
+                    //fullname, age parent
+                    y = 650;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 180, y, 0);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 490, y, 0);
 
-                    //Occupation position agency
-                    _y = 625;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _thOccupation, 80, _y, 0);//อาชีพ
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _position, 250, _y, 0);//ตำแหน่ง
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _agencyNameTH, 380, _y, 0);//สังกัด
+                    //occupation, position, agency
+                    y = 625;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, occupationTH, 80, y, 0); //อาชีพ
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, position, 250, y, 0); //ตำแหน่ง
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, agencyNameTH, 380, y, 0); //สังกัด
 
-                    //No,Moo,Soi
-                    _y = 600;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 110, _y, 0);//บ้านเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 190, _y, 0);//หมู่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 270, _y, 0);//ตรอก/ซอย
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 410, _y, 0);//ถนน
+                    //no, moo, soi
+                    y = 600;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 110, y, 0); //บ้านเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 190, y, 0); //หมู่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 270, y, 0); //ตรอก/ซอย
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 410, y, 0); //ถนน
 
-                    //subdistrict,district,provice
-                    _y = 578;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 110, _y, 0);//ตำบล/แขวง
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 265, _y, 0);//อำเภอ/เขต
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 400, _y, 0);//จังหวัด
+                    //subdistrict, district, province
+                    y = 578;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 110, y, 0); //ตำบล/แขวง
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 265, y, 0); //อำเภอ/เขต
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 400, y, 0); //จังหวัด
 
-                    //zipcode,phone,mobile
-                    _y = 555;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 110, _y, 0);//รหัสไปรษณีย์
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 250, _y, 0);//เบอร์โทรศัพท์บ้าน
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _mobile, 430, _y, 0);//เบอร์โทรศัพท์มือถือ
+                    //zipcode, phone, mobile
+                    y = 555;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 110, y, 0); //รหัสไปรษณีย์
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 250, y, 0); //เบอร์โทรศัพท์บ้าน
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, mobile, 430, y, 0); //เบอร์โทรศัพท์มือถือ
 
-                    //marrie Name
-                    _y = 530;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 180, _y, 0);//รหัสบัตรประชาชน
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameMarTh, 380, _y, 0);//ชื่อคู่สมรส
+                    //marrie name
+                    y = 530;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 180, y, 0); //รหัสบัตรประชาชน
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameMarTH, 380, y, 0); //ชื่อคู่สมรส
 
-                    //Name Student
-                    _y = 460;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 100, _y, 0);//ชื่อนักศึกษา
+                    //name student
+                    y = 460;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 100, y, 0); //ชื่อนักศึกษา
 
-                    //date Contract
-                    _y = 438;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dateContract, 150, _y, 0);//วันที่ทำสัญญา
-
+                    //date contract
+                    y = 438;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dateContract, 150, y, 0); //วันที่ทำสัญญา
                 }
-                else if (_ProgramCode == "RANSB")
-                {
-                    //ContractId 
-                    _y = 745;
-                    _cb.SetFontAndSize(_bf, 10);
-                    _cb.SetColorFill(BaseColor.GRAY);
+                
+                if (programCode == "RANSB") {
+                    //contract ID 
+                    y = 745;
+                    cb.SetFontAndSize(bf, 10);
+                    cb.SetColorFill(BaseColor.GRAY);
 
-                    ////แกน Y
-                    //for (int i = 0; i <= 800; i += 10)
-                    //{
-                    //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", 0, i, 0);
-                    //}
-                    ////แกน X
-                    //for (int i = 600; i >= 0; i -= 10)
-                    //{
-                    //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", i, 820, 270);
-                    //}
+                    /*
+                    //แกน Y
+                    for (int i = 0; i <= 800; i += 10) {
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), 0, i, 0);
+                    }
 
+                    //แกน X
+                    for (int i = 600; i >= 0; i -= 10) {
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), i, 820, 270);
+                    }
+                    */
 
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_C", 438, _y, 0);//สัญญาเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_C"), 438, y, 0); //สัญญาเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
 
-                    //Current Date
-                    _y = 670;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.SetColorFill(BaseColor.BLACK);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayP1, 390, _y, 0);//Date
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThP1, 435, _y, 0);//Month
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThP1, 515, _y, 0);//Year
+                    //current date
+                    y = 670;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.SetColorFill(BaseColor.BLACK);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayP1, 390, y, 0); //date
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHP1, 435, y, 0); //month
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHP1, 515, y, 0); //year
 
-                    //Name-LastName,age parent
-                    _y = 650;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 180, _y, 0);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 490, _y, 0);
+                    //fullname, age parent
+                    y = 650;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 180, y, 0);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 490, y, 0);
 
-                    //Occupation position agency
-                    _y = 625;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _thOccupation, 80, _y, 0);//อาชีพ
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _position, 250, _y, 0);//ตำแหน่ง
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _agencyNameTH, 380, _y, 0);//สังกัด
+                    //occupation, position, agency
+                    y = 625;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, occupationTH, 80, y, 0); //อาชีพ
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, position, 250, y, 0); //ตำแหน่ง
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, agencyNameTH, 380, y, 0); //สังกัด
 
-                    //No,Moo,Soi
-                    _y = 600;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 110, _y, 0);//บ้านเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 190, _y, 0);//หมู่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 270, _y, 0);//ตรอก/ซอย
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 410, _y, 0);//ถนน
+                    //no, moo, soi
+                    y = 600;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 110, y, 0); //บ้านเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 190, y, 0); //หมู่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 270, y, 0); //ตรอก/ซอย
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 410, y, 0); //ถนน
 
-                    //subdistrict,district,provice
-                    _y = 578;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 110, _y, 0);//ตำบล/แขวง
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 265, _y, 0);//อำเภอ/เขต
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 400, _y, 0);//จังหวัด
+                    //subdistrict, district, province
+                    y = 578;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 110, y, 0); //ตำบล/แขวง
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 265, y, 0); //อำเภอ/เขต
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 400, y, 0); //จังหวัด
 
-                    //zipcode,phone,mobile
-                    _y = 555;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 110, _y, 0);//รหัสไปรษณีย์
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 250, _y, 0);//เบอร์โทรศัพท์บ้าน
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _mobile, 430, _y, 0);//เบอร์โทรศัพท์มือถือ
+                    //zipcode, phone, mobile
+                    y = 555;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 110, y, 0); //รหัสไปรษณีย์
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 250, y, 0); //เบอร์โทรศัพท์บ้าน
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, mobile, 430, y, 0); //เบอร์โทรศัพท์มือถือ
 
-                    //marrie Name
-                    _y = 530;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 180, _y, 0);//รหัสบัตรประชาชน
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameMarTh, 380, _y, 0);//ชื่อคู่สมรส
+                    //marrie name
+                    y = 530;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 180, y, 0); //รหัสบัตรประชาชน
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameMarTH, 380, y, 0); //ชื่อคู่สมรส
 
-                    //Name Student
-                    _y = 460;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 100, _y, 0);//ชื่อนักศึกษา
+                    //name student
+                    y = 460;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 100, y, 0); //ชื่อนักศึกษา
 
-                    //date Contract
-                    _y = 438;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dateContract, 150, _y, 0);//วันที่ทำสัญญา
-
+                    //date contract
+                    y = 438;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dateContract, 150, y, 0); //วันที่ทำสัญญา
                 }
-                else if (_ProgramCode == "NSNSB")
-                {
-                    //ContractId 
-                    _y = 745;
-                    _cb.SetFontAndSize(_bf, 10);
-                    _cb.SetColorFill(BaseColor.GRAY);
+                
+                if (programCode == "NSNSB") {
+                    //contract ID 
+                    y = 745;
+                    cb.SetFontAndSize(bf, 10);
+                    cb.SetColorFill(BaseColor.GRAY);
 
-                    ////แกน Y
-                    //for (int i = 0; i <= 800; i += 10)
-                    //{
-                    //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", 0, i, 0);
-                    //}
-                    ////แกน X
-                    //for (int i = 600; i >= 0; i -= 10)
-                    //{
-                    //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", i, 820, 270);
-                    //}
+                    /*
+                    //แกน Y
+                    for (int i = 0; i <= 800; i += 10) {
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), 0, i, 0);
+                    }
+                    
+                    //แกน X
+                    for (int i = 600; i >= 0; i -= 10) {
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), i, 820, 270);
+                    }
+                    */
 
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_C"), 438, y, 0); //สัญญาเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
 
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_C", 438, _y, 0);//สัญญาเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
+                    //current date
+                    y = 670;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.SetColorFill(BaseColor.BLACK);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayP1, 390, y, 0); //date
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHP1, 435, y, 0); //month
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHP1, 515, y, 0); //year
 
-                    //Current Date
-                    _y = 670;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.SetColorFill(BaseColor.BLACK);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayP1, 390, _y, 0);//Date
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThP1, 435, _y, 0);//Month
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThP1, 515, _y, 0);//Year
+                    //fullname, age parent
+                    y = 650;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 180, y, 0);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 490, y, 0);
 
-                    //Name-LastName,age parent
-                    _y = 650;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 180, _y, 0);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 490, _y, 0);
+                    //occupation, position, agency
+                    y = 625;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, occupationTH, 80, y, 0); //อาชีพ
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, position, 250, y, 0); //ตำแหน่ง
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, agencyNameTH, 380, y, 0); //สังกัด
 
-                    //Occupation position agency
-                    _y = 625;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _thOccupation, 80, _y, 0);//อาชีพ
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _position, 250, _y, 0);//ตำแหน่ง
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _agencyNameTH, 380, _y, 0);//สังกัด
+                    //no, moo, soi
+                    y = 600;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 110, y, 0); //บ้านเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 190, y, 0); //หมู่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 270, y, 0); //ตรอก/ซอย
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 410, y, 0); //ถนน
 
-                    //No,Moo,Soi
-                    _y = 600;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 110, _y, 0);//บ้านเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 190, _y, 0);//หมู่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 270, _y, 0);//ตรอก/ซอย
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 410, _y, 0);//ถนน
+                    //subdistrict, district, provice
+                    y = 578;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 110, y, 0); //ตำบล/แขวง
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 265, y, 0); //อำเภอ/เขต
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 400, y, 0); //จังหวัด
 
-                    //subdistrict,district,provice
-                    _y = 578;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 110, _y, 0);//ตำบล/แขวง
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 265, _y, 0);//อำเภอ/เขต
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 400, _y, 0);//จังหวัด
+                    //zipcode, phone, mobile
+                    y = 555;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 110, y, 0); //รหัสไปรษณีย์
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 250, y, 0); //เบอร์โทรศัพท์บ้าน
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, mobile, 430, y, 0); //เบอร์โทรศัพท์มือถือ
 
-                    //zipcode,phone,mobile
-                    _y = 555;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 110, _y, 0);//รหัสไปรษณีย์
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 250, _y, 0);//เบอร์โทรศัพท์บ้าน
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _mobile, 430, _y, 0);//เบอร์โทรศัพท์มือถือ
+                    //marrie name
+                    y = 530;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 180, y, 0); //รหัสบัตรประชาชน
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameMarTH, 380, y, 0); //ชื่อคู่สมรส
 
-                    //marrie Name
-                    _y = 530;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 180, _y, 0);//รหัสบัตรประชาชน
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameMarTh, 380, _y, 0);//ชื่อคู่สมรส
+                    //name student
+                    y = 460;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 100, y, 0); //ชื่อนักศึกษา
 
-                    //Name Student
-                    _y = 460;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 100, _y, 0);//ชื่อนักศึกษา
-
-                    //date Contract
-                    _y = 438;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dateContract, 150, _y, 0);//วันที่ทำสัญญา
-
+                    //date contract
+                    y = 438;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dateContract, 150, y, 0); //วันที่ทำสัญญา
                 }
-                _cb.EndText();
+
+                cb.EndText();
+
                 //ขึ้นหน้าใหม่
-                _document.NewPage();
-                _cb.BeginText();
+                document.NewPage();
+                cb.BeginText();
 
                 //หน้าที่ 2 relationship
-                PdfImportedPage page2 = _writer.GetImportedPage(_reader, 2);//หน้า pdf template 2
-                _cb.AddTemplate(page2, 0, 0);
-                //ContractId 
-                _y = 745;
-                _cb.SetFontAndSize(_bf, 10);
-                _cb.SetColorFill(BaseColor.GRAY);
-                _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_C", 438, _y, 0);//สัญญาเลขที่
-                _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                if (_ProgramCode == "SIMDB" || _ProgramCode == "RAMDB")
-                {
-                    _y = 322;
+                PdfImportedPage page2 = writer.GetImportedPage(reader, 2); //หน้า pdf template 2
+                cb.AddTemplate(page2, 0, 0);
+
+                //contract ID 
+                y = 745;
+                cb.SetFontAndSize(bf, 10);
+                cb.SetColorFill(BaseColor.GRAY);
+                cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_C"), 438, y, 0); //สัญญาเลขที่
+                cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+
+                if (programCode == "SIMDB" ||
+                    programCode == "RAMDB") {
+                    y = 322;
                 }
-                else if (_ProgramCode == "PYPYB")
-                {
-                    _y = 290;
-                }
-                else if (_ProgramCode == "DTDSB")
-                {
-                    _y = 290;
-                }
-                else if (_ProgramCode == "RANSB")
-                {
-                    _y = 270;
-                }
-                else if (_ProgramCode == "NSNSB")
-                {
-                    _y = 270;
+                else {
+                    if (programCode == "PYPYB") {
+                        y = 290;
+                    }
+                    else {
+                        if (programCode == "DTDSB") {
+                            y = 290;
+                        }
+                        else {
+                            if (programCode == "RANSB") {
+                                y = 270;
+                            }
+                            else {
+                                if (programCode == "NSNSB") {
+                                    y = 270;
+                                }
+                            }
+                        }
+                    }
                 }
 
-                _cb.SetFontAndSize(_bf, 15);
-                _cb.SetColorFill(BaseColor.BLACK);
-                ////แกน Y
-                //for (int i = 0; i <= 800; i += 10)
-                //{
-                //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", 0, i, 0);
-                //}
-                ////แกน X
-                //for (int i = 600; i >= 0; i -= 10)
-                //{
-                //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", i, 820, 270);
-                //}
-                _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _relationship, 290, _y, 0);//เกี่ยวพันกับนักศึกษาโดยเป็น
-                _cb.EndText();
+                cb.SetFontAndSize(bf, 15);
+                cb.SetColorFill(BaseColor.BLACK);
+
+                /*
+                //แกน Y
+                for (int i = 0; i <= 800; i += 10) {
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), 0, i, 0);
+                }
+                
+                //แกน X
+                for (int i = 600; i >= 0; i -= 10) {
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), i, 820, 270);
+                }
+                */
+
+                cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, relationship, 290, y, 0); //เกี่ยวพันกับนักศึกษาโดยเป็น
+
+                cb.EndText();
 
                 //ขึ้นหน้าใหม่
-                _document.NewPage();
-                _cb.BeginText();
+                document.NewPage();
+                cb.BeginText();
 
                 //หน้าที่ 3 ลายเซ็นผู้ค้ำ
-                PdfImportedPage page3 = _writer.GetImportedPage(_reader, 3);//หน้า pdf template 3
-                _cb.AddTemplate(page3, 0, 0);
-                //ContractId 
-                _y = 745;
-                _cb.SetFontAndSize(_bf, 10);
-                _cb.SetColorFill(BaseColor.GRAY);
-                _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_C", 438, _y, 0);//สัญญาเลขที่
-                _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
+                PdfImportedPage page3 = writer.GetImportedPage(reader, 3); //หน้า pdf template 3
+                cb.AddTemplate(page3, 0, 0);
 
-                _cb.SetFontAndSize(_bf, 15);
-                _cb.SetColorFill(BaseColor.BLACK);
+                //contract ID 
+                y = 745;
+                cb.SetFontAndSize(bf, 10);
+                cb.SetColorFill(BaseColor.GRAY);
+                cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_C"), 438, y, 0); //สัญญาเลขที่
+                cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
 
-                ////แกน Y
-                //for (int i = 0; i <= 800; i += 10)
-                //{
-                //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", 0, i, 0);
-                //}
-                ////แกน X
-                //for (int i = 600; i >= 0; i -= 10)
-                //{
-                //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", i, 820, 270);
-                //}
-                if (_ProgramCode == "SIMDB" || _ProgramCode == "RAMDB")
-                {
-                    _y = 375;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 325, _y, 0);//ลงชื่อผู้ค้ำประกัน
+                cb.SetFontAndSize(bf, 15);
+                cb.SetColorFill(BaseColor.BLACK);
 
-                    _y = 343;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 325, _y, 0);//ลงชื่อผู้ค้ำประกัน
-                    _cb.EndText();
+                /*
+                //แกน Y
+                for (int i = 0; i <= 800; i += 10) {
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), 0, i, 0);
                 }
-                else if (_ProgramCode == "PYPYB")
-                {
-                    _y = 355;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 325, _y, 0);//ลงชื่อผู้ค้ำประกัน
 
-                    _y = 320;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 325, _y, 0);//ลงชื่อผู้ค้ำประกัน
-                    _cb.EndText();
+                //แกน X
+                for (int i = 600; i >= 0; i -= 10) {
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), i, 820, 270);
                 }
-                else if (_ProgramCode == "DTDSB")
-                {
-                    _y = 375;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 325, _y, 0);//ลงชื่อผู้ค้ำประกัน
+                */
 
-                    _y = 343;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 325, _y, 0);//ลงชื่อผู้ค้ำประกัน
-                    _cb.EndText();
+                if (programCode == "SIMDB" ||
+                    programCode == "RAMDB") {
+                    y = 375;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 325, y, 0); //ลงชื่อผู้ค้ำประกัน
+
+                    y = 343;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 325, y, 0); //ลงชื่อผู้ค้ำประกัน
+                    cb.EndText();
                 }
-                else if (_ProgramCode == "RANSB")
-                {
-                    _y = 330;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 325, _y, 0);//ลงชื่อผู้ค้ำประกัน
 
-                    _y = 300;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 325, _y, 0);//ลงชื่อผู้ค้ำประกัน
-                    _cb.EndText();
+                if (programCode == "PYPYB") {
+                    y = 355;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 325, y, 0); //ลงชื่อผู้ค้ำประกัน
+
+                    y = 320;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 325, y, 0); //ลงชื่อผู้ค้ำประกัน
+                    cb.EndText();
                 }
-                else if (_ProgramCode == "NSNSB")
-                {
-                    _y = 330;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 325, _y, 0);//ลงชื่อผู้ค้ำประกัน
+                
+                if (programCode == "DTDSB") {
+                    y = 375;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 325, y, 0); //ลงชื่อผู้ค้ำประกัน
 
-                    _y = 300;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 325, _y, 0);//ลงชื่อผู้ค้ำประกัน
-                    _cb.EndText();
+                    y = 343;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 325, y, 0); //ลงชื่อผู้ค้ำประกัน
+                    cb.EndText();
+                }
+
+                if (programCode == "RANSB") {
+                    y = 330;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 325, y, 0); //ลงชื่อผู้ค้ำประกัน
+
+                    y = 300;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 325, y, 0); //ลงชื่อผู้ค้ำประกัน
+                    cb.EndText();
+                }
+                
+                if (programCode == "NSNSB") {
+                    y = 330;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 325, y, 0); //ลงชื่อผู้ค้ำประกัน
+
+                    y = 300;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 325, y, 0); //ลงชื่อผู้ค้ำประกัน
+                    cb.EndText();
                 }
 
                 //ขึ้นหน้าใหม่
-                _document.NewPage();
-                _cb.BeginText();
+                document.NewPage();
+                cb.BeginText();
 
                 //หน้าที่ 4 หนังสือให้ความยินยอมคู่สมรส
-                PdfImportedPage page4 = _writer.GetImportedPage(_reader, 4);//หน้า pdf template 4
-                _cb.AddTemplate(page4, 0, 0);
+                PdfImportedPage page4 = writer.GetImportedPage(reader, 4); //หน้า pdf template 4
+                cb.AddTemplate(page4, 0, 0);
 
-                string _idCardonsent = "", _fullNameThonsent = "", _fullNameThonsent1 = "", _ageonsent = "";
-                string _dateSign = Myconfig.CvEmpty(_ctInfo.DateLongContractParent2, "");
-                if (_dateSign == "")
-                {
-                    _dateSign = _date.Day + " " + _date.MonthNameTh + " " + _date.YearTh;
+                string idCardOnsent = "";
+                string fullNameTHOnsent = "";
+                string fullNameTHOnsent1 = "";
+                string ageOnsent = "";
+                string dateSign = Myconfig.CvEmpty(ctInfo.DateLongContractParent2, "");
+
+                if (dateSign == "") {
+                    dateSign = (date.Day + " " + date.MonthNameTH + " " + date.YearTH);
                 }
+
                 //ข้อมูลบิดา
                 //ผู้ให้ควมยินยอมคู่สมรส
                 //parent sign
+                //string signCur = Myconfig.CvEmpty(parentInfo.FullNameTH, " - ");
+                //string consentBy = ctInfo.ConsentBy; //ยินยอมโดย
+                //string warrantBy = ctInfo.WarrantBy; //ค้ำประกัน
+                //string aliveF = ctInfo.IsAliveFather; //สถานะพ่อ 1 = มีชีวิต, 2 = เสียชีวิต
+                //string aliveM = ctInfo.IsAliveMother; //สถานะแม่ 1 = มีชีวิต, 2 = เสียชีวิต
+                //string marriage = ctInfo.IsMarriage; //1 = สมรส, 2 = สมรส(ไม่ได้จดทะเบียน), 3 = บิดามารดาหย่าร้าง
+                //string remark = ""; //หมายเหตุ
 
-                string _signCur = Myconfig.CvEmpty(_parentInfo.FullNameTh, " - ");
-                //string _consentBy = _ctInfo.ConsentBy;//ยินยอมโดย
-                //string _warrantBy = _ctInfo.WarrantBy;//ค้ำประกัน
-                //string _aliveF = _ctInfo.IsAliveFather;//สถานะพ่อ 1=มีชีวิต , 2 = เสียชีวิต
-                //string _aliveM = _ctInfo.IsAliveMother;//สถานะแม่ 1=มีชีวิต , 2 = เสียชีวิต
-                //string _marriage = _ctInfo.IsMarriage;//1=สมรส,2=สมรส(ไม่ได้จดทะเบียน),3=บิดามารดาหย่าร้าง
-                string _remark = "";//หมายเหตุ
-
-                //---กรณีสมรสกันบิดาและมารดายังมีชีวิตอยู่ทั้งคู่
-                if (_marriage == "1") //รวมไปถึง maritalStatus = 4,5
-                {
-                    if (_aliveF == "1" && _aliveM == "1")
-                    {
-                        if (_consentBy == "F")//แม่ค้ำ พ่อยินยอมคู่สมรส
-                        {
-                            _fullNameThonsent = Myconfig.CvEmpty(_parentFInfo.FullNameTh, " - ");
-                            _fullNameThonsent1 = Myconfig.CvEmpty(_parentMInfo.FullNameTh, " - ");
-                            _ageonsent = Myconfig.CvEmpty(_parentFInfo.Age, " - ");
-                            _idCardonsent = Myconfig.CvEmpty(_parentFInfo.IdCard, " - ");
+                //กรณีสมรสกันบิดาและมารดายังมีชีวิตอยู่ทั้งคู่
+                //รวมไปถึง marital status = 4,5
+                if (marriage == "1") {
+                    if (aliveF == "1" &&
+                        aliveM == "1") {
+                        //แม่ค้ำ พ่อยินยอมคู่สมรส
+                        if (consentBy == "F") {
+                            fullNameTHOnsent = Myconfig.CvEmpty(parentFInfo.FullNameTH, " - ");
+                            fullNameTHOnsent1 = Myconfig.CvEmpty(parentMInfo.FullNameTH, " - ");
+                            ageOnsent = Myconfig.CvEmpty(parentFInfo.Age, " - ");
+                            idCardOnsent = Myconfig.CvEmpty(parentFInfo.IDCard, " - ");
                         }
-                        else if (_consentBy == "M")//พ่อค้ำ แม่ยินยอมคู่สมรส
-                        {
-                            _fullNameThonsent = Myconfig.CvEmpty(_parentMInfo.FullNameTh, " - ");//ผู้ให้ความยินยอม
-                            _fullNameThonsent1 = Myconfig.CvEmpty(_parentFInfo.FullNameTh, " - ");//ผู้ค้ำ
-                            _ageonsent = Myconfig.CvEmpty(_parentMInfo.Age, " - ");
-                            _idCardonsent = Myconfig.CvEmpty(_parentMInfo.IdCard, " - ");
-                        }
-                        else
-                        {
-                            _fullNameThonsent = " - ";
-                            _fullNameThonsent1 = " - ";
-                            _ageonsent = " - ";
-                            _idCardonsent = " - ";
+                        else {
+                            //พ่อค้ำ แม่ยินยอมคู่สมรส
+                            if (consentBy == "M") {
+                                fullNameTHOnsent = Myconfig.CvEmpty(parentMInfo.FullNameTH, " - "); //ผู้ให้ความยินยอม
+                                fullNameTHOnsent1 = Myconfig.CvEmpty(parentFInfo.FullNameTH, " - "); //ผู้ค้ำ
+                                ageOnsent = Myconfig.CvEmpty(parentMInfo.Age, " - ");
+                                idCardOnsent = Myconfig.CvEmpty(parentMInfo.IDCard, " - ");
+                            }
+                            else {
+                                fullNameTHOnsent = " - ";
+                                fullNameTHOnsent1 = " - ";
+                                ageOnsent = " - ";
+                                idCardOnsent = " - ";
+                            }
                         }
                     }
-                    else if (_aliveM == "1" && _aliveF == "2")
-                    {
-                        _fullNameThonsent = " - ";
-                        _fullNameThonsent1 = " - ";
-                        _ageonsent = " - ";
-                        _idCardonsent = " - ";
-                        _dateSign = "-";
-                        //_remark = "หมายเหตุ : บิดาเสียชีวิต";
-                        _assure2 = "X";//คู่สมรสตาย : ใช้กับเคสที่เป็นหม้าย
-                    }
-                    else if (_aliveM == "2" && _aliveF == "1")
-                    {
-                        _fullNameThonsent = " - ";
-                        _fullNameThonsent1 = " - ";
-                        _ageonsent = " - ";
-                        _idCardonsent = " - ";
-                        _dateSign = "-";
-                        //_remark = "หมายเหตุ : มารดาเสียชีวิต";
-                        _assure2 = "X";//คู่สมรสตาย : ใช้กับเคสที่เป็นหม้าย
+                    else {
+                        if (aliveM == "1" &&
+                            aliveF == "2") {
+                            fullNameTHOnsent = " - ";
+                            fullNameTHOnsent1 = " - ";
+                            ageOnsent = " - ";
+                            idCardOnsent = " - ";
+                            dateSign = "-";
+                            //remark = "หมายเหตุ : บิดาเสียชีวิต";
+                            assure2 = "X"; //คู่สมรสตาย : ใช้กับเคสที่เป็นหม้าย
+                        }
+                        else {
+                            if (aliveM == "2" &&
+                                aliveF == "1") {
+                                fullNameTHOnsent = " - ";
+                                fullNameTHOnsent1 = " - ";
+                                ageOnsent = " - ";
+                                idCardOnsent = " - ";
+                                dateSign = "-";
+                                //remark = "หมายเหตุ : มารดาเสียชีวิต";
+                                assure2 = "X";//คู่สมรสตาย : ใช้กับเคสที่เป็นหม้าย
+                            }
+                        }
                     }
                 }
-                else
-                {
-                    //---กรณี ไม่สมรสหรือหย่าร้าง
-                    _fullNameThonsent = "-";
-                    _fullNameThonsent1 = " - ";
-                    _ageonsent = " - ";
-                    _idCardonsent = " - ";
-                    _signCur = "-";
-                    _dateSign = "-";
-                    if (_marriage == "2")//สมรส (ไม่จดทะเบียน)
-                    {
-                        //_remark = "หมายเหตุ : บิดาและมารดามิได้จดทะเบียนสมรสกัน";
-                        _assure1 = "X";//โสด : ใช้กับเคสที่ไม่จดทะเบียนสมรส กับเคสที่เป็นโสด
+                else {
+                    //กรณีไม่สมรสหรือหย่าร้าง
+                    fullNameTHOnsent = "-";
+                    fullNameTHOnsent1 = " - ";
+                    ageOnsent = " - ";
+                    idCardOnsent = " - ";
+                    //signCur = "-";
+                    dateSign = "-";
+
+                    //สมรส (ไม่จดทะเบียน)
+                    if (marriage == "2") {
+                        //remark = "หมายเหตุ : บิดาและมารดามิได้จดทะเบียนสมรสกัน";
+                        assure1 = "X";//โสด : ใช้กับเคสที่ไม่จดทะเบียนสมรส กับเคสที่เป็นโสด
                     }
-                    else if (_marriage == "3")
-                    {
-                        //_remark = "หมายเหตุ : บิดาและมารดาจดทะเบียนหย่า";
-                        _assure3 = "X";//- หย่าร้าง : ใช้กับเคสที่เป็นหย่าร้าง
+                    else {
+                        if (marriage == "3") {
+                            //remark = "หมายเหตุ : บิดาและมารดาจดทะเบียนหย่า";
+                            assure3 = "X";//- หย่าร้าง : ใช้กับเคสที่เป็นหย่าร้าง
+                        }
                     }
                 }
-                string _singleSts = _assure1 == "X" ? "X" : "";//คู่สมรสตาย : ใช้กับเคสที่เป็นหม้าย
-                string _dieSts = _assure2 == "X" ? "X" : "";//โสด : ใช้กับเคสที่ไม่จดทะเบียนสมรส กับเคสที่เป็นโสด
-                string _divorceSts = _assure3 == "X" ? "X" : ""; //-หย่าร้าง : ใช้กับเคสที่เป็นหย่าร้าง
+
+                string singleSts = (assure1 == "X" ? "X" : ""); //คู่สมรสตาย : ใช้กับเคสที่เป็นหม้าย
+                string dieSts = (assure2 == "X" ? "X" : ""); //โสด : ใช้กับเคสที่ไม่จดทะเบียนสมรส กับเคสที่เป็นโสด
+                string divorceSts = (assure3 == "X" ? "X" : ""); //หย่าร้าง : ใช้กับเคสที่เป็นหย่าร้าง
 
                 //ผู้ค้ำประกัน ไม่ใช่ คนเดียวกันกับผู้ยินยอม
-                if (_warrantBy != _consentBy)
-                {
+                if (warrantBy != consentBy) {
+                    if (programCode == "SIMDB") {
+                        //contract ID
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        
+                        /*
+                        //แกน Y
+                        for (int i = 0; i <= 800; i += 10) {
+                            cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), 0, i, 0);
+                        }
+                        
+                        //แกน X
+                        for (int i = 600; i >= 0; i -= 10) {
+                            cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), i, 820, 270);
+                        }
+                        */
 
-                    if (_ProgramCode == "SIMDB")
-                    {
-                        //ContractId
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        ////แกน Y
-                        //for (int i = 0; i <= 800; i += 10)
-                        //{
-                        //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", 0, i, 0);
-                        //}
-                        ////แกน X
-                        //for (int i = 600; i >= 0; i -= 10)
-                        //{
-                        //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", i, 820, 270);
-                        //}
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_C", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                                //Name-LastName,age parent
-                        _y = 692;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent, 130, _y, 0);//
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ageonsent, 305, _y, 0);//อายุ
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCardonsent, 445, _y, 0);//รหัสบัตรประชาชน
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_C"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                                
+                        //fullname, age parent
+                        y = 692;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent, 130, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ageOnsent, 305, y, 0); //อายุ
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCardOnsent, 445, y, 0); //รหัสบัตรประชาชน
 
                         //คู่สมรส
-                        _y = 670;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent1, 150, _y, 0);
+                        y = 670;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent1, 150, y, 0);
+
                         //คู่สมรส
-                        _y = 647;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent1, 90, _y, 0);
+                        y = 647;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent1, 90, y, 0);
+
                         //วันที่
-                        _y = 625;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dateSign, 60, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent1, 370, _y, 0);
+                        y = 625;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dateSign, 60, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent1, 370, y, 0);
+
                         //ลงนาม
-                        _y = 580;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent, 320, _y, 0);
-                        _y = 543;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent, 320, _y, 0);
+                        y = 580;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent, 320, y, 0);
+                        
+                        y = 543;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent, 320, y, 0);
 
-                        _y = 510;
+                        y = 510;
                         //รับรอง assure โสด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _singleSts, 206, _y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, singleSts, 206, y, 0);
                         //รับรอง assure คู่สมรสตาย
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dieSts, 276, _y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dieSts, 276, y, 0);
                         //รับรอง assure หย่าร้าง
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _divorceSts, 370, _y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, divorceSts, 370, y, 0);
+
                         //รหัสนักศึกษา
-                        _y = 480;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentProgram, 380, _y, 0);
-                        ////หมายเหตุ
-                        //_y = 450;
-                        //_cb.SetFontAndSize(_bf, 18);
-                        //_cb.SetColorFill(BaseColor.BLACK);
-                        //_cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _remark, 60, _y, 0);
-                        //_cb.EndText();
-                    }
-                    else if (_ProgramCode == "RAMDB")
-                    {
-                        //ContractId
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        ////แกน Y
-                        //for (int i = 0; i <= 800; i += 10)
-                        //{
-                        //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", 0, i, 0);
-                        //}
-                        ////แกน X
-                        //for (int i = 600; i >= 0; i -= 10)
-                        //{
-                        //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", i, 820, 270);
-                        //}
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_C", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                                //Name-LastName,age parent
-                        _y = 692;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent, 130, _y, 0);//
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ageonsent, 305, _y, 0);//อายุ
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCardonsent, 445, _y, 0);//รหัสบัตรประชาชน
+                        y = 480;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, studentProgram, 380, y, 0);
 
-                        //คู่สมรส
-                        _y = 670;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent1, 150, _y, 0);
-                        //คู่สมรส
-                        _y = 647;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent1, 90, _y, 0);
-                        //วันที่
-                        _y = 625;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dateSign, 60, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent1, 370, _y, 0);
-                        //ลงนาม
-                        _y = 580;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent, 320, _y, 0);
-                        _y = 543;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent, 320, _y, 0);
+                        /*
+                        //หมายเหตุ
+                        y = 450;
+                        cb.SetFontAndSize(bf, 18);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, remark, 60, y, 0);
 
-                        _y = 510;
-                        //รับรอง assure โสด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _singleSts, 206, _y, 0);
-                        //รับรอง assure คู่สมรสตาย
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dieSts, 276, _y, 0);
-                        //รับรอง assure หย่าร้าง
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _divorceSts, 370, _y, 0);
-                        //รหัสนักศึกษา
-                        _y = 480;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentProgram, 380, _y, 0);
-                        ////หมายเหตุ
-                        //_y = 450;
-                        //_cb.SetFontAndSize(_bf, 18);
-                        //_cb.SetColorFill(BaseColor.BLACK);
-                        //_cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _remark, 60, _y, 0);
-                        //_cb.EndText();
-                    }
-                    else if (_ProgramCode == "PYPYB")
-                    {
-                        //ContractId
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        ////แกน Y
-                        //for (int i = 0; i <= 800; i += 10)
-                        //{
-                        //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", 0, i, 0);
-                        //}
-                        ////แกน X
-                        //for (int i = 600; i >= 0; i -= 10)
-                        //{
-                        //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", i, 820, 270);
-                        //}
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_C", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                                //Name-LastName,age parent
-                        _y = 692;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent, 130, _y, 0);//
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ageonsent, 305, _y, 0);//อายุ
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCardonsent, 445, _y, 0);//รหัสบัตรประชาชน
-
-                        //คู่สมรส
-                        _y = 670;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent1, 150, _y, 0);
-                        //คู่สมรส
-                        _y = 647;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent1, 90, _y, 0);
-                        //วันที่
-                        _y = 625;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dateSign, 60, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent1, 370, _y, 0);
-                        //ลงนาม
-                        _y = 580;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent, 320, _y, 0);
-                        _y = 543;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent, 320, _y, 0);
-
-                        _y = 510;
-                        //รับรอง assure โสด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _singleSts, 206, _y, 0);
-                        //รับรอง assure คู่สมรสตาย
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dieSts, 276, _y, 0);
-                        //รับรอง assure หย่าร้าง
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _divorceSts, 370, _y, 0);
-                        //รหัสนักศึกษา
-                        _y = 480;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentProgram, 380, _y, 0);
-                        ////หมายเหตุ
-                        //_y = 450;
-                        //_cb.SetFontAndSize(_bf, 18);
-                        //_cb.SetColorFill(BaseColor.BLACK);
-                        //_cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _remark, 60, _y, 0);
-                        //_cb.EndText();
-                    }
-                    else if (_ProgramCode == "DTDSB")
-                    {
-                        //ContractId
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        ////แกน Y
-                        //for (int i = 0; i <= 800; i += 10)
-                        //{
-                        //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", 0, i, 0);
-                        //}
-                        ////แกน X
-                        //for (int i = 600; i >= 0; i -= 10)
-                        //{
-                        //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", i, 820, 270);
-                        //}
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_C", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                                //Name-LastName,age parent
-                        _y = 692;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent, 130, _y, 0);//
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ageonsent, 305, _y, 0);//อายุ
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCardonsent, 445, _y, 0);//รหัสบัตรประชาชน
-
-                        //คู่สมรส
-                        _y = 670;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent1, 150, _y, 0);
-                        //คู่สมรส
-                        _y = 647;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent1, 90, _y, 0);
-                        //วันที่
-                        _y = 625;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dateSign, 60, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent1, 370, _y, 0);
-                        //ลงนาม
-                        _y = 580;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent, 320, _y, 0);
-                        _y = 543;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent, 320, _y, 0);
-
-                        _y = 510;
-                        //รับรอง assure โสด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _singleSts, 206, _y, 0);
-                        //รับรอง assure คู่สมรสตาย
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dieSts, 276, _y, 0);
-                        //รับรอง assure หย่าร้าง
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _divorceSts, 370, _y, 0);
-                        //รหัสนักศึกษา
-                        _y = 480;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentProgram, 380, _y, 0);
-                        ////หมายเหตุ
-                        //_y = 450;
-                        //_cb.SetFontAndSize(_bf, 18);
-                        //_cb.SetColorFill(BaseColor.BLACK);
-                        //_cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _remark, 60, _y, 0);
-                        //_cb.EndText();
-                    }
-                    else if (_ProgramCode == "RANSB")
-                    {
-                        //ContractId
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        ////แกน Y
-                        //for (int i = 0; i <= 800; i += 10)
-                        //{
-                        //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", 0, i, 0);
-                        //}
-                        ////แกน X
-                        //for (int i = 600; i >= 0; i -= 10)
-                        //{
-                        //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", i, 820, 270);
-                        //}
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_C", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                                //Name-LastName,age parent
-                        _y = 692;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent, 130, _y, 0);//
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ageonsent, 305, _y, 0);//อายุ
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCardonsent, 445, _y, 0);//รหัสบัตรประชาชน
-
-                        //คู่สมรส
-                        _y = 670;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent1, 150, _y, 0);
-                        //คู่สมรส
-                        _y = 647;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent1, 90, _y, 0);
-                        //วันที่
-                        _y = 625;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dateSign, 60, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent1, 370, _y, 0);
-                        //ลงนาม
-                        _y = 580;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent, 320, _y, 0);
-                        _y = 543;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent, 320, _y, 0);
-
-                        _y = 510;
-                        //รับรอง assure โสด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _singleSts, 206, _y, 0);
-                        //รับรอง assure คู่สมรสตาย
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dieSts, 276, _y, 0);
-                        //รับรอง assure หย่าร้าง
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _divorceSts, 370, _y, 0);
-                        //รหัสนักศึกษา
-                        _y = 480;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentProgram, 380, _y, 0);
-                        ////หมายเหตุ
-                        //_y = 450;
-                        //_cb.SetFontAndSize(_bf, 18);
-                        //_cb.SetColorFill(BaseColor.BLACK);
-                        //_cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _remark, 60, _y, 0);
-                        //_cb.EndText();
-                    }
-                    else if (_ProgramCode == "NSNSB")
-                    {
-                        //ContractId
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        ////แกน Y
-                        //for (int i = 0; i <= 800; i += 10)
-                        //{
-                        //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", 0, i, 0);
-                        //}
-                        ////แกน X
-                        //for (int i = 600; i >= 0; i -= 10)
-                        //{
-                        //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", i, 820, 270);
-                        //}
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_C", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                                //Name-LastName,age parent
-                        _y = 692;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent, 130, _y, 0);//
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ageonsent, 305, _y, 0);//อายุ
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCardonsent, 445, _y, 0);//รหัสบัตรประชาชน
-
-                        //คู่สมรส
-                        _y = 670;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent1, 150, _y, 0);
-                        //คู่สมรส
-                        _y = 647;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent1, 90, _y, 0);
-                        //วันที่
-                        _y = 625;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dateSign, 60, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent1, 370, _y, 0);
-                        //ลงนาม
-                        _y = 580;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent, 320, _y, 0);
-                        _y = 543;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent, 320, _y, 0);
-
-                        _y = 510;
-                        //รับรอง assure โสด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _singleSts, 206, _y, 0);
-                        //รับรอง assure คู่สมรสตาย
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dieSts, 276, _y, 0);
-                        //รับรอง assure หย่าร้าง
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _divorceSts, 370, _y, 0);
-                        //รหัสนักศึกษา
-                        _y = 480;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentProgram, 380, _y, 0);
-                        ////หมายเหตุ
-                        //_y = 450;
-                        //_cb.SetFontAndSize(_bf, 18);
-                        //_cb.SetColorFill(BaseColor.BLACK);
-                        //_cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _remark, 60, _y, 0);
-                        //_cb.EndText();
+                        cb.EndText();
+                        */
                     }
 
+                    if (programCode == "RAMDB") {
+                        //contract ID
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
 
-                    //
+                        /*
+                        //แกน Y
+                        for (int i = 0; i <= 800; i += 10) {
+                            cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), 0, i, 0);
+                        }
+
+                        //แกน X
+                        for (int i = 600; i >= 0; i -= 10) {
+                            cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", i, 820, 270);
+                        }
+                        */
+
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_C"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                                
+                        //fullname, age parent
+                        y = 692;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent, 130, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ageOnsent, 305, y, 0); //อายุ
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCardOnsent, 445, y, 0); //รหัสบัตรประชาชน
+
+                        //คู่สมรส
+                        y = 670;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent1, 150, y, 0);
+
+                        //คู่สมรส
+                        y = 647;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent1, 90, y, 0);
+                        
+                        //วันที่
+                        y = 625;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dateSign, 60, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent1, 370, y, 0);
+                        
+                        //ลงนาม
+                        y = 580;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent, 320, y, 0);
+
+                        y = 543;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent, 320, y, 0);
+
+                        y = 510;
+                        //รับรอง assure โสด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, singleSts, 206, y, 0);
+                        //รับรอง assure คู่สมรสตาย
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dieSts, 276, y, 0);
+                        //รับรอง assure หย่าร้าง
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, divorceSts, 370, y, 0);
+
+                        //รหัสนักศึกษา
+                        y = 480;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, studentProgram, 380, y, 0);
+
+                        /*
+                        //หมายเหตุ
+                        y = 450;
+                        cb.SetFontAndSize(bf, 18);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, remark, 60, y, 0);
+                        
+                        cb.EndText();
+                        */
+                    }
+                    
+                    if (programCode == "PYPYB") {
+                        //contract ID
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+
+                        /*
+                        //แกน Y
+                        for (int i = 0; i <= 800; i += 10) {
+                            cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), 0, i, 0);
+                        }
+
+                        //แกน X
+                        for (int i = 600; i >= 0; i -= 10) {
+                            cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), i, 820, 270);
+                        }
+                        */
+
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_C"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                                
+                        //fullname, age parent
+                        y = 692;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent, 130, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ageOnsent, 305, y, 0); //อายุ
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCardOnsent, 445, y, 0); //รหัสบัตรประชาชน
+
+                        //คู่สมรส
+                        y = 670;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent1, 150, y, 0);
+                        
+                        //คู่สมรส
+                        y = 647;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent1, 90, y, 0);
+
+                        //วันที่
+                        y = 625;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dateSign, 60, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent1, 370, y, 0);
+
+                        //ลงนาม
+                        y = 580;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent, 320, y, 0);
+                        
+                        y = 543;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent, 320, y, 0);
+
+                        y = 510;
+                        //รับรอง assure โสด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, singleSts, 206, y, 0);
+                        //รับรอง assure คู่สมรสตาย
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dieSts, 276, y, 0);
+                        //รับรอง assure หย่าร้าง
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, divorceSts, 370, y, 0);
+
+                        //รหัสนักศึกษา
+                        y = 480;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, studentProgram, 380, y, 0);
+
+                        /*
+                        //หมายเหตุ
+                        y = 450;
+                        cb.SetFontAndSize(bf, 18);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, remark, 60, y, 0);
+                        
+                        cb.EndText();
+                        */
+                    }
+                    
+                    if (programCode == "DTDSB") {
+                        //contract ID
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+
+                        /*
+                        //แกน Y
+                        for (int i = 0; i <= 800; i += 10) {
+                            cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), 0, i, 0);
+                        }
+                        
+                        //แกน X
+                        for (int i = 600; i >= 0; i -= 10) {
+                            cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), i, 820, 270);
+                        }
+                        */
+
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_C"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                                
+                        //fullname, age parent
+                        y = 692;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent, 130, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ageOnsent, 305, y, 0); //อายุ
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCardOnsent, 445, y, 0);//รหัสบัตรประชาชน
+
+                        //คู่สมรส
+                        y = 670;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent1, 150, y, 0);
+
+                        //คู่สมรส
+                        y = 647;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent1, 90, y, 0);
+
+                        //วันที่
+                        y = 625;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dateSign, 60, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent1, 370, y, 0);
+
+                        //ลงนาม
+                        y = 580;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent, 320, y, 0);
+                        
+                        y = 543;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent, 320, y, 0);
+
+                        y = 510;
+                        //รับรอง assure โสด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, singleSts, 206, y, 0);
+                        //รับรอง assure คู่สมรสตาย
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dieSts, 276, y, 0);
+                        //รับรอง assure หย่าร้าง
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, divorceSts, 370, y, 0);
+                        //รหัสนักศึกษา
+                        y = 480;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, studentProgram, 380, y, 0);
+
+                        /*
+                        //หมายเหตุ
+                        y = 450;
+                        cb.SetFontAndSize(bf, 18);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, remark, 60, y, 0);
+                        
+                        cb.EndText();
+                        */
+                    }
+
+                    if (programCode == "RANSB") {
+                        //contract ID
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+
+                        /*
+                        //แกน Y
+                        for (int i = 0; i <= 800; i += 10) {
+                            cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), 0, i, 0);
+                        }
+
+                        //แกน X
+                        for (int i = 600; i >= 0; i -= 10) {
+                            cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), i, 820, 270);
+                        }
+                        */
+
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_C"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                                
+                        //fullname, age parent
+                        y = 692;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent, 130, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ageOnsent, 305, y, 0); //อายุ
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCardOnsent, 445, y, 0); //รหัสบัตรประชาชน
+
+                        //คู่สมรส
+                        y = 670;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent1, 150, y, 0);
+                        
+                        //คู่สมรส
+                        y = 647;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent1, 90, y, 0);
+                        
+                        //วันที่
+                        y = 625;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dateSign, 60, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent1, 370, y, 0);
+                        
+                        //ลงนาม
+                        y = 580;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent, 320, y, 0);
+                        
+                        y = 543;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent, 320, y, 0);
+
+                        y = 510;
+                        //รับรอง assure โสด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, singleSts, 206, y, 0);
+                        //รับรอง assure คู่สมรสตาย
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dieSts, 276, y, 0);
+                        //รับรอง assure หย่าร้าง
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, divorceSts, 370, y, 0);
+
+                        //รหัสนักศึกษา
+                        y = 480;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, studentProgram, 380, y, 0);
+
+                        /*
+                        //หมายเหตุ
+                        y = 450;
+                        cb.SetFontAndSize(bf, 18);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, remark, 60, y, 0);
+                        
+                        cb.EndText();
+                        */
+                    }
+
+                    if (programCode == "NSNSB") {
+                        //contract ID
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+
+                        /*
+                        //แกน Y
+                        for (int i = 0; i <= 800; i += 10) {
+                            cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), 0, i, 0);
+                        }
+                        
+                        //แกน X
+                        for (int i = 600; i >= 0; i -= 10) {
+                            cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), i, 820, 270);
+                        }
+                        */
+
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_C"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                                
+                        //fullname, age parent
+                        y = 692;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent, 130, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ageOnsent, 305, y, 0); //อายุ
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCardOnsent, 445, y, 0); //รหัสบัตรประชาชน
+
+                        //คู่สมรส
+                        y = 670;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent1, 150, y, 0);
+
+                        //คู่สมรส
+                        y = 647;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent1, 90, y, 0);
+
+                        //วันที่
+                        y = 625;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dateSign, 60, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent1, 370, y, 0);
+
+                        //ลงนาม
+                        y = 580;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent, 320, y, 0);
+                        
+                        y = 543;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent, 320, y, 0);
+
+                        y = 510;
+                        //รับรอง assure โสด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, singleSts, 206, y, 0);
+                        //รับรอง assure คู่สมรสตาย
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dieSts, 276, y, 0);
+                        //รับรอง assure หย่าร้าง
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, divorceSts, 370, y, 0);
+
+                        //รหัสนักศึกษา
+                        y = 480;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, studentProgram, 380, y, 0);
+
+                        /*
+                        //หมายเหตุ
+                        y = 450;
+                        cb.SetFontAndSize(bf, 18);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, remark, 60, y, 0);
+                        
+                        cb.EndText();
+                        */
+                    }
                 }
-                //
-                else
-                {
+                else {
+                    //contract ID
+                    y = 745;
+                    cb.SetFontAndSize(bf, 10);
+                    cb.SetColorFill(BaseColor.GRAY);
 
-                    //ContractId
-                    _y = 745;
-                    _cb.SetFontAndSize(_bf, 10);
-                    _cb.SetColorFill(BaseColor.GRAY);
-                    ////แกน Y
-                    //for (int i = 0; i <= 800; i += 10)
-                    //{
-                    //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", 0, i, 0);
-                    //}
-                    ////แกน X
-                    //for (int i = 600; i >= 0; i -= 10)
-                    //{
-                    //    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "" + i + "--", i, 820, 270);
-                    //}
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_C", 438, _y, 0);//สัญญาเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                            //Name-LastName,age parent
-                    _y = 692;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.SetColorFill(BaseColor.BLACK);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent, 130, _y, 0);//
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ageonsent, 305, _y, 0);//อายุ
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCardonsent, 445, _y, 0);//รหัสบัตรประชาชน
+                    /*
+                    //แกน Y
+                    for (int i = 0; i <= 800; i += 10) {
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), 0, i, 0);
+                    }
+
+                    //แกน X
+                    for (int i = 600; i >= 0; i -= 10) {
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ("" + i + "--"), i, 820, 270);
+                    }
+                    */
+
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_C"), 438, y, 0); //สัญญาเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                            
+                    //fullname, age parent
+                    y = 692;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.SetColorFill(BaseColor.BLACK);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent, 130, y, 0);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ageOnsent, 305, y, 0); //อายุ
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCardOnsent, 445, y, 0); //รหัสบัตรประชาชน
 
                     //คู่สมรส
-                    _y = 670;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent1, 150, _y, 0);
+                    y = 670;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent1, 150, y, 0);
+
                     //คู่สมรส
-                    _y = 647;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent1, 90, _y, 0);
+                    y = 647;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent1, 90, y, 0);
+
                     //วันที่
-                    _y = 625;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dateSign, 60, _y, 0);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent1, 370, _y, 0);
+                    y = 625;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dateSign, 60, y, 0);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent1, 370, y, 0);
+
                     //ลงนาม
-                    _y = 580;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent, 320, _y, 0);
-                    _y = 543;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameThonsent, 320, _y, 0);
+                    y = 580;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent, 320, y, 0);
+                    y = 543;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTHOnsent, 320, y, 0);
 
-                    _y = 510;
+                    y = 510;
                     //รับรอง assure โสด
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _singleSts, 206, _y, 0);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, singleSts, 206, y, 0);
                     //รับรอง assure คู่สมรสตาย
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dieSts, 276, _y, 0);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dieSts, 276, y, 0);
                     //รับรอง assure หย่าร้าง
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _divorceSts, 370, _y, 0);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, divorceSts, 370, y, 0);
+
                     //รหัสนักศึกษา
-                    _y = 480;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentProgram, 380, _y, 0);
-                    ////หมายเหตุ
-                    //_y = 450;
-                    //_cb.SetFontAndSize(_bf, 18);
-                    //_cb.SetColorFill(BaseColor.BLACK);
-                    //_cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _remark, 60, _y, 0);
-                    //_cb.EndText();
+                    y = 480;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, studentProgram, 380, y, 0);
+
+                    /*
+                    //หมายเหตุ
+                    y = 450;
+                    cb.SetFontAndSize(_bf, 18);
+                    cb.SetColorFill(BaseColor.BLACK);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, remark, 60, y, 0);
+                    
+                    cb.EndText();
+                    */
                 }
-                _cb.EndText();
-                _document.Close();
-                _writer.Close();
-                _reader.Close();
 
-                //update warranPath C
-                //string _warranPath = Server.MapPath("~/ElectronicContract/" + _acaYear + "/" + _ProgramCode + _programCodeExtra + "/") + _fileName;
-                string _warranPath = "C:\\inetpub\\wwwroot\\Econtract\\ElectronicContract\\" + _acaYear + "\\" + _ProgramCode + _programCodeExtra + "\\" + _fileName;
-                ContractDB.SetWarranPath(_studentId, _acaYear, _warranPath);
+                cb.EndText();
+                document.Close();
+                writer.Close();
+                reader.Close();
 
-                FileStream sourceFile = new FileStream((Server.MapPath("~/ElectronicContract/" + _acaYear + "/" + _ProgramCode + _programCodeExtra + "/") + _fileName), FileMode.Open);
+                //update warran path C
+                //string warranPath = (Server.MapPath("~/ElectronicContract/" + acaYear + "/" + programCode + programCodeExtra + "/") + fileName);
+                string warranPath = ("C:\\inetpub\\wwwroot\\Econtract\\ElectronicContract\\" + acaYear + "\\" + programCode + programCodeExtra + "\\" + fileName);
+                ContractDB.SetWarranPath(studentID, acaYear, warranPath);
+                FileStream sourceFile = new FileStream((Server.MapPath("~/ElectronicContract/" + acaYear + "/" + programCode + programCodeExtra + "/") + fileName), FileMode.Open);
                 long FileSize;
                 FileSize = sourceFile.Length;
                 byte[] getContent = new byte[(int)FileSize];
+
                 sourceFile.Read(getContent, 0, (int)sourceFile.Length);
                 sourceFile.Close();
                 Response.BinaryWrite(getContent);
-            //}
-            //else
-            //{
-            //    //กรณีมี File สัญญาในระบบแล้ว เปิดอ่านเลย
+            /*
+            }
+            else {
+                //กรณีมี file สัญญาในระบบแล้ว เปิดอ่านเลย
+                WebClient client3 = new WebClient();
+                Byte[] buffer3 = client3.DownloadData(warran);
 
-            //    WebClient client3 = new WebClient();
-            //    Byte[] buffer3 = client3.DownloadData(_warran);
-            //    Response.ContentType = "application/pdf";
-            //    Response.AddHeader("content-length", buffer3.Length.ToString());
-            //    Response.BinaryWrite(buffer3);
-            //    client3.Dispose();
-            //}
-
-
+                Response.ContentType = "application/pdf";
+                Response.AddHeader("content-length", buffer3.Length.ToString());
+                Response.BinaryWrite(buffer3);
+                client3.Dispose();
+            }
+            */
         }
 
-        #endregion printWarrant_NEW20170820
+        #endregion PrintWarrant_NEW20170820
 
-        #region printGarrantee
-        /// <summary>
-        /// Author: Anussara Wanwang
-        /// Create Date: 11-12-2015
-        /// Update Date: 07-08-2020
-        /// Description: หนังสือให้ความยินยอมของผู้แทนโดยชอบธรรม B
-        /// Parameter:n/a
-        /// </summary>
-        public void printGarrantee(string _studentId, string _parentType, string _studentCode)
-        {
-            //ในกรณีที่มี file ใน Folder แล้วให้เปิดเลย ไม่ต้องสร้าง pdf ใหม่
-            ContractInfo _ctInfo = new ContractInfo(_studentId);
-            string _garrantee = Myconfig.CvEmpty(_ctInfo.garranteePath, " - ");
-            if (_garrantee == " - ")
-            {
-                StringBuilder _string = new StringBuilder();
+        #region PrintGarrantee
+        /*
+        author      : Anussara Wanwang
+        create date : 11-12-2015
+        update date : 07-08-2020
+        description : หนังสือให้ความยินยอมของผู้แทนโดยชอบธรรม B
+        parameter   : n/a
+        */
+        public void PrintGarrantee(
+            string studentID,
+            string parentType,
+            string studentCode
+        ) {
+            if (parentType is null){
+                throw new ArgumentNullException(nameof(parentType));
+            }
 
-                StudentInfo _stdInfo = new StudentInfo(_studentCode);
-                ParentInfo _parentInfo = new ParentInfo(_studentId, _parentType);
-                ParentInfo _parentMInfo = new ParentInfo(_studentId, "M");
-                ParentInfo _parentFInfo = new ParentInfo(_studentId, "F");
-                CurDate _date = new CurDate();
-                //string _acaYear = Myconfig.GetYearContract();
-                string _acaYear = Myconfig.CvEmpty(_stdInfo.AcaYear, " - ");
-                string _quotaCode = _stdInfo.QuotaCode;
-                string _warrantBy = _ctInfo.WarrantBy;
-                string _consentBy = _ctInfo.ConsentBy;
-                string _programCodeExtra = "";
-                string _stdNameTh, _programNameTh, _ProgramCode;
-                //ข้อมูลนักศึกษา
-                _stdNameTh = Myconfig.CvEmpty(_stdInfo.StdNameTh, " - ");
-                _programNameTh = Myconfig.CvEmpty(_stdInfo.ProgramNameTh, " - ");
-                //_studentCode = Myconfig.CvEmpty(_stdInfo.StudentCode, " - ");
-                _ProgramCode = Myconfig.CvEmpty(_stdInfo.ProgramCode, " - ");
+            //ในกรณีที่มี file ใน folder แล้วให้เปิดเลย ไม่ต้องสร้าง pdf ใหม่
+            ContractInfo ctInfo = new ContractInfo(studentID);
+            string garrantee = Myconfig.CvEmpty(ctInfo.GarranteePath, " - ");
 
-                string _idCard, _fullNameTh, _age, _moo, _no, _soi, _road, _subdistrict
-                    , _district, _provice, _zipcode, _phone, _statusContract; ;
+            if (garrantee == " - ") {
+                //StringBuilder html = new StringBuilder();
+                StudentInfo stdInfo = new StudentInfo(studentCode);
+                //ParentInfo parentInfo = new ParentInfo(studentID, parentType);
+                ParentInfo parentMInfo = new ParentInfo(studentID, "M");
+                ParentInfo parentFInfo = new ParentInfo(studentID, "F");
+                //CurDate date = new CurDate();
+                //string acaYear = Myconfig.GetYearContract();
+                string acaYear = Myconfig.CvEmpty(stdInfo.AcaYear, " - ");
+                string quotaCode = stdInfo.QuotaCode;
+                string warrantBy = ctInfo.WarrantBy;
+                string consentBy = ctInfo.ConsentBy;
+                string programCodeExtra;
+                //string studentCode = Myconfig.CvEmpty(stdInfo.StudentCode, " - ");
+                string stdNameTH = Myconfig.CvEmpty(stdInfo.StdNameTH, " - ");
+                //string programNameTH = Myconfig.CvEmpty(stdInfo.ProgramNameTH, " - ");
+                string programCode = Myconfig.CvEmpty(stdInfo.ProgramCode, " - ");
+                string idCard;
+                string fullNameTH;
+                string age;
+                string moo;
+                string no;
+                string soi;
+                string road;
+                string subdistrict;
+                string district;
+                string province;
+                string zipcode;
+                string phone;
+                string statusContract;
+                //string signFather;
+                string signMother;
+                string dateContract = ctInfo.DateLongContractStudent;
+                int checkAcaYear = Convert.ToInt32(acaYear);
 
-                string _signFather, _signMother;
-
-                string _dateContract = _ctInfo.DateLongContractStudent;
-                int _checkAcaYear = Convert.ToInt32(_acaYear);
-                if (_checkAcaYear < 2565)
-                {
-                    _statusContract = "OLD";
+                if (checkAcaYear < 2565) {
+                    statusContract = "OLD";
                 }
-                else
-                {
-                    _statusContract = "NEW";
+                else {
+                    statusContract = "NEW";
                 }
 
                 //ข้อมูลบิดา ถ้าเป็นผู้ค้ำประกัน หรือ ผู้ยินยอมคู่สมรส ให้รับรองบุตรด้วย
-                if (_warrantBy == "F" || _consentBy == "F")
-                {
-                    _fullNameTh = Myconfig.CvEmpty(_parentFInfo.FullNameTh, " - ");
-                    _age = Myconfig.CvEmpty(_parentFInfo.Age, " - ");
-                    _moo = Myconfig.CvEmpty(_parentFInfo.MooPermanent, " - ");
-                    _no = Myconfig.CvEmpty(_parentFInfo.NoPermanent, " - ");
-                    _soi = Myconfig.CvEmpty(_parentFInfo.SoiPermanent, " - ");
-                    _road = Myconfig.CvEmpty(_parentFInfo.RoadPermanent, " - ");
-                    _subdistrict = Myconfig.CvEmpty(_parentFInfo.ThSubdistrictName, " - ");
-                    _district = Myconfig.CvEmpty(_parentFInfo.ThDistrictName, " - ");
-                    _provice = Myconfig.CvEmpty(_parentFInfo.ProvinceNameTH, " - ");
-                    _zipcode = Myconfig.CvEmpty(_parentFInfo.ZipCodePermanent, " - ");
-                    _phone = Myconfig.CvEmpty(_parentFInfo.PhoneNumberPermanent, " - ");
-                    _idCard = Myconfig.CvEmpty(_parentFInfo.IdCard, " - ");
-                    _signFather = Myconfig.CvEmpty(_parentFInfo.FullNameTh, " - ");
+                if (warrantBy == "F" ||
+                    consentBy == "F") {
+                    fullNameTH = Myconfig.CvEmpty(parentFInfo.FullNameTH, " - ");
+                    age = Myconfig.CvEmpty(parentFInfo.Age, " - ");
+                    moo = Myconfig.CvEmpty(parentFInfo.MooPermanent, " - ");
+                    no = Myconfig.CvEmpty(parentFInfo.NoPermanent, " - ");
+                    soi = Myconfig.CvEmpty(parentFInfo.SoiPermanent, " - ");
+                    road = Myconfig.CvEmpty(parentFInfo.RoadPermanent, " - ");
+                    subdistrict = Myconfig.CvEmpty(parentFInfo.SubdistrictNameTH, " - ");
+                    district = Myconfig.CvEmpty(parentFInfo.DistrictNameTH, " - ");
+                    province = Myconfig.CvEmpty(parentFInfo.ProvinceNameTH, " - ");
+                    zipcode = Myconfig.CvEmpty(parentFInfo.ZipcodePermanent, " - ");
+                    phone = Myconfig.CvEmpty(parentFInfo.PhoneNumberPermanent, " - ");
+                    idCard = Myconfig.CvEmpty(parentFInfo.IDCard, " - ");
+                    //signFather = Myconfig.CvEmpty(parentFInfo.FullNameTH, " - ");
                 }
-                else
-                {
-                    _fullNameTh = " - ";
-                    _age = " - ";
-                    _moo = " - ";
-                    _no = " - ";
-                    _soi = " - ";
-                    _road = " - ";
-                    _subdistrict = " - ";
-                    _district = " - ";
-                    _provice = " - ";
-                    _zipcode = " - ";
-                    _phone = " - ";
-                    _idCard = " - ";
-                    _signFather = " - ";
+                else {
+                    fullNameTH = " - ";
+                    age = " - ";
+                    moo = " - ";
+                    no = " - ";
+                    soi = " - ";
+                    road = " - ";
+                    subdistrict = " - ";
+                    district = " - ";
+                    province = " - ";
+                    zipcode = " - ";
+                    phone = " - ";
+                    idCard = " - ";
+                    //signFather = " - ";
                 }
 
+                string path = Server.MapPath("~");
+                string fileTmp = "";
 
-                //end father profile
-
-
-
-                string _path = Server.MapPath("~");
-                string _fileTmp = "";
-                //เรียกใช้ file Template
-                switch (_ProgramCode)
-                {
+                //เรียกใช้ file template
+                switch (programCode) {
                     case "SIMDB":
-                        switch (_statusContract)
-                        {
+                        switch (statusContract) {
                             case "OLD":
-                                _fileTmp = _path + "/Template/B_Consent/Consent1.pdf";
+                                fileTmp = (path + "/Template/B_Consent/Consent1.pdf");
                                 break;
                             case "NEW":
-                                _fileTmp = _path + "/Template/B_Consent/SIMDB-2565-consent.pdf";
+                                fileTmp = (path + "/Template/B_Consent/SIMDB-2565-consent.pdf");
                                 break;
                         }
                         break;
                     case "RAMDB":
-                        switch (_statusContract)
-                        {
+                        switch (statusContract) {
                             case "OLD":
-                                _fileTmp = _path + "/Template/B_Consent/Consent1.pdf";
+                                fileTmp = (path + "/Template/B_Consent/Consent1.pdf");
                                 break;
                             case "NEW":
-                                _fileTmp = _path + "/Template/B_Consent/RAMDB-2565-consent.pdf";
+                                fileTmp = (path + "/Template/B_Consent/RAMDB-2565-consent.pdf");
                                 break;
                         }
                         break;
-
                     case "DTDSB":
-                        switch (_statusContract)
-                        {
+                        switch (statusContract) {
                             case "OLD":
-                                _fileTmp = _path + "/Template/B_Consent/Consent2.pdf";
+                                fileTmp = (path + "/Template/B_Consent/Consent2.pdf");
                                 break;
                             case "NEW":
-                                _fileTmp = _path + "/Template/B_Consent/DTDSB-2565-consent.pdf";
+                                fileTmp = (path + "/Template/B_Consent/DTDSB-2565-consent.pdf");
                                 break;
                         }
                         break;
-
                     case "PYPYB":
-                        _fileTmp = _path + "/Template/B_Consent/Consent3.pdf";
+                        fileTmp = (path + "/Template/B_Consent/Consent3.pdf");
                         break;
-
                     case "RANSB":
                     case "NSNSB":
-                        _fileTmp = _path + "/Template/B_Consent/Consent4.pdf";
+                        fileTmp = (path + "/Template/B_Consent/Consent4.pdf");
                         break;
                 }
 
-                //Folder extra
-                switch (_quotaCode)
-                {
-                    default: // siriraj hospital
-                        _programCodeExtra = "";
+                //folder extra
+                switch (quotaCode) {
+                    //siriraj hospital
+                    default: 
+                        programCodeExtra = "";
                         break;
                     case "354":
-                        _programCodeExtra = "_CL";
+                        programCodeExtra = "_CL";
                         break;
                     case "351":
-                        _programCodeExtra = "_TM";
+                        programCodeExtra = "_TM";
                         break;
                 }
-                string _fileName = _studentCode + _ProgramCode + _programCodeExtra + "_B.pdf";
-                string _fileDocument = _path + "/ElectronicContract/" + _fileName;
+
+                string fileName = (studentCode + programCode + programCodeExtra + "_B.pdf");
+                //string fileDocument = (path + "/ElectronicContract/" + fileName);
+
                 Response.ContentType = "application/pdf";
-                Response.AddHeader("content-disposition", "attachment;filename=" + _studentCode + "_B.pdf");
+                Response.AddHeader("content-disposition", ("attachment;filename=" + studentCode + "_B.pdf"));
                 //Response.Cache.SetCacheability(HttpCacheability.NoCache);
-                //Open the reader
-                PdfReader _reader = new PdfReader(_fileTmp);//file Template
+                
+                //open the reader
+                PdfReader reader = new PdfReader(fileTmp); //file template
+                //string path = (requestObj.PhysicalApplicationPath + "\\electronicContract\\"); 
+                DirectoryInfo dirInfo = new DirectoryInfo(Server.MapPath("~/ElectronicContract/" + acaYear + "/" + programCode + programCodeExtra + "/")); //ต้องเป็นตัวแปรโฟลเดอร์ด้วยนะ
 
-                //string path = requestObj.PhysicalApplicationPath + "\\electronicContract\\" 
-                DirectoryInfo DirInfo = new DirectoryInfo(Server.MapPath("~/ElectronicContract/" + _acaYear + "/" + _ProgramCode + _programCodeExtra + "/"));  // ต้องเป็นตัวแปรโฟลเดอร์ด้วยนะ
-                if (!DirInfo.Exists)
-                {
-                    //  Response.Write("OK");
-                    DirInfo.Create();
+                if (!dirInfo.Exists) {
+                    //Response.Write("OK");
+                    dirInfo.Create();
                 }
-                Document _document = new Document(PageSize.A4, 10.0F, 10.0F, 100.0F, 0.0F);
-                // open the writer
-                PdfWriter _writer = PdfWriter.GetInstance(_document, new FileStream(Server.MapPath("~/ElectronicContract/" + _acaYear + "/" + _ProgramCode + _programCodeExtra + "/") + _fileName, FileMode.Create));
-                //PdfWriter _writer = PdfWriter.GetInstance(_document, Response.OutputStream);
-                Response.Charset = String.Empty;
+
+                Document document = new Document(PageSize.A4, 10.0F, 10.0F, 100.0F, 0.0F);
+                //open the writer
+                PdfWriter writer = PdfWriter.GetInstance(document, new FileStream((Server.MapPath("~/ElectronicContract/" + acaYear + "/" + programCode + programCodeExtra + "/") + fileName), FileMode.Create));
+                //PdfWriter writer = PdfWriter.GetInstance(_document, Response.OutputStream);                
+                Response.Charset = string.Empty;
                 Response.ClearContent();
-                _document.Open();
-                int _y = 0;
-                //Configure the content
-                PdfContentByte _cb = _writer.DirectContent;
-                //Write the text here
-                _cb.BeginText();
+                document.Open();
+                int y = 0;
+
+                //configure the content
+                PdfContentByte cb = writer.DirectContent;
+                //write the text here
+                cb.BeginText();
+
                 //หน้าที่ 1
-                PdfImportedPage page1 = _writer.GetImportedPage(_reader, 1);//หน้า pdf template 1
-                _cb.AddTemplate(page1, 0, 0);
+                PdfImportedPage page1 = writer.GetImportedPage(reader, 1); //หน้า pdf template 1
+                cb.AddTemplate(page1, 0, 0);
 
+                if (programCode == "SIMDB" ||
+                    programCode == "RAMDB") {
+                    //acaYear < 2565
+                    if (statusContract == "OLD") {
+                        BaseFont bf = BaseFont.CreateFont((path + "\\fonts\\THSarabun.ttf"), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
 
-                if (_ProgramCode == "SIMDB" || _ProgramCode == "RAMDB")
-                {
-                    if (_statusContract == "OLD")
-                    {// acaYear < 2565
-                        BaseFont _bf = BaseFont.CreateFont(_path + "\\fonts\\THSarabun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                        //contract ID
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_B"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
 
-                        //ContractId
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_B", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
+                        //current date
+                        y = 670;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayP2, 418, y, 0); //date
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHP2, 460, y, 0); //month
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHP2, 523, y, 0); //year
 
-                        //Current Date
-                        _y = 670;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayP2, 418, _y, 0);//Date
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThP2, 460, _y, 0);//Month
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThP2, 523, _y, 0);//Year
+                        //fullname, age parent
+                        y = 647;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (fullNameTH + "  (บิดา)"), 180, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 510, y, 0);
 
-                        //Name-LastName,age parent
-                        _y = 647;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh + "  (บิดา)", 180, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 510, _y, 0);
+                        //no, moo, soi
+                        y = 625;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 110, y, 0); //บ้านเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 200, y, 0); //หมู่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 290, y, 0); //ตรอก/ซอย
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 430, y, 0); //ถนน
 
-                        //No,Moo,Soi
-                        _y = 625;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 110, _y, 0);//บ้านเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 200, _y, 0);//หมู่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 290, _y, 0);//ตรอก/ซอย
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 430, _y, 0);//ถนน
+                        //road, subdistrict, district
+                        y = 600;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 110, y, 0); //ตำบล/แขวง
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 282, y, 0); //อำเภอ/เขต
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 415, y, 0); //จังหวัด
 
-                        //road,subdistrict,district
-                        _y = 600;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 110, _y, 0);//ตำบล/แขวง
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 282, _y, 0);//อำเภอ/เขต
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 415, _y, 0);//จังหวัด
-
-                        //provice,zipcode,phone
-                        _y = 578;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 130, _y, 0);//รหัสไปรษณีย์
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 220, _y, 0);//เบอร์โทรศัพท์
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 420, _y, 0);//รหัสบัตรประชาชน
+                        //province, zipcode, phone
+                        y = 578;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 130, y, 0); //รหัสไปรษณีย์
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 220, y, 0); //เบอร์โทรศัพท์
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 420, y, 0); //รหัสบัตรประชาชน
 
                         //sign father
-                        _y = 295;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 350, _y, 0);
+                        y = 295;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 350, y, 0);
                     }
-                    else
-                    {// acayear >= 2565
+                    else {
+                        //acayear >= 2565
+                        BaseFont bf = BaseFont.CreateFont((path + "\\fonts\\THSarabun.ttf"), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
 
-                        BaseFont _bf = BaseFont.CreateFont(_path + "\\fonts\\THSarabun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                        //ContractId
-                        _y = 746;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_B", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
+                        //contract ID
+                        y = 746;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_B"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
 
-                        //Current Date
-                        _y = 645;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayP2, 346, _y, 0);//Date
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThP2, 400, _y, 0);//Month
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThP2, 509, _y, 0);//Year
+                        //current date
+                        y = 645;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayP2, 346, y, 0); //date
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHP2, 400, y, 0); //month
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHP2, 509, y, 0); //year
 
-                        //Name-LastName,age parent, NO., MOO
-                        _y = 611;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 180, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 338, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 433, _y, 0);//บ้านเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 521, _y, 0);//หมู่
+                        //fullname, age parent, no, moo
+                        y = 611;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 180, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 338, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 433, y, 0); //บ้านเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 521, y, 0); //หมู่
 
-                        //Soi, Road, SubDistrict
-                        _y = 587;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 136, _y, 0);//ตรอก/ซอย
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 251, _y, 0);//ถนน
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 424, _y, 0);//ตำบล/แขวง
+                        //soi, road, subdistrict
+                        y = 587;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 136, y, 0); //ตรอก/ซอย
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 251, y, 0); //ถนน
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 424, y, 0); //ตำบล/แขวง
 
-                        //District, Province, Zipcode
-                        _y = 566;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 136, _y, 0);//อำเภอ/เขต
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 300, _y, 0);//จังหวัด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 489, _y, 0);//รหัสไปรษณีย์
+                        //district, province, zipcode
+                        y = 566;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 136, y, 0); //อำเภอ/เขต
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 300, y, 0); //จังหวัด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 489, y, 0); //รหัสไปรษณีย์
 
-                        //Telephone, IdCard
-                        _y = 545;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 125, _y, 0);//เบอร์โทรศัพท์
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 347, _y, 0);//รหัสบัตรประชาชน
-                    }
-                }
-                else if (_ProgramCode == "DTDSB")
-                {
-                    if (_statusContract == "OLD")
-                    {
-
-                        BaseFont _bf = BaseFont.CreateFont(_path + "\\fonts\\THSarabun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                        //ContractId
-                        _y = 745;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_B", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-
-                        //Current Date
-                        _y = 670;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayP2, 418, _y, 0);//Date
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThP2, 460, _y, 0);//Month
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThP2, 523, _y, 0);//Year
-
-                        //Name-LastName,age parent
-                        _y = 647;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh + "  (บิดา)", 180, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 510, _y, 0);
-
-                        //No,Moo,Soi
-                        _y = 625;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 130, _y, 0);//บ้านเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 210, _y, 0);//หมู่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 310, _y, 0);//ตรอก/ซอย
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 450, _y, 0);//ถนน
-
-                        //road,subdistrict,district
-                        _y = 600;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 110, _y, 0);//ตำบล/แขวง
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 282, _y, 0);//อำเภอ/เขต
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 415, _y, 0);//จังหวัด
-
-                        //provice,zipcode,phone
-                        _y = 578;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 130, _y, 0);//รหัสไปรษณีย์
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 220, _y, 0);//เบอร์โทรศัพท์
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 420, _y, 0);//รหัสบัตรประชาชน
-                                                                                            //sign father
-                        _y = 295;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 350, _y, 0);
-
-                    }
-                    else
-                    {// acayear >= 2565
-
-                        BaseFont _bf = BaseFont.CreateFont(_path + "\\fonts\\THSarabun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-
-                        //ContractId
-                        _y = 746;
-                        _cb.SetFontAndSize(_bf, 10);
-                        _cb.SetColorFill(BaseColor.GRAY);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_B", 438, _y, 0);//สัญญาเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-
-                        //Current Date
-                        _y = 645;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.SetColorFill(BaseColor.BLACK);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayP2, 346, _y, 0);//Date
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThP2, 400, _y, 0);//Month
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThP2, 509, _y, 0);//Year
-
-                        //Name-LastName,age parent, NO., MOO
-                        _y = 610;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 180, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 338, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 433, _y, 0);//บ้านเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 521, _y, 0);//หมู่
-
-                        //Soi, Road, SubDistrict
-                        _y = 587;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 136, _y, 0);//ตรอก/ซอย
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 251, _y, 0);//ถนน
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 424, _y, 0);//ตำบล/แขวง
-
-                        //District, Province, Zipcode
-                        _y = 566;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 136, _y, 0);//อำเภอ/เขต
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 300, _y, 0);//จังหวัด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 489, _y, 0);//รหัสไปรษณีย์
-
-                        //Telephone, IdCard
-                        _y = 545;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 125, _y, 0);//เบอร์โทรศัพท์
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 347, _y, 0);//รหัสบัตรประชาชน
+                        //telephone, ID card
+                        y = 545;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 125, y, 0); //เบอร์โทรศัพท์
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 347, y, 0); //รหัสบัตรประชาชน
                     }
                 }
-                else if (_ProgramCode == "PYPYB")
-                {
-                    BaseFont _bf = BaseFont.CreateFont(_path + "\\fonts\\THSarabun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                
+                if (programCode == "DTDSB") {
+                    if (statusContract == "OLD") {
+                        BaseFont bf = BaseFont.CreateFont((path + "\\fonts\\THSarabun.ttf"), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                        
+                        //contract ID
+                        y = 745;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_B"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
 
-                    //ContractId
-                    _y = 745;
-                    _cb.SetFontAndSize(_bf, 10);
-                    _cb.SetColorFill(BaseColor.GRAY);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_B", 438, _y, 0);//สัญญาเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
+                        //current date
+                        y = 670;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayP2, 418, y, 0); //date
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHP2, 460, y, 0); //month
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHP2, 523, y, 0); //year
 
-                    //Current Date
-                    _y = 670;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.SetColorFill(BaseColor.BLACK);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayP2, 418, _y, 0);//Date
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThP2, 460, _y, 0);//Month
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThP2, 523, _y, 0);//Year
+                        //fullname, age parent
+                        y = 647;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (fullNameTH + "  (บิดา)"), 180, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 510, y, 0);
 
-                    //Name-LastName,age parent
-                    _y = 648;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh + "  (บิดา)", 180, _y, 0);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 510, _y, 0);
+                        //no, moo, soi
+                        y = 625;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 130, y, 0); //บ้านเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 210, y, 0); //หมู่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 310, y, 0); //ตรอก/ซอย
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 450, y, 0); //ถนน
 
-                    //No,Moo,Soi
-                    _y = 625;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 130, _y, 0);//บ้านเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 220, _y, 0);//หมู่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 300, _y, 0);//ตรอก/ซอย
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 445, _y, 0);//ถนน
+                        //road, subdistrict, district
+                        y = 600;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 110, y, 0); //ตำบล/แขวง
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 282, y, 0); //อำเภอ/เขต
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 415, y, 0); //จังหวัด
 
-                    //road,subdistrict,district
-                    _y = 600;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 110, _y, 0);//ตำบล/แขวง
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 280, _y, 0);//อำเภอ/เขต
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 410, _y, 0);//จังหวัด
+                        //province, zipcode, phone
+                        y = 578;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 130, y, 0); //รหัสไปรษณีย์
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 220, y, 0); //เบอร์โทรศัพท์
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 420, y, 0); //รหัสบัตรประชาชน
+                                                                                            
+                        //sign father
+                        y = 295;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 350, y, 0);
+                    }
+                    else {
+                        //acayear >= 2565
+                        BaseFont bf = BaseFont.CreateFont((path + "\\fonts\\THSarabun.ttf"), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
 
-                    //provice,zipcode,phone
-                    _y = 578;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 130, _y, 0);//รหัสไปรษณีย์
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 220, _y, 0);//เบอร์โทรศัพท์
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 420, _y, 0);//รหัสบัตรประชาชน
+                        //contract ID
+                        y = 746;
+                        cb.SetFontAndSize(bf, 10);
+                        cb.SetColorFill(BaseColor.GRAY);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_B"), 438, y, 0); //สัญญาเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+
+                        //current date
+                        y = 645;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.SetColorFill(BaseColor.BLACK);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayP2, 346, y, 0); //date
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHP2, 400, y, 0); //month
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHP2, 509, y, 0); //year
+
+                        //fullname, age parent, no, moo
+                        y = 610;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 180, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 338, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 433, y, 0); //บ้านเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 521, y, 0); //หมู่
+
+                        //soi, road, subdistrict
+                        y = 587;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 136, y, 0); //ตรอก/ซอย
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 251, y, 0); //ถนน
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 424, y, 0); //ตำบล/แขวง
+
+                        //district, province, zipcode
+                        y = 566;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 136, y, 0); //อำเภอ/เขต
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 300, y, 0); //จังหวัด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 489, y, 0); //รหัสไปรษณีย์
+
+                        //telephone, ID card
+                        y = 545;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 125, y, 0); //เบอร์โทรศัพท์
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 347, y, 0); //รหัสบัตรประชาชน
+                    }
+                }
+                
+                if (programCode == "PYPYB") {
+                    BaseFont bf = BaseFont.CreateFont((path + "\\fonts\\THSarabun.ttf"), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+
+                    //contract ID
+                    y = 745;
+                    cb.SetFontAndSize(bf, 10);
+                    cb.SetColorFill(BaseColor.GRAY);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_B"), 438, y, 0); //สัญญาเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+
+                    //current date
+                    y = 670;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.SetColorFill(BaseColor.BLACK);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayP2, 418, y, 0); //date
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHP2, 460, y, 0); //month
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHP2, 523, y, 0); //year
+
+                    //fullname, age parent
+                    y = 648;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (fullNameTH + "  (บิดา)"), 180, y, 0);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 510, y, 0);
+
+                    //no, moo, soi
+                    y = 625;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 130, y, 0); //บ้านเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 220, y, 0); //หมู่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 300, y, 0); //ตรอก/ซอย
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 445, y, 0); //ถนน
+
+                    //road, subdistrict, district
+                    y = 600;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 110, y, 0); //ตำบล/แขวง
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 280, y, 0); //อำเภอ/เขต
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 410, y, 0); //จังหวัด
+
+                    //province, zipcode, phone
+                    y = 578;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 130, y, 0); //รหัสไปรษณีย์
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 220, y, 0); //เบอร์โทรศัพท์
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 420, y, 0); //รหัสบัตรประชาชน
 
                     //sign father
-                    _y = 295;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 400, _y, 0);
+                    y = 295;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 400, y, 0);
                 }
-                else if (_ProgramCode == "RANSB" || _ProgramCode == "NSNSB")
-                {
-                    BaseFont _bf = BaseFont.CreateFont(_path + "\\fonts\\THSarabun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                    //ContractId
-                    _y = 745;
-                    _cb.SetFontAndSize(_bf, 10);
-                    _cb.SetColorFill(BaseColor.GRAY);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode + "_B", 438, _y, 0);//สัญญาเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _studentCode + _ProgramCode, 540, _y, 0);//รหัสนักศึกษา
-                                                                                                            //Current Date
-                    _y = 670;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.SetColorFill(BaseColor.BLACK);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayP2, 418, _y, 0);//Date
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThP2, 460, _y, 0);//Month
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThP2, 523, _y, 0);//Year
-                                                                                                 //Name-LastName,age parent
-                    _y = 648;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh + "  (บิดา)", 180, _y, 0);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 505, _y, 0);
-                    //No,Moo,Soi
-                    _y = 625;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 115, _y, 0);//บ้านเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 220, _y, 0);//หมู่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 300, _y, 0);//ตรอก/ซอย
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 445, _y, 0);//ถนน
+                
+                if (programCode == "RANSB" ||
+                    programCode == "NSNSB") {
+                    BaseFont bf = BaseFont.CreateFont((path + "\\fonts\\THSarabun.ttf"), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
 
-                    //road,subdistrict,district
-                    _y = 600;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 100, _y, 0);//ตำบล/แขวง
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 285, _y, 0);//อำเภอ/เขต
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 415, _y, 0);//จังหวัด
+                    //contract ID
+                    y = 745;
+                    cb.SetFontAndSize(bf, 10);
+                    cb.SetColorFill(BaseColor.GRAY);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode + "_B"), 438, y, 0); //สัญญาเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (studentCode + programCode), 540, y, 0); //รหัสนักศึกษา
+                                                                                                            
+                    //current date
+                    y = 670;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.SetColorFill(BaseColor.BLACK);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayP2, 418, y, 0); //date
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHP2, 460, y, 0); //month
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHP2, 523, y, 0); //year
+                                                                                                 
+                    //fullname, age parent
+                    y = 648;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (fullNameTH + "  (บิดา)"), 180, y, 0);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 505, y, 0);
 
-                    //provice,zipcode,phone
-                    _y = 578;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 130, _y, 0);//รหัสไปรษณีย์
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 215, _y, 0);//เบอร์โทรศัพท์
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 420, _y, 0);//รหัสบัตรประชาชน
+                    //no, moo, soi
+                    y = 625;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 115, y, 0); //บ้านเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 220, y, 0); //หมู่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 300, y, 0); //ตรอก/ซอย
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 445, y, 0); //ถนน
+
+                    //road, subdistrict, district
+                    y = 600;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 100, y, 0); //ตำบล/แขวง
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 285, y, 0); //อำเภอ/เขต
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 415, y, 0); //จังหวัด
+
+                    //province, zipcode, phone
+                    y = 578;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 130, y, 0); //รหัสไปรษณีย์
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 215, y, 0); //เบอร์โทรศัพท์
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 420, y, 0); //รหัสบัตรประชาชน
 
                     //sign father
-                    _y = 275;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 400, _y, 0);
+                    y = 275;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 400, y, 0);
                 }
 
-
-
-
-                // show mohter profile
+                //show mohter profile
                 //ข้อมูลมารดา ถ้าเป็นผู้ค้ำประกัน หรือ ผู้ยินยอมคู่สมรส ให้รับรองบุตรด้วย
-                if (_warrantBy == "M" || _consentBy == "M")
-                {
-                    _fullNameTh = Myconfig.CvEmpty(_parentMInfo.FullNameTh, " - ");
-                    _age = Myconfig.CvEmpty(_parentMInfo.Age, " - ");
-                    _moo = Myconfig.CvEmpty(_parentMInfo.MooPermanent, " - ");
-                    _no = Myconfig.CvEmpty(_parentMInfo.NoPermanent, " - ");
-                    _soi = Myconfig.CvEmpty(_parentMInfo.SoiPermanent, " - ");
-                    _road = Myconfig.CvEmpty(_parentMInfo.RoadPermanent, " - ");
-                    _subdistrict = Myconfig.CvEmpty(_parentMInfo.ThSubdistrictName, " - ");
-                    _district = Myconfig.CvEmpty(_parentMInfo.ThDistrictName, " - ");
-                    _provice = Myconfig.CvEmpty(_parentMInfo.ProvinceNameTH, " - ");
-                    _zipcode = Myconfig.CvEmpty(_parentMInfo.ZipCodePermanent, " - ");
-                    _phone = Myconfig.CvEmpty(_parentMInfo.PhoneNumberPermanent, " - ");
-                    _idCard = Myconfig.CvEmpty(_parentMInfo.IdCard, " - ");
-                    _signMother = Myconfig.CvEmpty(_parentMInfo.FullNameTh, " - ");
+                if (warrantBy == "M" ||
+                    consentBy == "M") {
+                    fullNameTH = Myconfig.CvEmpty(parentMInfo.FullNameTH, " - ");
+                    age = Myconfig.CvEmpty(parentMInfo.Age, " - ");
+                    moo = Myconfig.CvEmpty(parentMInfo.MooPermanent, " - ");
+                    no = Myconfig.CvEmpty(parentMInfo.NoPermanent, " - ");
+                    soi = Myconfig.CvEmpty(parentMInfo.SoiPermanent, " - ");
+                    road = Myconfig.CvEmpty(parentMInfo.RoadPermanent, " - ");
+                    subdistrict = Myconfig.CvEmpty(parentMInfo.SubdistrictNameTH, " - ");
+                    district = Myconfig.CvEmpty(parentMInfo.DistrictNameTH, " - ");
+                    province = Myconfig.CvEmpty(parentMInfo.ProvinceNameTH, " - ");
+                    zipcode = Myconfig.CvEmpty(parentMInfo.ZipcodePermanent, " - ");
+                    phone = Myconfig.CvEmpty(parentMInfo.PhoneNumberPermanent, " - ");
+                    idCard = Myconfig.CvEmpty(parentMInfo.IDCard, " - ");
+                    signMother = Myconfig.CvEmpty(parentMInfo.FullNameTH, " - ");
                 }
-                else
-                {
-                    _fullNameTh = " - ";
-                    _age = " - ";
-                    _moo = " - ";
-                    _no = " - ";
-                    _soi = " - ";
-                    _road = " - ";
-                    _subdistrict = " - ";
-                    _district = " - ";
-                    _provice = " - ";
-                    _zipcode = " - ";
-                    _phone = " - ";
-                    _idCard = " - ";
-                    _signMother = " - ";
-
+                else {
+                    fullNameTH = " - ";
+                    age = " - ";
+                    moo = " - ";
+                    no = " - ";
+                    soi = " - ";
+                    road = " - ";
+                    subdistrict = " - ";
+                    district = " - ";
+                    province = " - ";
+                    zipcode = " - ";
+                    phone = " - ";
+                    idCard = " - ";
+                    signMother = " - ";
                 }
 
-                if (_ProgramCode == "SIMDB" || _ProgramCode == "RAMDB")
-                { // Name-LastName,age
-                    if (_statusContract == "OLD")
-                    {// acaYear < 2565
-                        BaseFont _bf = BaseFont.CreateFont(_path + "\\fonts\\THSarabun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                        _y = 530;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh + "  (มารดา)", 180, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 505, _y, 0);
-                        //No,Moo,Soi
-                        _y = 505;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 130, _y, 0);//บ้านเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 200, _y, 0);//หมู่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 285, _y, 0);//ตรอก/ซอย
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 425, _y, 0);//ถนน
+                if (programCode == "SIMDB" ||
+                    programCode == "RAMDB") {
+                    //acaYear < 2565
+                    if (statusContract == "OLD") {                        
+                        BaseFont bf = BaseFont.CreateFont((path + "\\fonts\\THSarabun.ttf"), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
 
-                        //road,subdistrict,district
-                        _y = 482;
-                        _cb.SetFontAndSize(_bf, 15);
+                        //fullname, age
+                        y = 530;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (fullNameTH + "  (มารดา)"), 180, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 505, y, 0);
 
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 105, _y, 0);//ตำบล/แขวง
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 282, _y, 0);//อำเภอ/เขต
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 415, _y, 0);//จังหวัด
-                                                                                             //provice,zipcode,phone
-                        _y = 460;
-                        _cb.SetFontAndSize(_bf, 15);
+                        //no, moo, soi
+                        y = 505;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 130, y, 0); //บ้านเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 200, y, 0); //หมู่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 285, y, 0); //ตรอก/ซอย
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 425, y, 0); //ถนน
 
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 130, _y, 0);//รหัสไปรษณีย์
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 220, _y, 0);//เบอร์โทรศัพท์
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 420, _y, 0);//รหัสบัตรประชาชน
+                        //road, subdistrict, district
+                        y = 482;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 105, y, 0); //ตำบล/แขวง
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 282, y, 0); //อำเภอ/เขต
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 415, y, 0); //จังหวัด
+                                                                                             
+                        //province, zipcode, phone
+                        y = 460;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 130, y, 0); //รหัสไปรษณีย์
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 220, y, 0); //เบอร์โทรศัพท์
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 420, y, 0); //รหัสบัตรประชาชน
 
+                        //name student
+                        y = 437;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 240, y, 0); //ชื่อนักศึกษา
 
-                        //Name student
-                        _y = 437;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 240, _y, 0);//ชื่อนักศึกษา
-                        _y = 412;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 350, _y, 0);//ชื่อนักศึกษา
-                        _y = 389;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dateContract, 289, _y, 0);//วันที่ทำสัญญา
-                        _y = 368;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 90, _y, 0);//ชื่อนักศึกษา
+                        y = 412;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 350, y, 0); //ชื่อนักศึกษา
+
+                        y = 389;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dateContract, 289, y, 0); //วันที่ทำสัญญา
+
+                        y = 368;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 90, y, 0); //ชื่อนักศึกษา
 
                         //sign Mather
-                        _y = 250;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 350, _y, 0);
-                        _cb.EndText();
+                        y = 250;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 350, y, 0);
+
+                        cb.EndText();
                     }
-                    else
-                    {// acaYear < 2565
-                        BaseFont _bf = BaseFont.CreateFont(_path + "\\fonts\\THSarabun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                        //FullName, Age, NO, MOO
-                        _y = 525;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 165, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 336, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 432, _y, 0);//บ้านเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 520, _y, 0);//หมู่
+                    else {
+                        //acaYear < 2565
+                        BaseFont bf = BaseFont.CreateFont((path + "\\fonts\\THSarabun.ttf"), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                        
+                        //fullname, age, no, moo
+                        y = 525;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 165, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 336, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 432, y, 0); //บ้านเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 520, y, 0); //หมู่
 
-                        //Soi, Road, Subdistrict
-                        _y = 502;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 136, _y, 0);//ตรอก/ซอย
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 251, _y, 0);//ถนน
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 424, _y, 0);//ตำบล/แขวง
+                        //soi, road, subdistrict
+                        y = 502;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 136, y, 0); //ตรอก/ซอย
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 251, y, 0); //ถนน
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 424, y, 0); //ตำบล/แขวง
 
-                        //District, Province, Zipcode
-                        _y = 480;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 136, _y, 0);//อำเภอ/เขต
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 300, _y, 0);//จังหวัด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 489, _y, 0);//รหัสไปรษณีย์
+                        //district, province, zipcode
+                        y = 480;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 136, y, 0); //อำเภอ/เขต
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 300, y, 0); //จังหวัด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 489, y, 0); //รหัสไปรษณีย์
 
-                        //Telephone, IdCard
-                        _y = 459;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 125, _y, 0);//เบอร์โทรศัพท์
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 347, _y, 0);//รหัสบัตรประชาชน
+                        //telephone, ID card
+                        y = 459;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 125, y, 0); //เบอร์โทรศัพท์
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 347, y, 0); //รหัสบัตรประชาชน
 
-                        //Name student
-                        _y = 439;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 267, _y, 0);//ชื่อนักศึกษา
+                        //name student
+                        y = 439;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 267, y, 0); //ชื่อนักศึกษา
 
-                        _y = 398;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 189, _y, 0);//ชื่อนักศึกษา
+                        y = 398;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 189, y, 0); //ชื่อนักศึกษา
 
-                        _y = 354;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 89, _y, 0);//ชื่อนักศึกษา
+                        y = 354;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 89, y, 0); //ชื่อนักศึกษา
 
-                        //Relation
-                        _y = 418;
-                        if (Myconfig.CvEmpty(_parentFInfo.FullNameTh, "") != "" && Myconfig.CvEmpty(_parentMInfo.FullNameTh, "") != "")
-                        {//บิดาและมารดา
-                            _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "บิดาและมารดา", 178, _y, 0);
+                        //relation
+                        y = 418;
+                        //บิดาและมารดา
+                        if (Myconfig.CvEmpty(parentFInfo.FullNameTH, "") != "" &&
+                            Myconfig.CvEmpty(parentMInfo.FullNameTH, "") != "") {
+                            cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "บิดาและมารดา", 178, y, 0);
                         }
-                        else if (Myconfig.CvEmpty(_parentFInfo.FullNameTh, "") != "" && Myconfig.CvEmpty(_parentMInfo.FullNameTh, "") == "")
-                        {//บิดา
-                            _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "บิดา", 185, _y, 0);
-                        }
-                        else if (Myconfig.CvEmpty(_parentFInfo.FullNameTh, "") == "" && Myconfig.CvEmpty(_parentMInfo.FullNameTh, "") != "")
-                        {//มารดา
-                            _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "มารดา", 185, _y, 0);
-                        }
-
-
-                        //Contract Date
-                        _y = 374;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayStd, 205, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThStd, 262, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThStd, 357, _y, 0);
-
-                        //Sign Father & Mother
-                        _y = 311;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, Myconfig.CvEmpty(_parentFInfo.FullNameTh, " "), 199, _y, 0);
-                        _y = 248;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, Myconfig.CvEmpty(_parentMInfo.FullNameTh, " "), 199, _y, 0);
-                        _cb.EndText();
-                    }
-                }
-                else if (_ProgramCode == "DTDSB")
-                {// Name-LastName,age
-                    if (_statusContract == "OLD")
-                    {// acaYear < 2565
-                        BaseFont _bf = BaseFont.CreateFont(_path + "\\fonts\\THSarabun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                        _y = 530;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh + "  (มารดา)", 180, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 505, _y, 0);
-                        //No,Moo,Soi
-                        _y = 505;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 130, _y, 0);//บ้านเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 200, _y, 0);//หมู่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 285, _y, 0);//ตรอก/ซอย
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 425, _y, 0);//ถนน
-                                                                                          //road,subdistrict,district
-                        _y = 482;
-                        _cb.SetFontAndSize(_bf, 15);
-
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 105, _y, 0);//ตำบล/แขวง
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 282, _y, 0);//อำเภอ/เขต
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 415, _y, 0);//จังหวัด
-                                                                                             //provice,zipcode,phone
-                        _y = 460;
-                        _cb.SetFontAndSize(_bf, 15);
-
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 130, _y, 0);//รหัสไปรษณีย์
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 220, _y, 0);//เบอร์โทรศัพท์
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 420, _y, 0);//รหัสบัตรประชาชน
-
-
-                        //Name student
-                        _y = 437;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 240, _y, 0);//ชื่อนักศึกษา
-                        _y = 412;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 400, _y, 0);//ชื่อนักศึกษา
-                        _y = 389;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dateContract, 289, _y, 0);//วันที่ทำสัญญา
-                        _y = 368;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 90, _y, 0);//ชื่อนักศึกษา
-                                                                                              //sign Mather
-                        _y = 250;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 350, _y, 0);
-                        _cb.EndText();
-                    }
-                    else
-                    {// acaYear < 2565
-                        BaseFont _bf = BaseFont.CreateFont(_path + "\\fonts\\THSarabun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                        //FullName, Age, NO, MOO
-                        _y = 524;
-                        _cb.SetFontAndSize(_bf, 15);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 165, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 336, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 432, _y, 0);//บ้านเลขที่
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 520, _y, 0);//หมู่
-
-                        //Soi, Road, Subdistrict
-                        _y = 502;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 136, _y, 0);//ตรอก/ซอย
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 251, _y, 0);//ถนน
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 424, _y, 0);//ตำบล/แขวง
-
-                        //District, Province, Zipcode
-                        _y = 480;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 136, _y, 0);//อำเภอ/เขต
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 300, _y, 0);//จังหวัด
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 489, _y, 0);//รหัสไปรษณีย์
-
-                        //Telephone, IdCard
-                        _y = 459;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 125, _y, 0);//เบอร์โทรศัพท์
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 347, _y, 0);//รหัสบัตรประชาชน
-
-                        //Name student
-                        _y = 439;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 267, _y, 0);//ชื่อนักศึกษา
-
-                        _y = 397;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 215, _y, 0);//ชื่อนักศึกษา
-
-                        _y = 354;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 89, _y, 0);//ชื่อนักศึกษา
-
-                        //Relation
-                        _y = 418;
-                        if (Myconfig.CvEmpty(_parentFInfo.FullNameTh, "") != "" && Myconfig.CvEmpty(_parentMInfo.FullNameTh, "") != "")
-                        {//บิดาและมารดา
-                            _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "บิดาและมารดา", 178, _y, 0);
-                        }
-                        else if (Myconfig.CvEmpty(_parentFInfo.FullNameTh, "") != "" && Myconfig.CvEmpty(_parentMInfo.FullNameTh, "") == "")
-                        {//บิดา
-                            _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "บิดา", 185, _y, 0);
-                        }
-                        else if (Myconfig.CvEmpty(_parentFInfo.FullNameTh, "") == "" && Myconfig.CvEmpty(_parentMInfo.FullNameTh, "") != "")
-                        {//มารดา
-                            _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "มารดา", 185, _y, 0);
+                        else {
+                            //บิดา
+                            if (Myconfig.CvEmpty(parentFInfo.FullNameTH, "") != "" &&
+                                Myconfig.CvEmpty(parentMInfo.FullNameTH, "") == "") {
+                                cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "บิดา", 185, y, 0);
+                            }
+                            else {
+                                //มารดา
+                                if (Myconfig.CvEmpty(parentFInfo.FullNameTH, "") == "" &&
+                                    Myconfig.CvEmpty(parentMInfo.FullNameTH, "") != "") {
+                                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "มารดา", 185, y, 0);
+                                }
+                            }
                         }
 
+                        //contract date
+                        y = 374;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayStd, 205, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHStd, 262, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHStd, 357, y, 0);
 
-                        //Contract Date
-                        _y = 374;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.dayStd, 205, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.monthNameThStd, 262, _y, 0);
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _ctInfo.yearThStd, 357, _y, 0);
+                        //sign father & mother
+                        y = 311;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, Myconfig.CvEmpty(parentFInfo.FullNameTH, " "), 199, y, 0);
 
-                        //Sign Father & Mother
-                        _y = 311;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, Myconfig.CvEmpty(_parentFInfo.FullNameTh, " "), 199, _y, 0);
-                        _y = 248;
-                        _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, Myconfig.CvEmpty(_parentMInfo.FullNameTh, " "), 199, _y, 0);
-                        _cb.EndText();
+                        y = 248;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, Myconfig.CvEmpty(parentMInfo.FullNameTH, " "), 199, y, 0);
+
+                        cb.EndText();
                     }
                 }
-                else if (_ProgramCode == "PYPYB")
-                { // Name-LastName,age
-                    BaseFont _bf = BaseFont.CreateFont(_path + "\\fonts\\THSarabun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                    _y = 530;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh + "  (มารดา)", 180, _y, 0);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 505, _y, 0);
-                    //No,Moo,Soi
-                    _y = 505;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 130, _y, 0);//บ้านเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 200, _y, 0);//หมู่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 285, _y, 0);//ตรอก/ซอย
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 425, _y, 0);//ถนน
-                                                                                      //road,subdistrict,district
-                    _y = 482;
-                    _cb.SetFontAndSize(_bf, 15);
+                
+                if (programCode == "DTDSB") {
+                    //acaYear < 2565
+                    if (statusContract == "OLD") {
+                        BaseFont bf = BaseFont.CreateFont((path + "\\fonts\\THSarabun.ttf"), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
 
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 105, _y, 0);//ตำบล/แขวง
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 280, _y, 0);//อำเภอ/เขต
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 410, _y, 0);//จังหวัด
-                                                                                         //provice,zipcode,phone
-                    _y = 460;
-                    _cb.SetFontAndSize(_bf, 15);
+                        //fullname, age
+                        y = 530;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (fullNameTH + "  (มารดา)"), 180, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 505, y, 0);
 
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 130, _y, 0);//รหัสไปรษณีย์
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 220, _y, 0);//เบอร์โทรศัพท์
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 420, _y, 0);//รหัสบัตรประชาชน
+                        //no, moo, soi
+                        y = 505;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 130, y, 0); //บ้านเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 200, y, 0); //หมู่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 285, y, 0); //ตรอก/ซอย
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 425, y, 0); //ถนน
+                                                                                          
+                        //road, subdistrict, district
+                        y = 482;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 105, y, 0); //ตำบล/แขวง
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 282, y, 0); //อำเภอ/เขต
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 415, y, 0); //จังหวัด
+                                                                                             
+                        //province, zipcode, phone
+                        y = 460;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 130, y, 0); //รหัสไปรษณีย์
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 220, y, 0); //เบอร์โทรศัพท์
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 420, y, 0); //รหัสบัตรประชาชน
 
+                        //name student
+                        y = 437;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 240, y, 0); //ชื่อนักศึกษา
 
-                    //Name student
-                    _y = 435;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 270, _y, 0);//ชื่อนักศึกษา
-                    _y = 415;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 350, _y, 0);//ชื่อนักศึกษา
-                    _y = 392;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dateContract, 280, _y, 0);//วันที่ทำสัญญา
-                    _y = 368;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 90, _y, 0);//ชื่อนักศึกษา
-                                                                                          //sign Mather
-                    _y = 250;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 400, _y, 0);
-                    _cb.EndText();
+                        y = 412;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 400, y, 0); //ชื่อนักศึกษา
+
+                        y = 389;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dateContract, 289, y, 0); //วันที่ทำสัญญา
+
+                        y = 368;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 90, y, 0); //ชื่อนักศึกษา
+                                                                                              
+                        //sign mather
+                        y = 250;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 350, y, 0);
+                        cb.EndText();
+                    }
+                    else {
+                        //acaYear < 2565
+                        BaseFont bf = BaseFont.CreateFont((path + "\\fonts\\THSarabun.ttf"), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+
+                        //fullname, age, no, moo
+                        y = 524;
+                        cb.SetFontAndSize(bf, 15);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 165, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 336, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 432, y, 0); //บ้านเลขที่
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 520, y, 0); //หมู่
+
+                        //soi, road, subdistrict
+                        y = 502;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 136, y, 0); //ตรอก/ซอย
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 251, y, 0); //ถนน
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 424, y, 0); //ตำบล/แขวง
+
+                        //district, province, zipcode
+                        y = 480;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 136, y, 0); //อำเภอ/เขต
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 300, y, 0); //จังหวัด
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 489, y, 0); //รหัสไปรษณีย์
+
+                        //telephone, ID card
+                        y = 459;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 125, y, 0); //เบอร์โทรศัพท์
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 347, y, 0); //รหัสบัตรประชาชน
+
+                        //name student
+                        y = 439;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 267, y, 0); //ชื่อนักศึกษา
+
+                        y = 397;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 215, y, 0); //ชื่อนักศึกษา
+
+                        y = 354;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 89, y, 0); //ชื่อนักศึกษา
+
+                        //relation
+                        y = 418;
+                        //บิดาและมารดา
+                        if (Myconfig.CvEmpty(parentFInfo.FullNameTH, "") != "" &&
+                            Myconfig.CvEmpty(parentMInfo.FullNameTH, "") != "") {
+                            cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "บิดาและมารดา", 178, y, 0);
+                        }
+                        else {
+                            //บิดา
+                            if (Myconfig.CvEmpty(parentFInfo.FullNameTH, "") != "" &&
+                                Myconfig.CvEmpty(parentMInfo.FullNameTH, "") == "") {
+                                cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "บิดา", 185, y, 0);
+                            }
+                            else {
+                                //มารดา
+                                if (Myconfig.CvEmpty(parentFInfo.FullNameTH, "") == "" &&
+                                    Myconfig.CvEmpty(parentMInfo.FullNameTH, "") != "") {
+                                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "มารดา", 185, y, 0);
+                                }
+                            }
+                        }
+
+                        //contract date
+                        y = 374;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.DayStd, 205, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.MonthNameTHStd, 262, y, 0);
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, ctInfo.YearTHStd, 357, y, 0);
+
+                        //sign father & mother
+                        y = 311;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, Myconfig.CvEmpty(parentFInfo.FullNameTH, " "), 199, y, 0);
+
+                        y = 248;
+                        cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, Myconfig.CvEmpty(parentMInfo.FullNameTH, " "), 199, y, 0);
+
+                        cb.EndText();
+                    }
                 }
-                else if (_ProgramCode == "RANSB" || _ProgramCode == "NSNSB")
-                {// Name-LastName,age
-                    BaseFont _bf = BaseFont.CreateFont(_path + "\\fonts\\THSarabun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                    _y = 530;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh + "  (มารดา)", 180, _y, 0);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _age, 500, _y, 0);
-                    //No,Moo,Soi
-                    _y = 505;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _no, 110, _y, 0);//บ้านเลขที่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _moo, 200, _y, 0);//หมู่
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _soi, 290, _y, 0);//ตรอก/ซอย
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _road, 425, _y, 0);//ถนน
-                                                                                      //road,subdistrict,district
-                    _y = 485;
-                    _cb.SetFontAndSize(_bf, 15);
+                
+                if (programCode == "PYPYB") {                    
+                    BaseFont bf = BaseFont.CreateFont((path + "\\fonts\\THSarabun.ttf"), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
 
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _subdistrict, 105, _y, 0);//ตำบล/แขวง
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _district, 285, _y, 0);//อำเภอ/เขต
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _provice, 415, _y, 0);//จังหวัด
-                                                                                         //provice,zipcode,phone
-                    _y = 460;
-                    _cb.SetFontAndSize(_bf, 15);
+                    //fullname, age
+                    y = 530;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (fullNameTH + "  (มารดา)"), 180, y, 0);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 505, y, 0);
 
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _zipcode, 130, _y, 0);//รหัสไปรษณีย์
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _phone, 215, _y, 0);//เบอร์โทรศัพท์
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _idCard, 420, _y, 0);//รหัสบัตรประชาชน
+                    //no, moo, soi
+                    y = 505;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 130, y, 0); //บ้านเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 200, y, 0); //หมู่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 285, y, 0); //ตรอก/ซอย
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 425, y, 0); //ถนน
+                                                                                      
+                    //road, subdistrict, district
+                    y = 482;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 105, y, 0); //ตำบล/แขวง
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 280, y, 0); //อำเภอ/เขต
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 410, y, 0); //จังหวัด
+                                                                                         
+                    //provice, zipcode, phone
+                    y = 460;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 130, y, 0); //รหัสไปรษณีย์
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 220, y, 0); //เบอร์โทรศัพท์
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 420, y, 0); //รหัสบัตรประชาชน
 
+                    //name student
+                    y = 435;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 270, y, 0); //ชื่อนักศึกษา
 
-                    //Name student
-                    _y = 435;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 270, _y, 0);//ชื่อนักศึกษา
-                    _y = 390;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 180, _y, 0);//ชื่อนักศึกษา
-                    _y = 365;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _dateContract, 230, _y, 0);//วันที่ทำสัญญา
-                    _y = 344;
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _stdNameTh, 130, _y, 0);//ชื่อนักศึกษา
-                                                                                           //sign Mather
-                    _y = 229;
-                    _cb.SetFontAndSize(_bf, 15);
-                    _cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, _fullNameTh, 400, _y, 0);
-                    _cb.EndText();
+                    y = 415;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 350, y, 0); //ชื่อนักศึกษา
+                    
+                    y = 392;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dateContract, 280, y, 0); //วันที่ทำสัญญา
+                    
+                    y = 368;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 90, y, 0); //ชื่อนักศึกษา
+                                                                                          
+                    //sign mother
+                    y = 250;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 400, y, 0);
+
+                    cb.EndText();
+                }
+                
+                if (programCode == "RANSB" ||
+                    programCode == "NSNSB") {
+                    BaseFont bf = BaseFont.CreateFont((path + "\\fonts\\THSarabun.ttf"), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+
+                    //fullname, age
+                    y = 530;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, (fullNameTH + "  (มารดา)"), 180, y, 0);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, age, 500, y, 0);
+
+                    //no, moo, soi
+                    y = 505;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, no, 110, y, 0); //บ้านเลขที่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, moo, 200, y, 0); //หมู่
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, soi, 290, y, 0); //ตรอก/ซอย
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, road, 425, y, 0); //ถนน
+                                                                                      
+                    //road, subdistrict, district
+                    y = 485;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, subdistrict, 105, y, 0); //ตำบล/แขวง
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, district, 285, y, 0); //อำเภอ/เขต
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, province, 415, y, 0); //จังหวัด
+                                                                                         
+                    //province, zipcode, phone
+                    y = 460;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, zipcode, 130, y, 0); //รหัสไปรษณีย์
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, phone, 215, y, 0); //เบอร์โทรศัพท์
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, idCard, 420, y, 0); //รหัสบัตรประชาชน
+
+                    //name student
+                    y = 435;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 270, y, 0); //ชื่อนักศึกษา
+
+                    y = 390;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 180, y, 0); //ชื่อนักศึกษา
+
+                    y = 365;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, dateContract, 230, y, 0); //วันที่ทำสัญญา
+
+                    y = 344;
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, stdNameTH, 130, y, 0); //ชื่อนักศึกษา
+                                                                                           
+                    //sign mother
+                    y = 229;
+                    cb.SetFontAndSize(bf, 15);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, fullNameTH, 400, y, 0);
+                    
+                    cb.EndText();
                 }
 
+                document.Close();
+                writer.Close();
+                reader.Close();
 
-
-
-                //Close all streams
-                _document.Close();
-                _writer.Close();
-                _reader.Close();
-
-                //update garranteePath  B
-                string _garranteePath = Server.MapPath("~/ElectronicContract/" + _acaYear + "/" + _ProgramCode + _programCodeExtra + "/") + _fileName;
-                ContractDB.SetGarranteePath(_studentId, _acaYear, _garranteePath);
-
-                FileStream sourceFile = new FileStream((Server.MapPath("~/ElectronicContract/" + _acaYear + "/" + _ProgramCode + _programCodeExtra + "/") + _fileName), FileMode.Open);
+                //update garrantee path B
+                string garranteePath = (Server.MapPath("~/ElectronicContract/" + acaYear + "/" + programCode + programCodeExtra + "/") + fileName);
+                ContractDB.SetGarranteePath(studentID, acaYear, garranteePath);
+                FileStream sourceFile = new FileStream((Server.MapPath("~/ElectronicContract/" + acaYear + "/" + programCode + programCodeExtra + "/") + fileName), FileMode.Open);
                 long FileSize;
                 FileSize = sourceFile.Length;
                 byte[] getContent = new byte[(int)FileSize];
+
                 sourceFile.Read(getContent, 0, (int)sourceFile.Length);
                 sourceFile.Close();
                 Response.BinaryWrite(getContent);
             }
-            else
-            {
-                //กรณีมี File สัญญาในระบบแล้ว เปิดอ่านเลย
-
+            else {
+                //กรณีมี file สัญญาในระบบแล้ว เปิดอ่านเลย
                 WebClient client2 = new WebClient();
-                Byte[] buffer2 = client2.DownloadData(_garrantee);
+                Byte[] buffer2 = client2.DownloadData(garrantee);
+
                 Response.ContentType = "application/pdf";
                 Response.AddHeader("content-length", buffer2.Length.ToString());
                 Response.BinaryWrite(buffer2);
                 client2.Dispose();
             }
-
-            // end mother profile
-
-
-            // abs contract
-
-
-
-
-            // ens abs
-
-            // sign father and mother
-
         }
 
-        #endregion printGarrantee
+        #endregion PrintGarrantee
     }
 }

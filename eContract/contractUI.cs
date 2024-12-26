@@ -1,1260 +1,1506 @@
-﻿//using authen;
-using eContract;
-using System;
+﻿using System;
 using System.Data;
 using System.Text;
-using System.Web;
 
-/// <summary>
-/// Summary description for contractUI
-/// </summary>
-namespace eContract
-{
+namespace eContract {
+    public class ContractUI {
+        /*
+        Auther  : Odd.Nopparat
+        Date    : 20-11-2015
+        Perpose : UiStudentProfile
+        Method  : UiStudentProfile
+        Sample  : N/A
+        */
+        public static string UiStudentProfile(string studentCode) {
+            StringBuilder html = new StringBuilder();
+            StudentInfo stdInfo = new StudentInfo(studentCode);
+            //string programCode = Myconfig.CvEmpty(stdInfo.ProgramCode, " - ");
+            //string quotaCode = Myconfig.CvEmpty(stdInfo.QuotaCode, " - ");
+            //string admissionType = Myconfig.CvEmpty(stdInfo.AdmissionType, " - "); 
+            //string studentCode = Myconfig.CvEmpty(_stdInfo.StudentCode, " - ");
+            string stdNameTH = Myconfig.CvEmpty(stdInfo.StdNameTH, " - ");
+            string stdNameEN = Myconfig.CvEmpty(stdInfo.StdNameEN, " - ");
+            string stdStatusNameTH = Myconfig.CvEmpty(stdInfo.StatusNameTH, " - ");
+            string stdStatusNameEN = Myconfig.CvEmpty(stdInfo.StatusNameEN, " - ");
+            //string urlPic = Myconfig.CvEmpty(stdInfo.UrlPic, " - ");
+            string facultyCode = Myconfig.CvEmpty(stdInfo.FacultyCode, " - ");
+            string facultyNameTH = Myconfig.CvEmpty(stdInfo.FacultyNameTH, " - ");
+            string facultyNameEN = Myconfig.CvEmpty(stdInfo.FacultyNameEN, " - ");
+            //string pCode = Myconfig.CvEmpty(stdInfo.PCode, " - ");
+            string programNameTH = Myconfig.CvEmpty(stdInfo.ProgramNameTH, " - ");
+            string programNameEN = Myconfig.CvEmpty(stdInfo.ProgramNameEN, " - ");
+            string urlPicInternet = stdInfo.UrlPicInternet;            
 
-
-    public class ContractUI
-    {
-        public ContractUI()
-        { }
-
-
-
-        /// <summary>
-        /// Auther : Odd.Nopparat
-        /// Date   : 2015-11-20.
-        /// Perpose: UiStudentProfile
-        /// Method : UiStudentProfile
-        /// Sample : N/A
-        /// </summary>
-        public static string UiStudentProfile(string _studentCode)
-        {
-            StringBuilder _string = new StringBuilder();
-
-            StudentInfo _stdInfo = new StudentInfo(_studentCode);
-
-
-            string _programCode, _quotaCode, _admissionType, _stdNameTh, _stdNameEn, _stdStatusEn, _stdStatusTh, _urlPic;
-            string _facultyCode, _facultyNameTh, _facultyNameEn, _pCode, _programNameTh, _programNameEn, _urlPicInternet;
-
-            //_studentCode = Myconfig.CvEmpty(_stdInfo.StudentCode, " - ");
-            _admissionType = Myconfig.CvEmpty(_stdInfo.AdmissionType, " - ");
-            _urlPic = Myconfig.CvEmpty(_stdInfo.UrlPic, " - ");
-            _stdNameEn = Myconfig.CvEmpty(_stdInfo.StdNameEn, " - ");
-            _stdNameTh = Myconfig.CvEmpty(_stdInfo.StdNameTh, " - ");
-            _programCode = Myconfig.CvEmpty(_stdInfo.ProgramCode, " - ");
-            _quotaCode = Myconfig.CvEmpty(_stdInfo.QuotaCode, " - ");
-            _facultyCode = Myconfig.CvEmpty(_stdInfo.FacultyCode, " - ");
-            _facultyNameTh = Myconfig.CvEmpty(_stdInfo.FacultyNameTh, " - ");
-            _facultyNameEn = Myconfig.CvEmpty(_stdInfo.FacultyNameEn, " - ");
-            _programNameTh = Myconfig.CvEmpty(_stdInfo.ProgramNameTh, " - ");
-            _programNameEn = Myconfig.CvEmpty(_stdInfo.ProgramNameEn, " - ");
-            _pCode = Myconfig.CvEmpty(_stdInfo.PCode, " - ");
-            _stdStatusEn = Myconfig.CvEmpty(_stdInfo.StatusEn, " - ");
-            _stdStatusTh = Myconfig.CvEmpty(_stdInfo.StatusTh, " - ");
-            _urlPicInternet = _stdInfo.UrlPicInternet;
-
-            _string.Append("<div class='row'>");
-            _string.Append("    <div class='col m2 l2 hide-on-med-and-down'>" +
-                           "            <img src = '" + _urlPicInternet + "' alt='' class='square responsive-img z-depth-1'" +
-                           "                onError='this.onerror=null;this.src='nopic.png';'/>" +
-                           "    </div>");
-
-
-
-            _string.Append(@"   <div class='col l2 m2 hide-on-med-and-down'>
-                                <ul class='pink-text'>
-                                        <li><span class='th'>รหัสนักศึกษา</span><span class='en hide'>StudentID</span></li>
-                                        <li><span class='th'>ชื่อ-นามสกุล</span><span class='en hide'>Name-Lastname</span></li>
-                                        <li><span class='th'>คณะ</span><span class='en hide'>Faculty</span></li>
-                                        <li><span class='th'>หลักสูตร</span><span class='en hide'>Program</span></li>
-                                        <li><span class='th'>สถานะ</span><span class='en hide'>Status</span></li>
-                                </ul>
-                            </div>");
-
-            _string.Append("   <div class='col l8 m8 s12'>" +
-                           "       <ul class='blue-text text-darken-4'>" +
-                           "               <li>" + _studentCode + "</li>" +
-                           "               <li><span class='th'>" + _stdNameTh + "</span></li>" +
-                           "               <li><span class='en hide'>" + _stdNameEn + "</span></li>" +
-                           "               <li><span class='th'>" + _facultyNameTh + "</span>" +
-                           "                   <span class='en hide'>" + _facultyNameEn + "</span>" +
-                           "                   <span>&nbsp;&nbsp;( " + _facultyCode + " )</span>" +
-                           "               </li>" +
-                           "               <li>" +
-                           "                   <span class='th'>" + _programNameTh + "</span>" +
-                           "                   <span class='en hide'>" + _programNameEn + "</span>" +
-                           "               </li>" +
-                           "               <li>" +
-                           "                   <span class='th'>" + _stdStatusTh + "</span>" +
-                           "                   <span class='en hide'>" + _stdStatusEn + "</span>" +
-                           "               </li>" +
-                           "       </ul>" +
-                           "   </div>");
-
-            _string.Append("</div>");
-
-            return _string.ToString();
-        }
-
-        /// <summary>
-        /// Auther : Odd.Nopparat
-        /// Date   : 2015-11-20.
-        /// Perpose: ข้อมูล บิดามารดา
-        /// Method : parentProfile
-        /// Sample : N/A
-        /// </summary>
-        public static string UiParentProfile(string _studentId, string _parentType, string _studentCode)
-        {
-            StringBuilder _string = new StringBuilder();
-
-            StudentInfo _stdInfo = new StudentInfo(_studentCode);
-            ParentInfo _parentInfo = new ParentInfo(_studentId, _parentType);
-
-            string _idCard, _fullNameTh, _fullNameEn, _position;
-            string _stdNameTh, _stdNameEn, _stdStatusTh, _stdStatusEn;
-
-            _idCard = Myconfig.CvEmpty(_parentInfo.IdCard, " - ");
-            _fullNameTh = Myconfig.CvEmpty(_parentInfo.FullNameTh, " - ");
-            _fullNameEn = Myconfig.CvEmpty(_parentInfo.FullNameEn, " - ");
-            _position = Myconfig.CvEmpty(_parentInfo.Position, " - ");
-
-            _stdNameTh = Myconfig.CvEmpty(_stdInfo.StdNameTh, " - ");
-            _stdNameEn = Myconfig.CvEmpty(_stdInfo.StdNameEn, " - ");
-            _stdStatusEn = Myconfig.CvEmpty(_stdInfo.StatusEn, " - ");
-            _stdStatusTh = Myconfig.CvEmpty(_stdInfo.StatusTh, " - ");
-
-            _string.Append(@"<div class='row'>");
-
-            _string.Append(@"   <div class='col m2 l2 hide-on-med-and-down'>
-                                <img src = 'images/nopic.png' alt='' class='square responsive-img z-depth-1' />
-                            </div>
-                            <div class='col l2 m2 hide-on-med-and-down'>
-                                <ul class='pink-text'>
-                                    <li><span class='th'>เลข ปชช.</span><span class='en hide'>Student-ID</span></li>
-                                    <li><span class='th'>ชื่อภาษาไทย</span><span class='en hide'>Thai-Name</span></li>
-                                    <li><span class='th'>ชื่ออังกฤษ</span><span class='en hide'>Eng-Name</span></li>
-                                    <li><span class='th'>อาชีพ</span><span class='en hide'>Faculty</span></li>
-                                    <li><span class='th'>นักศึกษา</span><span class='en hide'>Student</span></li>
-                                    <li><span class='th'>สถานะ</span><span class='en hide'>Status</span></li>
-                                </ul>
-                            </div>");
-
-
-            _string.Append("    <div class='col l8 m8 s12'>" +
-                            "       <ul class='blue-text text-darken-4'>" +
-                            "           <li>" + _idCard + "</li>" +
-                            "           <li><span>" + _fullNameTh + "</span></li>" +
-                            "           <li><span>" + _fullNameEn + "</span></li>" +
-                            "           </li>" +
-                            "           <li><span class='th'>" + _position + "</span>" +
-                            "                <span class='en hide'>" + _position + "</span>" +
-                            "           </li>" +
-                            "           <li>" +
-                            "                <span class='th'>" + _stdNameTh + "</span>" +
-                            "                <span class='en hide'>" + _stdNameEn + "</span>" +
-                            "           </li>" +
-                            "           <li>" +
-                            "                <span class='th'>" + _stdStatusTh + "</span>" +
-                            "                <span class='en hide'>" + _stdStatusEn + "</span>" +
-                            "                <span class=''></span>" +
-                            "           </li>" +
-                            "       </ul>" +
-                            "   </div>");
-
-            _string.Append("</div>");
-
-
-            return _string.ToString();
-        }
-
-        /// <summary>
-        /// Auther : Odd.Nopparat
-        /// Date   : 2015-11-20.
-        /// Change Auther : korakot.pim
-        /// Change Date   : 2020-08-07
-        /// Detail Change : เพิ่มสถานภาพของบิดามารดา หย่าร้าง แยกกันอยู่ โสด
-        /// Perpose: UiParentCheckingStatus
-        /// Method : UiParentCheckingStatus
-        /// Sample : N/A
-        /// </summary>
-        public static string UiParentCheckingStatus(string _studentId)
-        {
-            StringBuilder _string = new StringBuilder();
-            DataSet _ds = ContractDB.Sp_ectStatusInfo(_studentId);
-
-            //const string _checked = "checked='checked'";
-            string _register = string.Empty
-                 , _unregister = string.Empty
-                 , _divorced = string.Empty
-                 , _fatherDied = string.Empty
-                 , _motherDied = string.Empty
-                 , _studentStatus = string.Empty
-                 , _fatherAlive = string.Empty
-                 , _motherAlive = string.Empty
-                 , _registerStatus = string.Empty
-                 , _studentStatusNameTh = string.Empty
-                 , _studentStatusNameEn = string.Empty;
-
-            // fill parameter
-
-            _fatherAlive = _ds.Tables[0].Rows[0]["fatherSts"].ToString();
-            _motherAlive = _ds.Tables[0].Rows[0]["motherSts"].ToString();
-            _registerStatus = _ds.Tables[0].Rows[0]["marriedSts"].ToString();
-            _studentStatus = _ds.Tables[0].Rows[0]["studentStatus"].ToString();
-            _studentStatusNameEn = _ds.Tables[0].Rows[0]["stsNameEn"].ToString();
-            _studentStatusNameTh = _ds.Tables[0].Rows[0]["stsNameTh"].ToString();
-
-            // register status
-            if (_studentStatus == "000") //สถานะกำลังศึกษาอยู่ไหม
-            {
-                //20200807 anussara.wan เนื่องจากอนาคตจะมีการยกเลิกการกรอกสถานภาพจาก e-Profile จึงไม่เช็ค Defalut แล้ว
-                //switch (_registerStatus) //สถานภาพที่เลือกมาจากระบบ e-Profile
-                //{
-                //    case "1": // สมรสจดทะเบียน
-                //        _register = _checked;
-                //        break;
-
-                //    case "2": // สมรสไม่จดทะเบียน
-                //        _unregister = _checked;
-                //        break;
-
-                //    case "3": // หย่าร้าง
-                //        _divorced = _checked;
-                //        break;
-                //}
-
-                // father alive
-                //switch (_fatherAlive)
-                //{
-                //    case "Y":
-                //        _fatherAlive = _checked;
-                //        break;
-
-                //    case "N":
-                //        _fatherDied = _checked;
-                //        break;
-
-                //    default:
-                //        _fatherAlive = _checked;
-                //        break;
-                //}
-
-                //// mother alive
-                //switch (_motherAlive)
-                //{
-                //    case "Y":
-                //        _motherAlive = _checked;
-                //        break;
-
-                //    case "N":
-                //        _motherDied = _checked;
-                //        break;
-
-                //    default:
-                //        _motherAlive = _checked;
-                //        break;
-                //}
-
-                _string.Append(@"<ul class='collection'>
-                            <li class='collection-item avatar'>
-                                <i class='mdi mdi-human-male-female circle green'></i>
-                                <span class='title'><span class='th'>สถานภาพสมรสบิดามารดา</span>
-                                <span class='en hide'>Parent Status</span></span>
-                                <p>");
-                //สมรส จดทะเบียน
-                _string.Append(@"               <input class='rdoMarried' name='rdoMarried' type='radio' id='rdoRegister' title='สมรส(จดทะเบียน)' value='1' />");
-                _string.Append(@"               <label for='rdoRegister'>
-                                        <span class='th'>จดทะเบียน</span><span class='en hide'>Registered</span>
-                                    </label>");
-                //สมรส ไม่จดทะเบียน
-                _string.Append(@"               <input class='rdoMarried' name='rdoMarried' type='radio' title='สมรส(ไม่จดทะเบียน)' id='rdoNotregister' value='2' />");
-                _string.Append(@"               <label for='rdoNotregister'>
-                                        <span class='th'>ไม่จดทะเบียน</span><span class='en hide'>Not Registered</span>
-                                    </label>");
-                //หย่าร้าง
-                _string.Append(@"               <input class='rdoMarried' name='rdoMarried' type='radio' title='หย่าร้าง(จดทะเบียนหย่า)' id='rdoDivorced' value='3' />");
-                _string.Append(@"               <label for='rdoDivorced'>
-                                        <span class='th'>หย่าร้าง</span><span class='en hide'>Divorced</span>
-                                    </label>");
-                //แยกกันอยู่
-                _string.Append(@"               <input class='rdoMarried' name='rdoMarried' type='radio' title='แยกกันอยู่(จดทะเบียนแต่แยกกันอยู่)' id='rdoSeparated' value='4' />");
-                _string.Append(@"               <label for='rdoSeparated'>
-                                        <span class='th'>แยกกันอยู่(จดทะเบียนแต่แยกกันอยู่)</span><span class='en hide'>Separated</span>
-                                    </label>");
-                //หม้าย
-                _string.Append(@"               <input class='rdoMarried' name='rdoMarried' type='radio' title='หม้าย(จดทะเบียนแต่ฝ่ายใดฝ่ายหนึ่งเสียชีวิต)' id='rdoWidowed' value='5' />");
-                _string.Append(@"               <label for='rdoWidowed'>
-                                        <span class='th'>หม้าย(จดทะเบียนแต่ฝ่ายใดฝ่ายหนึ่งเสียชีวิต)</span><span class='en hide'>Widowed</span>
-                                    </label>");
-                //โสด
-                _string.Append(@"               <input class='rdoMarried' name='rdoMarried' type='radio' title='โสด(ไม่จดทะเบียนและแยกกันอยู่)' id='rdoSingle' value='6' />");
-                _string.Append(@"               <label for='rdoSingle'>
-                                        <span class='th'>โสด(ไม่จดทะเบียนและแยกกันอยู่)</span><span class='en hide'>Single</span>
-                                    </label>");
-                _string.Append(@"
-                                </p>
-                            </li>
-                            <li class='collection-item avatar'>
-                                <i class='mdi mdi-gender-male circle blue'></i>
-                                <span class='title'><span class='th'>บิดามีชีวิตอยู่หรือไม่</span>
-                                <span class='en hide'>Father Status</span></span>
-                                <p>");
-                _string.Append(@"           <input class='rdoFatherSts' name='rdoFatherSts' type='radio' id='rdoFatherStsYes'  value='1' />");
-                _string.Append(@"           <label for='rdoFatherStsYes'>
-                                        <span class='th'>มีชีวิตอยู่</span><span class='en hide'>Yes</span>
-                                    </label>");
-                _string.Append(@"           <input class='rdoFatherSts' name='rdoFatherSts' type='radio' id='rdoFatherStsNo' value='2' />");
-                _string.Append(@"           <label for='rdoFatherStsNo'>
-                                        <span class='th'>เสียชีวิตแล้ว</span><span class='en hide'>No</span>
-                                    </label>
-                                </p>
-                            </li>
-                            <li class='collection-item avatar'>
-                                <i class='mdi mdi-gender-female circle pink'></i>
-                                <span class='title'><span class='th'>มารดามีชีวิตอยู่หรือไม่</span>
-                                <span class='en hide'>Mother Status</span></span>
-                                <p>");
-                _string.Append(@"           <input class='rdoMotherSts' name='rdoMotherSts' type='radio' id='rdoMotherStsYes' value='1' />");
-                _string.Append(@"           <label for='rdoMotherStsYes'>
-                                        <span class='th'>มีชีวิตอยู่</span><span class='en hide'>Yes</span>
-                                    </label>");
-                _string.Append(@"           <input class='rdoMotherSts' name='rdoMotherSts' type='radio' id='rdoMotherStsNo' value='2' />");
-                _string.Append(@"           <label for='rdoMotherStsNo'>
-                                        <span class='th'>เสียชีวิตแล้ว</span><span class='en hide'>No</span>
-                                    </label>
-                                </p>
-                            </li>
-                            ");
-                //<li class='collection-item avatar panelStayWith' style='display:none;'>
-                //    <i class='mdi mdi-home circle amber'></i>
-                //    <span class='title'><span class='th'>นักศึกษาอาศัยอยู่กับ</span>
-                //        <span class='en hide'>Stay with</span></span>
-                //    <p>
-                //        <input class='chkStay' name='chkStay' type='checkbox' id='chkStayF' value='1' />
-                //        <label for='chkStayF'>
-                //            <span class='th'>บิดา</span><span class='en hide'>Father</span>
-                //        </label>
-                //        <input class='chkStay' name='chkStay' type='checkbox' id='chkStayM' value='1' />
-                //        <label for='chkStayM'>
-                //            <span class='th'>มารดา</span><span class='en hide'>Mother</span>
-                //        </label>
-                //        <input class='chkStay' name='chkStay' type='checkbox' id='chkStayO' value='1' />
-                //        <label for='chkStayO'>
-                //            <span class='th'>บุคคลอื่น</span><span class='en hide'>Other</span>
-                //        </label>
-
-                //    </p>
-                //</li>
-                _string.Append(@"
-                            <li class='collection-item avatar grey lighten-2'>
-                                <i class='mdi mdi-clipboard-check circle blue-grey'></i>
-                                <span class='title'><span class='th'>สรุปเงื่อนไข</span>
-                                    <span class='en hide'>Summary Accept</span></span>
-                                <p>
-                                    <span class='green-text'>ค้ำประกันโดย : </span><span class='blue-text spWarrant'></span><br>
-                                    <span class='green-text'>ยินยอมโดย : </span><span class='blue-text spConsent'></span><br><br>                                       
-                                </p>
-                                <p class='panelContactLost'>
-                                    //<span class='title'><span class='th red-text'>สถานะติดต่อ :&nbsp; 
-                                    //<input class='chkStay' name='chkStay' type='checkbox' id='chkStayLost' value='1' />
-                                    //<label for='chkStayLost'>
-                                    //    <span class='th red-text'>ไม่สามารถติดต่อ ผู้ค้ำประกันได้</span><span class='en hide red-text'>Family not found</span>
-                                    //</label>
-                                    //</span>
-                                </p>");
-                //เพิ่มการแสดงสถานะให้ติดต่อทำสัญญานอกระบบที่กองกฎหมาย
-                _string.Append(@"
-                                <p class='panelContactTolaw'>
-                                        <span class='th red-text'>ให้นักศึกษาดำเนินการทำสัญญาการเป็นนักศึกษาผ่านระบบ e-Contract ให้เรียบร้อย ทั้งนี้ การทำหนังสือแสดงความยินยอมของผู้แทนโดยชอบธรรม และสัญญาค้ำประกันในระบบ e-Contract เป็นสิทธิของบิดาและมารดาโดยชอบธรรมด้วยกฎหมายเท่านั้น ระบบจะไม่สามารถออกรหัสผ่านให้แก่ บุคคลอื่น ซึ่งไม่ได้รับอนุญาตสิทธิ โปรดติดต่อกองกฎหมาย สำนักงานอธิการบดี เพื่อทำสัญญาการเป็นนักศึกษานอกระบบ e-Contract ต่อไป</span>
-                                    </span>
-                                </p>
-                            </li>
-                         </ul>");
-                _string.Append("<span class='waves-effect waves-light btn-large green col s12  accent-12 btnConfirmInfo' >ยืนยันข้อมูล</span>");
-            }
-            else//กรณีที่นักศึกษาลาออกไปแล้ว
-            {
-                _string.Append(@"<ul class='collection'>
-                            <li class='collection-item avatar'>");
-                _string.Append(@"<span class='title'><span class='th red-text'>" + _studentStatusNameTh + "</span>");
-                _string.Append(@"<span class='en hide red-text'>" + _studentStatusNameEn + "</span></span>");
-                _string.Append(@"</li>
-                            </ul>
-                            ");
-            }
-            return _string.ToString();
-        }
-
-        /// <summary>
-        /// Auther : Odd.Nopparat
-        /// Date   : 2015-11-20.
-        /// Perpose: parallaxbanner
-        /// Method : parallaxbanner
-        /// Sample : N/A
-        /// </summary>
-        public static string Parallaxbanner(string _acaYear1)
-        {
-            string _txtDateOpen = "";
-
-            DataSet _ds = ContractDB.Sp_ectGetDateEvent(_acaYear1);
-
-            int _row = _ds.Tables[0].Rows.Count;
-            string _startDate, _endDate, _sTime, _eTime, _acaYear, _isBetween, _enAcaYear;
-            string _startDateEn, _endDateEn;
-            foreach (DataRow _dr in _ds.Tables[0].Rows)
-            {
-                _startDate = _dr["cStartDate"].ToString();
-                _endDate = _dr["cEndDate"].ToString();
-                _startDateEn = _dr["enStartDate"].ToString();
-                _endDateEn = _dr["enEndDate"].ToString();
-                _acaYear = _dr["acaYear"].ToString();
-                _isBetween = _dr["isBetween"].ToString();
-                _enAcaYear = _dr["enAcaYear"].ToString();
-                _sTime = _dr["cStartTime"].ToString();
-                _eTime = _dr["cEndTime"].ToString();
-
-                if (_isBetween == "1")
-                {
-
-                    _txtDateOpen = "<span class='th' style='font-size:15pt;font-weight:bold;color:green;'>เปิดทำสัญญา สำหรับนักศึกษาที่เข้าศึกษาปี " + _acaYear + " </br>ตั้งแต่วันที่ " + _startDate + " เวลา " + _sTime +" น. ถึงวันที่ " + _endDate + " เวลา " + _eTime + " น. " + "</span><span class='en hide' style='font-size:12pt;font-weight:bold;color:blue;'>Sign e-Contract. A Students who admission for academic year " + _enAcaYear + "(BE " + _acaYear + ")</br>the system wil be available from " + _startDateEn + " to " + _endDateEn + "  </span>";
-
-                }
-                else
-                {
-
-                    _txtDateOpen = "<span class='th' style='font-size:13pt;font-weight:bold;color:red;'>ยังไม่เปิดให้บริการ หรือ ปิดชั่วคราว สำหรับนักศึกษาที่เข้าศึกษาปี " + _acaYear + " </br>เปิด วันที่ " + _startDate + " เวลา " + _sTime + " น. ถึงวันที่ " + _endDate + " เวลา " + _eTime + " น. " + "</span><span class='en hide' style='font-size:12pt;font-weight:bold;color:red;'>The System out of service. A Students who admission for academic year " + _enAcaYear + "(BE " + _acaYear + ") </br>the system wil be available from " + _startDateEn + " to " + _endDateEn + "  </span>";
-                }
-            }
-
-
-            StringBuilder _string = new StringBuilder();
-            _string.Append(@"<div id='index-bannerx' class='parallax-container' style='height: 160px;'>
-        <div class='section no-pad-bot '>
-            <div class='container'>
+            html.Append(@"
                 <div class='row'>
-                    <div class='col s12 m12 l12'><img src='Images/logoFullName.png' alt='' class='responsive-img' /></div>
-                    <div class='col s12 m8 l8 hide-on-small-only'>");
-            _string.Append(@"<div class=''><h5 class='light'>" + _txtDateOpen + "</h5></div>");
-            _string.Append(@"</div>
-                    <div class='col s12 m4 l4'>
-                        <div class='right-align'><img src='Images/contract_string.png' alt='' class='responsive-img' /></div>
+                    <div class='col m2 l2 hide-on-med-and-down'>
+                        <img src = '" + urlPicInternet + @"' alt='' class='square responsive-img z-depth-1' onError='this.onerror=null;this.src='nopic.png';' />
+                    </div>
+                    <div class='col l2 m2 hide-on-med-and-down'>
+                        <ul class='pink-text'>
+                            <li>
+                                <span class='th'>รหัสนักศึกษา</span>
+                                <span class='en hide'>StudentID</span>
+                            </li>
+                            <li>
+                                <span class='th'>ชื่อ-นามสกุล</span>
+                                <span class='en hide'>Name-Lastname</span>
+                            </li>
+                            <li>
+                                <span class='th'>คณะ</span>
+                                <span class='en hide'>Faculty</span>
+                            </li>
+                            <li>
+                                <span class='th'>หลักสูตร</span>
+                                <span class='en hide'>Program</span>
+                            </li>
+                            <li>
+                                <span class='th'>สถานะ</span>
+                                <span class='en hide'>Status</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class='col l8 m8 s12'>
+                        <ul class='blue-text text-darken-4'>
+                            <li>" + studentCode + @"</li>
+                            <li>
+                                <span class='th'>" + stdNameTH + @"</span>
+                            </li>
+                            <li>
+                                <span class='en hide'>" + stdNameEN + @"</span>
+                            </li>
+                            <li>
+                                <span class='th'>" + facultyNameTH + @"</span>
+                                <span class='en hide'>" + facultyNameEN + @"</span>
+                                <span>&nbsp;&nbsp;( " + facultyCode + @" )</span>
+                            </li>
+                            <li>
+                                <span class='th'>" + programNameTH + @"</span>
+                                <span class='en hide'>" + programNameEN + @"</span>
+                            </li>
+                            <li>
+                                <span class='th'>" + stdStatusNameTH + @"</span>
+                                <span class='en hide'>" + stdStatusNameEN + @"</span>
+                            </li>
+                        </ul>
                     </div>
                 </div>
-            </div>
-        <div class='parallax'>
-            <img src='images/bgs.png' alt='#' />
-        </div>
-    </div>");
-            return _string.ToString();
+            ");
+
+            return html.ToString();
         }
 
-        /// <summary>
-        /// Auther : Odd.Nopparat
-        /// Date   : 2015-11-20.
-        /// Perpose: parallaxbanner
-        /// Method : parallaxbanner
-        /// Sample : N/A
-        /// </summary>
-        public static string UiLoginForm()
-        {
-            StringBuilder _string = new StringBuilder();
-            _string.Append(@"<div class='row'>
-                        <div class='col s12 m6 l6'>
-                            <div class='card medium'>
-                                <div class='card-image waves-effect waves-block waves-light'>
-                                    <img class='activator' src='images/student018-s.jpg' />
+        /*
+        Auther  : Odd.Nopparat
+        Date    : 20-11-2015
+        Perpose : ข้อมูล บิดามารดา
+        Method  : parentProfile
+        Sample  : N/A
+        */
+        public static string UiParentProfile(
+            string studentID,
+            string parentType,
+            string studentCode
+        ) {
+            StringBuilder html = new StringBuilder();
+            StudentInfo stdInfo = new StudentInfo(studentCode);
+            ParentInfo parentInfo = new ParentInfo(studentID, parentType);
+            string idCard = Myconfig.CvEmpty(parentInfo.IDCard, " - ");
+            string fullNameTH = Myconfig.CvEmpty(parentInfo.FullNameTH, " - ");
+            string fullNameEN = Myconfig.CvEmpty(parentInfo.FullNameEN, " - ");
+            string position = Myconfig.CvEmpty(parentInfo.Position, " - ");
+            string stdNameTH = Myconfig.CvEmpty(stdInfo.StdNameTH, " - ");
+            string stdNameEN = Myconfig.CvEmpty(stdInfo.StdNameEN, " - ");
+            string stdStatusNameTH = Myconfig.CvEmpty(stdInfo.StatusNameTH, " - ");
+            string stdStatusNameEN = Myconfig.CvEmpty(stdInfo.StatusNameEN, " - ");
+            
+            html.Append(@"
+                <div class='row'>
+                    <div class='col m2 l2 hide-on-med-and-down'>
+                        <img src = 'images/nopic.png' alt='' class='square responsive-img z-depth-1' />
+                    </div>
+                    <div class='col l2 m2 hide-on-med-and-down'>
+                        <ul class='pink-text'>
+                            <li>
+                                <span class='th'>เลข ปชช.</span>
+                                <span class='en hide'>Student-ID</span>
+                            </li>
+                            <li>
+                                <span class='th'>ชื่อภาษาไทย</span>
+                                <span class='en hide'>Thai-Name</span>
+                            </li>
+                            <li>
+                                <span class='th'>ชื่ออังกฤษ</span>
+                                <span class='en hide'>Eng-Name</span>
+                            </li>
+                            <li>
+                                <span class='th'>อาชีพ</span>
+                                <span class='en hide'>Faculty</span>
+                            </li>
+                            <li>
+                                <span class='th'>นักศึกษา</span>
+                                <span class='en hide'>Student</span>
+                            </li>
+                            <li>
+                                <span class='th'>สถานะ</span>
+                                <span class='en hide'>Status</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class='col l8 m8 s12'>
+                        <ul class='blue-text text-darken-4'>
+                            <li>" + idCard + @"</li>
+                            <li>
+                                <span>" + fullNameTH + @"</span>
+                            </li>
+                            <li>
+                                <span>" + fullNameEN + @"</span>
+                            </li>
+                            </li>
+                            <li>
+                                <span class='th'>" + position + @"</span>
+                                <span class='en hide'>" + position + @"</span>
+                            </li>
+                            <li>
+                                <span class='th'>" + stdNameTH + @"</span>
+                                <span class='en hide'>" + stdNameEN + @"</span>
+                            </li>
+                            <li>
+                                <span class='th'>" + stdStatusNameTH + @"</span>
+                                <span class='en hide'>" + stdStatusNameEN + @"</span>
+                                <span class=''></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            ");
+
+            return html.ToString();
+        }
+
+        /*
+        Auther          : Odd.Nopparat
+        Date            : 20-11-2015
+        Change Auther   : korakot.pim
+        Change Date     : 07-08-2020
+        Detail Change   : เพิ่มสถานภาพของบิดามารดา หย่าร้าง แยกกันอยู่ โสด
+        Perpose         : UiParentCheckingStatus
+        Method          : UiParentCheckingStatus
+        Sample          : N/A
+        */
+        public static string UiParentCheckingStatus(string studentID) {
+            StringBuilder html = new StringBuilder();
+            DataSet ds = ContractDB.Sp_ectStatusInfo(studentID);
+            //const string checked = "checked = 'checked'";
+            //string register = string.Empty;
+            //string unregister = string.Empty;
+            //string divorced = string.Empty;
+            //string fatherDied = string.Empty;
+            //string motherDied = string.Empty;            
+            //string fatherAlive = ds.Tables[0].Rows[0]["fatherSts"].ToString();
+            //string motherAlive = ds.Tables[0].Rows[0]["motherSts"].ToString();
+            //string registerStatus = ds.Tables[0].Rows[0]["marriedSts"].ToString();
+            string stdStatus = ds.Tables[0].Rows[0]["studentStatus"].ToString();
+            string stdStatusNameTH = ds.Tables[0].Rows[0]["stsNameTh"].ToString();
+            string stdStatusNameEN = ds.Tables[0].Rows[0]["stsNameEn"].ToString();
+
+            //สถานะกำลังศึกษาอยู่ไหม
+            if (stdStatus == "000") {
+                //20200807 anussara.wan เนื่องจากอนาคตจะมีการยกเลิกการกรอกสถานภาพจาก e-Profile จึงไม่เช็ค defalut แล้ว
+                /*
+                //สถานภาพที่เลือกมาจากระบบ e-Profile
+                switch (registerStatus) {
+                    //สมรสจดทะเบียน
+                    case "1":
+                        register = checked;
+                        break;
+                    //สมรสไม่จดทะเบียน
+                    case "2":
+                        unregister = checked;
+                        break;
+                    //หย่าร้าง
+                    case "3":
+                        divorced = checked;
+                        break;
+                }
+                */
+
+                /*
+                //father alive
+                switch (fatherAlive) {
+                    case "Y":
+                        fatherAlive = checked;
+                        break;
+                    case "N":
+                        fatherDied = checked;
+                        break;
+                    default:
+                        fatherAlive = checked;
+                        break;
+                }
+                */
+
+                /*
+                //mother alive
+                switch (motherAlive) {
+                    case "Y":
+                        motherAlive = checked;
+                        break;
+                    case "N":
+                        motherDied = checked;
+                        break;
+                    default:
+                        motherAlive = _checked;
+                        break;
+                }
+                */
+
+                html.Append(@"
+                    <ul class='collection'>
+                        <li class='collection-item avatar'>
+                            <i class='mdi mdi-human-male-female circle green'></i>
+                            <span class='title'>
+                                <span class='th'>สถานภาพสมรสบิดามารดา</span>
+                                <span class='en hide'>Parent Status</span>
+                            </span>
+                            <p>" +
+                                //สมรส จดทะเบียน
+                                @"
+                                <input class='rdoMarried' name='rdoMarried' type='radio' id='rdoRegister' title='สมรส(จดทะเบียน)' value='1' />
+                                <label for='rdoRegister'>
+                                    <span class='th'>จดทะเบียน</span>
+                                    <span class='en hide'>Registered</span>
+                                </label>" +
+                                //สมรส ไม่จดทะเบียน
+                                @"
+                                <input class='rdoMarried' name='rdoMarried' type='radio' title='สมรส(ไม่จดทะเบียน)' id='rdoNotregister' value='2' />
+                                <label for='rdoNotregister'>
+                                    <span class='th'>ไม่จดทะเบียน</span>
+                                    <span class='en hide'>Not Registered</span>
+                                </label>" +
+                                //หย่าร้าง
+                                @"
+                                <input class='rdoMarried' name='rdoMarried' type='radio' title='หย่าร้าง(จดทะเบียนหย่า)' id='rdoDivorced' value='3' />
+                                <label for='rdoDivorced'>
+                                    <span class='th'>หย่าร้าง</span>
+                                    <span class='en hide'>Divorced</span>
+                                </label>" +
+                                //แยกกันอยู่
+                                @"
+                                <input class='rdoMarried' name='rdoMarried' type='radio' title='แยกกันอยู่(จดทะเบียนแต่แยกกันอยู่)' id='rdoSeparated' value='4' />
+                                <label for='rdoSeparated'>
+                                    <span class='th'>แยกกันอยู่(จดทะเบียนแต่แยกกันอยู่)</span>
+                                    <span class='en hide'>Separated</span>
+                                </label>" +
+                                //หม้าย
+                                @"
+                                <input class='rdoMarried' name='rdoMarried' type='radio' title='หม้าย(จดทะเบียนแต่ฝ่ายใดฝ่ายหนึ่งเสียชีวิต)' id='rdoWidowed' value='5' />
+                                <label for='rdoWidowed'>
+                                    <span class='th'>หม้าย(จดทะเบียนแต่ฝ่ายใดฝ่ายหนึ่งเสียชีวิต)</span>
+                                    <span class='en hide'>Widowed</span>
+                                </label>" +
+                                //โสด
+                                @"
+                                <input class='rdoMarried' name='rdoMarried' type='radio' title='โสด(ไม่จดทะเบียนและแยกกันอยู่)' id='rdoSingle' value='6' />
+                                <label for='rdoSingle'>
+                                    <span class='th'>โสด(ไม่จดทะเบียนและแยกกันอยู่)</span>
+                                    <span class='en hide'>Single</span>
+                                </label>
+                            </p>
+                        </li>
+                        <li class='collection-item avatar'>
+                            <i class='mdi mdi-gender-male circle blue'></i>
+                            <span class='title'>
+                                <span class='th'>บิดามีชีวิตอยู่หรือไม่</span>
+                                <span class='en hide'>Father Status</span>
+                            </span>
+                            <p>
+                                <input class='rdoFatherSts' name='rdoFatherSts' type='radio' id='rdoFatherStsYes'  value='1' />
+                                <label for='rdoFatherStsYes'>
+                                    <span class='th'>มีชีวิตอยู่</span>
+                                    <span class='en hide'>Yes</span>
+                                </label>;
+                                <input class='rdoFatherSts' name='rdoFatherSts' type='radio' id='rdoFatherStsNo' value='2' />
+                                <label for='rdoFatherStsNo'>
+                                    <span class='th'>เสียชีวิตแล้ว</span>
+                                    <span class='en hide'>No</span>
+                                </label>
+                            </p>
+                        </li>
+                        <li class='collection-item avatar'>
+                            <i class='mdi mdi-gender-female circle pink'></i>
+                            <span class='title'>
+                                <span class='th'>มารดามีชีวิตอยู่หรือไม่</span>
+                                <span class='en hide'>Mother Status</span>
+                            </span>
+                            <p>
+                                <input class='rdoMotherSts' name='rdoMotherSts' type='radio' id='rdoMotherStsYes' value='1' />
+                                <label for='rdoMotherStsYes'>
+                                    <span class='th'>มีชีวิตอยู่</span>
+                                    <span class='en hide'>Yes</span>
+                                </label>
+                                <input class='rdoMotherSts' name='rdoMotherSts' type='radio' id='rdoMotherStsNo' value='2' />
+                                <label for='rdoMotherStsNo'>
+                                    <span class='th'>เสียชีวิตแล้ว</span>
+                                    <span class='en hide'>No</span>
+                                </label>
+                            </p>
+                        </li>" +
+                        /*
+                        <li class='collection-item avatar panelStayWith' style='display:none;'>
+                            <i class='mdi mdi-home circle amber'></i>
+                            <span class='title'>
+                                <span class='th'>นักศึกษาอาศัยอยู่กับ</span>
+                                <span class='en hide'>Stay with</span>
+                            </span>
+                            <p>
+                                <input class='chkStay' name='chkStay' type='checkbox' id='chkStayF' value='1' />
+                                <label for='chkStayF'>
+                                    <span class='th'>บิดา</span>
+                                    <span class='en hide'>Father</span>
+                                </label>
+                                <input class='chkStay' name='chkStay' type='checkbox' id='chkStayM' value='1' />
+                                <label for='chkStayM'>
+                                    <span class='th'>มารดา</span>
+                                    <span class='en hide'>Mother</span>
+                                </label>
+                                <input class='chkStay' name='chkStay' type='checkbox' id='chkStayO' value='1' />
+                                <label for='chkStayO'>
+                                    <span class='th'>บุคคลอื่น</span>
+                                    <span class='en hide'>Other</span>
+                                </label>
+                            </p>
+                        </li>
+                        */
+                        @"
+                        <li class='collection-item avatar grey lighten-2'>
+                            <i class='mdi mdi-clipboard-check circle blue-grey'></i>
+                            <span class='title'>
+                                <span class='th'>สรุปเงื่อนไข</span>
+                                <span class='en hide'>Summary Accept</span>
+                            </span>
+                            <p>
+                                <span class='green-text'>ค้ำประกันโดย : </span><span class='blue-text spWarrant'></span><br />
+                                <span class='green-text'>ยินยอมโดย : </span><span class='blue-text spConsent'></span><br /><br />                                       
+                            </p>
+                            <p class='panelContactLost'>" +
+                                /*
+                                <span class='title'>
+                                    <span class='th red-text'>
+                                        สถานะติดต่อ :&nbsp; 
+                                        <input class='chkStay' name='chkStay' type='checkbox' id='chkStayLost' value='1' />
+                                        <label for='chkStayLost'>
+                                            <span class='th red-text'>ไม่สามารถติดต่อ ผู้ค้ำประกันได้</span>
+                                            <span class='en hide red-text'>Family not found</span>
+                                        </label>
+                                    </span>
+                                */
+                            @"
+                            </p>" +
+                            //เพิ่มการแสดงสถานะให้ติดต่อทำสัญญานอกระบบที่กองกฎหมาย
+                            @" 
+                            <p class='panelContactTolaw'>
+                                <span class='th red-text'>ให้นักศึกษาดำเนินการทำสัญญาการเป็นนักศึกษาผ่านระบบ e-Contract ให้เรียบร้อย ทั้งนี้ การทำหนังสือแสดงความยินยอมของผู้แทนโดยชอบธรรม และสัญญาค้ำประกันในระบบ e-Contract เป็นสิทธิของบิดาและมารดาโดยชอบธรรมด้วยกฎหมายเท่านั้น ระบบจะไม่สามารถออกรหัสผ่านให้แก่ บุคคลอื่น ซึ่งไม่ได้รับอนุญาตสิทธิ โปรดติดต่อกองกฎหมาย สำนักงานอธิการบดี เพื่อทำสัญญาการเป็นนักศึกษานอกระบบ e-Contract ต่อไป</span>
+                            </p>
+                        </li>
+                    </ul>
+                    <span class='waves-effect waves-light btn-large green col s12  accent-12 btnConfirmInfo' >ยืนยันข้อมูล</span>
+                ");
+            }
+            else {
+                //กรณีที่นักศึกษาลาออกไปแล้ว
+                html.Append(@"
+                    <ul class='collection'>
+                        <li class='collection-item avatar'>
+                            <span class='title'>
+                                <span class='th red-text'>" + stdStatusNameTH + @"</span>
+                                <span class='en hide red-text'>" + stdStatusNameEN + @"</span>
+                            </span>
+                        </li>
+                    </ul>
+                ");
+            }
+
+            return html.ToString();
+        }
+
+        /*
+        Auther  : Odd.Nopparat
+        Date    : 20-11-2015
+        Perpose : parallaxbanner
+        Method  : parallaxbanner
+        Sample  : N/A
+        */
+        public static string Parallaxbanner(string acaYear1) {
+            StringBuilder html = new StringBuilder();
+            string txtDateOpen = "";
+            DataSet ds = ContractDB.Sp_ectGetDateEvent(acaYear1);
+            //int row = ds.Tables[0].Rows.Count;
+            string startDate;
+            string endDate;
+            string sTime;
+            string eTime;
+            string acaYear;
+            string isBetween;
+            string acaYearEN;
+            string startDateEN;
+            string endDateEN;
+
+            foreach (DataRow dr in ds.Tables[0].Rows) {
+                startDate = dr["cStartDate"].ToString();
+                endDate = dr["cEndDate"].ToString();
+                startDateEN = dr["enStartDate"].ToString();
+                endDateEN = dr["enEndDate"].ToString();
+                acaYear = dr["acaYear"].ToString();
+                isBetween = dr["isBetween"].ToString();
+                acaYearEN = dr["enAcaYear"].ToString();
+                sTime = dr["cStartTime"].ToString();
+                eTime = dr["cEndTime"].ToString();
+
+                if (isBetween == "1") {
+                    txtDateOpen = (@"
+                        <span class='th' style='font-size:15pt;font-weight:bold;color:green;'>เปิดทำสัญญา สำหรับนักศึกษาที่เข้าศึกษาปี " + acaYear + " <br />ตั้งแต่วันที่ " + startDate + " เวลา " + sTime +" น. ถึงวันที่ " + endDate + " เวลา " + eTime + " น. " + @"</span>
+                        <span class='en hide' style='font-size:12pt;font-weight:bold;color:blue;'>Sign e-Contract. A Students who admission for academic year " + acaYearEN + "(BE " + acaYear + ")<br />the system wil be available from " + startDateEN + " to " + endDateEN + @"  </span>
+                    ");
+                }
+                else {
+                    txtDateOpen = (@"
+                        <span class='th' style='font-size:13pt;font-weight:bold;color:red;'>ยังไม่เปิดให้บริการ หรือ ปิดชั่วคราว สำหรับนักศึกษาที่เข้าศึกษาปี " + acaYear + " <br />เปิด วันที่ " + startDate + " เวลา " + sTime + " น. ถึงวันที่ " + endDate + " เวลา " + eTime + " น. " + @"</span>
+                        <span class='en hide' style='font-size:12pt;font-weight:bold;color:red;'>The System out of service. A Students who admission for academic year " + acaYearEN + "(BE " + acaYear + ") </br>the system wil be available from " + startDateEN + " to " + endDateEN + @"  </span>
+                    ");
+                }
+            }
+
+            html.Append(@"
+                <div id='index-bannerx' class='parallax-container' style='height: 160px;'>
+                    <div class='section no-pad-bot'>
+                        <div class='container'>
+                            <div class='row'>
+                                <div class='col s12 m12 l12'>
+                                    <img src='Images/logoFullName.png' alt='' class='responsive-img' />
                                 </div>
-                                <div class='card-content'>
-                                    <span class='card-title activator grey-text text-darken-4 th'>สำหรับนักศึกษา<i class='mdi mdi-dots-vertical right'></i></span>
-                                    <span class='card-title activator grey-text text-darken-4 en hide'>For Student<i class='mdi mdi-dots-vertical right'></i></span>
-                                    <p class='center-align'>
-                                        <a href='javascript:void(0);' class='activator btn indigo darken-4 th student-login'>เข้าที่นี่</a>
-                                        <a href='javascript:void(0);' class='activator btn indigo darken-4 en hide'>Click</a>
+                                <div class='col s12 m8 l8 hide-on-small-only'>
+                                    <div class=''>
+                                        <h5 class='light'>" + txtDateOpen + @"</h5>
+                                    </div>
+                                </div>
+                                <div class='col s12 m4 l4'>
+                                    <div class='right-align'>
+                                        <img src='Images/contract_string.png' alt='' class='responsive-img' />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class='parallax'>
+                            <img src='images/bgs.png' alt='#' />
+                        </div>
+                    </div>
+                </div>
+            ");
+
+            return html.ToString();
+        }
+
+        /*
+        Auther  : Odd.Nopparat
+        Date    : 20-11-2015
+        Perpose : parallaxbanner
+        Method  : parallaxbanner
+        Sample  : N/A
+        */
+        public static string UiLoginForm() {
+            StringBuilder html = new StringBuilder();
+
+            html.Append(@"
+                <div class='row'>
+                    <div class='col s12 m6 l6'>
+                        <div class='card medium'>
+                            <div class='card-image waves-effect waves-block waves-light'>
+                                <img class='activator' src='images/student018-s.jpg' />
+                            </div>
+                            <div class='card-content'>
+                                <span class='card-title activator grey-text text-darken-4 th'>สำหรับนักศึกษา<i class='mdi mdi-dots-vertical right'></i></span>
+                                <span class='card-title activator grey-text text-darken-4 en hide'>For Student<i class='mdi mdi-dots-vertical right'></i></span>
+                                <p class='center-align'>
+                                    <a href='javascript:void(0);' class='activator btn indigo darken-4 th student-login'>เข้าที่นี่</a>
+                                    <a href='javascript:void(0);' class='activator btn indigo darken-4 en hide'>Click</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>" +
+                    /*
+                    <div class='card-reveal light-green lighten-5'>
+                        <span class='card-title grey-text text-darken-4'>
+                            <span class='th'>สำหรับนักศึกษา</span>
+                            <span class='en hide'>For Student</span>
+                            <i class='mdi mdi-close right'></i>
+                        </span>
+                        <div class='row'>
+                            <div class='input-field'>
+                                <i class='mdi mdi-account-circle prefix'></i>
+                                <input placeholder='u59xxxxx' id='username' name='username' type='text' class='validate' maxlength='30' value='' />
+                                <label for='username'>
+                                    <span class='th'>ชื่อผู้ใช้งาน</span>
+                                    <span class='en hide'>Username</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class='row'>
+                            <div class='input-field'>
+                                <i class='mdi mdi-multiplication prefix'></i>
+                                <input placeholder='internet account' id='studentpassword' name='studentpassword' type='password' class='validate' maxlength='50' value='' />
+                                <label for='studentpassword'>
+                                    <span class='th'>รหัสผ่าน</span>
+                                    <span class='en hide'>Password</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class='teal-text'>
+                                <i class='mdi mdi-message-alert on-left'></i>
+                                <span class='blue-text th'>ลืมรหัสผ่าน โทร 0-2849-6022</span>
+                                <span class='en hide'>Forgot password Call. 66(0) 2849-6022</span>
+                            </p>
+                            <a href='https://myinternet.mahidol.ac.th/'>
+                                <i class='mdi mdi-undo-variant'></i>
+                                <span class='pink-text th'>สมัครใช้งาน Internet Account หรือ เปลี่ยนรหัสผ่าน</span>
+                                <span class='pink-text en hide'>Register Internet Account or Change password</span>
+                            </a>
+                        </div>
+                        <div class='card-action center-align'>
+                            <a href='javascript:void(0);' class='activator btn indigo darken-4 th student-login'>เข้าระบบ</a>
+                            <a href='javascript:void(0);' class='activator btn indigo darken-4 en hide student-login'>Log in</a>
+                        </div>
+                    </div>
+                    */
+                    @"
+                    <div class='col s12 m6 l6'>
+                        <div class='card medium'>
+                            <div class='card-image waves-effect waves-block waves-light'>
+                                <img class='activator' src='images/grad010.jpg' />
+                            </div>
+                            <div class='card-content'>
+                                <span class='card-title activator grey-text text-darken-4 th'>สำหรับผู้ปกครอง<i class='mdi mdi-dots-vertical right'></i></span>
+                                <span class='card-title activator grey-text text-darken-4 en hide'>For Parent<i class='mdi mdi-dots-vertical right'></i></span>
+                                <p class='center-align'>
+                                    <a href='javascript:void(0);' class='activator btn lime darken-4 th'>เข้าที่นี่</a>
+                                    <a href='javascript:void(0);' class='activator btn lime darken-4 en hide'>Click</a>
+                                </p>
+                            </div>
+                            <div class='card-reveal pink lighten-5'>
+                                <span class='card-title grey-text text-darken-4'>
+                                    <span class='th'>สำหรับผู้ปกครอง/ผู้คำประกัน-ยินยอม</span>
+                                    <span class='en hide'>For Parent</span>
+                                    <i class='mdi mdi-close right'></i>
+                                </span>
+                                <div class='row'>
+                                    <div class='input-field'>
+                                        <i class='mdi mdi-account-circle prefix'></i>
+                                        <input placeholder='' id='citizenid' name='userid' type='text' class='validate' maxlength='50' value='' />
+                                        <label for='citizenid'>
+                                            <span class='th'>รหัสผู้ใช้</span>
+                                            <span class='en hide'>Username</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class='row'>
+                                    <div class='input-field'>
+                                        <i class='mdi mdi-multiplication prefix'></i>
+                                        <input placeholder='' id='parentpassword' name='parentpassword' type='password' class='validate' maxlength='30' value='' />
+                                        <label for='parentpassword'>
+                                            <span class='th'>รหัสผ่าน</span>
+                                            <span class='en hide'>Password</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class='teal-text'>
+                                        <i class='mdi mdi-message-alert on-left'></i>
+                                        <span class='blue-text th'>ลืมรหัสผ่าน โทร 0-2849-6260</span>
+                                        <span class='en hide'>Forgot password Call. 0(66)2849-6260</span>
                                     </p>
+                                    <i class='mdi mdi-undo-variant'></i>
+                                    <span class='pink-text th'>นักศึกษาเป็นผู้รับรหัสผ่านของบิดาและมารดา จากส่วนสำหรับนักศึกษาขอให้บิดาและมารดา<br/>สอบถามข้อมูล Username และ Password จากนักศึกษาก่อนเข้าทำสัญญา</span>
+                                    <span class='pink-text en hide'>The Student will receive Parents' Username and Password from the Student Section. Please ask the student for your Username and Password before entering into a contract.</span>
+                                </div>
+                                <div class='card-action center-align'>
+                                    <input type='hidden' id='usertype' name='usertype' value='' />
+                                    <a href='javascript:void(0);' class='activator btn lime darken-4 th parent-login'>เข้าระบบ</a>
+                                    <a href='javascript:void(0);' class='activator btn lime darken-4 en hide parent-login'>LOG-IN</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            ");
+
+            return html.ToString();
+        }
+
+        /*
+        Auther  : Odd.Nopparat
+        Date    : 20-11-2015
+        Perpose : reLoginForm
+        Method  : reLoginForm
+        Sample  : N/A
+        */
+        public static string UiReLoginForm(
+            string userType,
+            ContractInfo ctInfo,
+            string username,
+            string parentType
+        ) {
+            StringBuilder html = new StringBuilder();
+            string lblUsernameTH;
+            string lblUserNameEN;
+            string lblPasswordTH;
+            string lblPasswordEN;
+            string warrantBy = ctInfo.WarrantBy;
+            string consentBy = ctInfo.ConsentBy;
+            string txtTitle = "ใส่รหัสอีกครั้งเพื่อยืนยันการทำสัญญา";
+
+            if (warrantBy == parentType) {
+                txtTitle += " ค้ำประกัน";
+            }
+            else if (consentBy == parentType) {
+                txtTitle += " ยินยอมคู่สมรส";
+            }
+
+            if (userType == "STUDENT") {
+                lblUsernameTH = "รหัสนักศึกษา";
+                lblUserNameEN = "STUDENT ID";
+                //lblPasswordTH = "รหัสผ่าน (Internet Account)";
+                //lblPasswordEN = "INTERNET ACCOUNT";
+
+                html.Append(@"
+                    <div class='card-panel blue lighten-5'>
+                        <div class='row'>
+                            <h5 class='red-text'>
+                                <span class='th'>" + txtTitle + @"</span>
+                                <span class='en hide'>Re-Login for sign contract</span>
+                            </h5>
+                            <div class='col s12 m8 l8'>
+                                <div class='input-field'>
+                                    <i class='mdi mdi-account-circle prefix'></i>
+                                    <input placeholder='' id='username' name='username' type='text' class='validate valid' maxlength='8' value='" + username + @"' />
+                                    <label for='username' class='active'>
+                                        <span class='th'>" + lblUsernameTH + @"</span>
+                                        <span class='en hide'>" + lblUserNameEN + @"</span>
+                                    </label>
+                                </div>
+                            </div>" +
+                            /*
+                            <div class='col s12 m4 l4'>
+                                <div class='input-field'>
+                                    <i class='mdi mdi-multiplication prefix'></i>
+                                    <input placeholder='' id='password' name='password' type='password' class='validate' maxlength='50' value='' />
+                                    <label for='password'>
+                                        <span class='th'>" + lblPasswordTH + @"</span>
+                                        <span class='en hide'>" + lblPasswordEN + @"</span>
+                                    </label>
+                                </div>
+                            </div>
+                            */
+                            @"
+                            <div class='col s12 m4 l4'>
+                                <div class='center'>
+                                    <a href='#!' class='waves-effect waves-light btn-large blue accent-4 btnReLogin'>
+                                        <i class='mdi mdi-checkbox-marked-circle-outline'></i>
+                                        <span class='th'>ทำสัญญา</span>
+                                        <span class='en hide'>Sign Contract</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ");
+            }
+            else {
+                if (userType == "PARENT") {
+                    lblUsernameTH = "รหัสผู้ใช้";
+                    lblUserNameEN = "USERNAME";
+                    lblPasswordTH = "รหัสผ่าน";
+                    lblPasswordEN = "PASSWORD";
+
+                    html.Append(@"
+                        <div class='card-panel blue lighten-5'>
+                            <div class='row'>
+                                <h5 class='red-text'>
+                                    <span class='th'>" + txtTitle + @"</span>
+                                    <span class='en hide'>Re-Login for sign contract</span>
+                                </h5>
+                                <div class='col s12 m4 l4'>
+                                    <div class='input-field'>
+                                        <i class='mdi mdi-account-circle prefix'></i>
+                                        <input placeholder='' id='username' name='username' type='text' class='validate valid' maxlength='30' value='" + username + @"' />
+                                        <label for='username' class='active'>
+                                            <span class='th'>" + lblUsernameTH + @"</span>
+                                            <span class='en hide'>" + lblUserNameEN + @"</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class='col s12 m4 l4'>
+                                    <div class='input-field'>
+                                        <i class='mdi mdi-multiplication prefix'></i>
+                                        <input placeholder='' id='password' name='password' type='password' class='validate' maxlength='50' value='' />
+                                        <label for='password'>
+                                            <span class='th'>" + lblPasswordTH + @"</span>
+                                            <span class='en hide'>" + lblPasswordEN + @"</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class='col s12 m4 l4'>
+                                    <div class='center'>
+                                        <a href='#!' class='waves-effect waves-light btn-large blue accent-4 btnReLogin'>
+                                            <i class='mdi mdi-checkbox-marked-circle-outline'></i>
+                                            <span class='th'>ทำสัญญา</span>
+                                            <span class='en hide'>Sign Contract</span>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     ");
-            //<div class='card-reveal light-green lighten-5'>
-            //    <span class='card-title grey-text text-darken-4'>
-            //        <span class='th'>สำหรับนักศึกษา</span>
-            //        <span class='en hide'>For Student</span>
-            //        <i class='mdi mdi-close right'></i></span>
+                }
+            }
 
-            //    <div class='row'>
-            //        <div class='input-field'>
-            //            <i class='mdi mdi-account-circle prefix'></i>
-            //            <input placeholder='u59xxxxx' id='username' name='username' type='text' class='validate' maxlength='30' value='' />
-            //            <label for='username'><span class='th'>ชื่อผู้ใช้งาน</span><span class='en hide'>Username</span></label>
-            //        </div>
-            //    </div>
-            //    <div class='row'>
-            //        <div class='input-field'>
-            //            <i class='mdi mdi-multiplication prefix'></i>
-            //            <input placeholder='internet account' id='studentpassword' name='studentpassword' type='password' class='validate' maxlength='50' value='' />
-            //            <label for='studentpassword'><span class='th'>รหัสผ่าน</span><span class='en hide'>Password</span></label>
-            //        </div>
-            //    </div>
-            //    <div>
-            //        <p class='teal-text'><i class='mdi mdi-message-alert on-left'></i><span class='blue-text th'>ลืมรหัสผ่าน โทร 0-2849-6022</span>
-            //        <span class='en hide'>Forgot password Call. 66(0) 2849-6022</span></p>
-            //        <a href='https://myinternet.mahidol.ac.th/'><i class='mdi mdi-undo-variant'></i>
-            //        <span class='pink-text th'>สมัครใช้งาน Internet Account หรือ เปลี่ยนรหัสผ่าน</span>
-            //        <span class='pink-text en hide'>Register Internet Account or Change password</span></a>
-            //    </div>
-            //    <div class='card-action center-align'>
-            //        <a href='javascript:void(0);' class='activator btn indigo darken-4 th student-login'>เข้าระบบ</a>
-            //        <a href='javascript:void(0);' class='activator btn indigo darken-4 en hide student-login'>Log in</a>
-            //    </div>
-            //</div>
-            _string.Append(@"
-                        <div class='col s12 m6 l6'>
-                            <div class='card medium'>
-                                <div class='card-image waves-effect waves-block waves-light'>
-                                    <img class='activator' src='images/grad010.jpg' />
+            return html.ToString();
+        }
+
+        /*
+        Auther  : Odd.Nopparat
+        Date    : 20-11-2015
+        Perpose : UiComplete
+        Method  : UiComplete
+        Sample  : N/A
+        */
+        public static string UiComplete(
+            ContractInfo ctInfo,
+            StudentInfo stdInfo,
+            ParentInfo parentMInfo,
+            ParentInfo parentFInfo,
+            string userType
+        ) {
+            if (stdInfo is null)
+                throw new ArgumentNullException(nameof(stdInfo));
+
+            if (parentMInfo is null)
+                throw new ArgumentNullException(nameof(parentMInfo));
+
+            if (parentFInfo is null)
+                throw new ArgumentNullException(nameof(parentFInfo));
+
+            StringBuilder html = new StringBuilder();
+            Login login = new Login("STUDENT");
+            string teal = "teal-text";
+            //string amber = "amber-text";
+            string red = "red-text";
+            //string contractTH = "การทำสัญญา";
+            //string contractEN = "Contract";
+            string completeTH = "เสร็จสิ้น";
+            //string completeEN = "Complete";
+            string incompleteTH = "ยังไม่เสร็จสิ้น";
+            //string incompleteEN = "not complete";
+            string messageIncomplete = "กรุณาติดต่อผู้ปกครองให้ดำเนินการจัดทำ หนังสือแสดงความยินยอมของผู้แทนโดยชอบธรรม และ สัญญาค้ำประกัน";
+            string messageComplete = "ดาวน์โหลดเอกสารเก็บไว้เป็นหลักฐาน";
+            string message = messageIncomplete;
+            string iconPass = "<i class='mdi mdi-check green-text'></i>";
+            string iconNotpass = "<i class='mdi mdi-close-box-outline red-text'></i>";
+            string contractHeaderTH = "";
+            string contractHeaderEN = "";
+            string csstext;
+            string contractDate = ctInfo.DateLongContractStudent;
+            string iconContract;
+            string iconGuarantee;
+            string iconWarrant;
+            //string cssContract;
+            string cssGuarantee;
+            string cssWarrant;
+            string headContract;
+            string headGuarantee;
+            string headWarrant;
+            string btnPrintContract;
+            string btnPrintConsent;
+            string btnPrintWarrant;
+            string btnPrintAll = string.Empty;
+
+            //check 3 pass items. active on download .pdf button
+            if (ctInfo.StatusComplete == "S" ||
+                (ctInfo.SignStudent == "True" && ctInfo.SignParent1 == "True" && ctInfo.SignParent2 == "True")) {
+                csstext = teal;
+                message = messageComplete;
+                contractHeaderTH = "การทำสัญญาสมบูรณ์ครบถ้วน";
+                contractHeaderEN = "Sign Contract is Successfully";
+
+                /*
+                btnPrintAll = (@"
+                    <a href='printContract.aspx?action=printAll&userType=" + userType + @"' target='printContract' class='waves-effect waves-light btn-large green'>
+                        <span class='th'>ดาวน์โหลดเอกสาร 3 ฉบับ</span>
+                        <span class='en hide'>Download All items</span>
+                        <i class='mdi mdi-file-pdf'></i>
+                    </a>
+                ");
+                */
+
+                btnPrintContract = (@"
+                    <a href='printContract.aspx?action=printContract&userType=" + userType + @"' target='printContract' class='waves-effect waves-light btn-large  green darken-1'>
+                        <span class='th'>สัญญา</span>
+                        <span class='en hide'>Contract</span>
+                        <i class='mdi mdi-file-pdf'></i>
+                    </a>
+                ");
+                btnPrintConsent = (@"
+                    <a href='printContract.aspx?action=printConsent&userType=" + userType + @"' target='printContract' class='waves-effect waves-light btn-large green darken-1'>
+                        <span class='th'>สัญญา</span>
+                        <span class='en hide'>Contract</span>
+                        <i class='mdi mdi-file-pdf'></i>
+                    </a>
+                ");
+                btnPrintWarrant = (@"
+                    <a href='printContract.aspx?action=printWarrant&userType=" + userType + @"' target='printContract' class='waves-effect waves-light btn-large green darken-1'>
+                        <span class='th'>สัญญา</span>
+                        <span class='en hide'>Contract</span>
+                        <i class='mdi mdi-file-pdf'></i>
+                    </a>
+                ");
+            }
+            else {
+                csstext = red;
+
+                if (ctInfo.SignStudent == "True" &&
+                    (ctInfo.SignParent1 == "False" || ctInfo.SignParent2 == "False")) {
+                    contractHeaderTH = "การทำสัญญายังไม่สมบูรณ์ครบถ้วน<br>กรุณาแจ้งผู้ค้ำประกัน/ยินยอม ให้เข้ามาทำสัญญา";
+                    contractHeaderEN = "Sign Contract is Unsuccessfully";
+                }
+
+                /*
+                btnPrintAll = (@"
+                    <span class='waves-effect waves-light btn-large red darken-4 disabled'>
+                        <span class='th'>ดาวน์โหลดเอกสาร 3 ฉบับ</span>
+                        <span class='en hide'>Download All items</span>
+                        <i class='mdi mdi-file-pdf'></i>
+                    </span>
+                ");
+                */
+
+                btnPrintContract = (@"
+                    <span class='waves-effect waves-light btn-large red accent-2 disabled'>
+                        <span class='th'>สัญญา</span>
+                        <span class='en hide'>Contract</span>
+                        <i class='mdi mdi-file-pdf'></i>
+                    </span>
+                ");
+                btnPrintConsent = (@"
+                    <span class='waves-effect waves-light btn-large red accent-2 disabled'>
+                        <span class='th'>สัญญา</span>
+                        <span class='en hide'>Contract</span>
+                        <i class='mdi mdi-file-pdf'></i>
+                    </span>
+                ");
+                btnPrintWarrant = (@"
+                    <span class='waves-effect waves-light btn-large red accent-2 disabled'>
+                        <span class='th'>สัญญา</span>
+                        <span class='en hide'>Contract</span>
+                        <i class='mdi mdi-file-pdf'></i>
+                    </span>
+                ");
+            }
+
+            //iconGuarantee = (ctInfo.StatusSignMother == "Y" ? iconPass : iconNotpass);
+            //iconWarrant = (ctInfo.StatusSignMother == "Y" ? iconPass : iconNotpass);
+
+            //นักศึกษาทำสํญญาแล้ว หรือสถานะสำเร็จ
+            if (ctInfo.StatusComplete == "S" ||
+                ctInfo.SignStudent == "True") {
+                iconContract = iconPass;
+                //cssContract = teal;
+                headContract = completeTH;
+                btnPrintContract = (@"
+                    <a href='printContract.aspx?action=printContract&userType=" + userType + @"' target='printContract' class='waves-effect waves-light btn-large  green darken-1'>
+                        <span class='th'>สัญญา</span>
+                        <span class='en hide'>Contract</span>
+                        <i class='mdi mdi-file-pdf'></i>
+                    </a>
+                ");
+            }
+            else {
+                iconContract = iconNotpass;
+                //cssContract = red;
+                headContract = incompleteTH;
+            }
+
+            //warrant
+            //ถ้าผู้ค้ำประกัน สถานะสำเร็จ
+            if (ctInfo.StatusComplete == "S" ||
+                ctInfo.SignParent1 == "True") {
+                iconWarrant = iconPass;
+                cssWarrant = teal;
+                headWarrant = completeTH;
+            }
+            else {
+                iconWarrant = iconNotpass;
+                cssWarrant = red;
+                headWarrant = incompleteTH;
+            }
+
+            //guarantee
+            //ถ้าผู้ยินยอมคู่สมรส สถานะสำเร็จ
+            if (ctInfo.StatusComplete == "S" ||
+                ctInfo.SignParent2 == "True") {
+                iconGuarantee = iconPass;
+                cssGuarantee = teal;
+                headGuarantee = completeTH;
+            }
+            else {
+                iconGuarantee = iconNotpass;
+                cssGuarantee = red;
+                headGuarantee = incompleteTH;
+            }
+
+            html.Append(@"
+                <div class='section'>
+                    <div class='row'>
+                        <div class='col s12 m12'>
+            ");
+
+            if (userType == "STUDENT") {
+                //string marriage = ctInfo.IsMarriage; //1 = สมรส, 2 = สมรส(ไม่ได้จดทะเบียน), 3 = บิดามารดาหย่าร้าง
+                string maritalStatus = ctInfo.MaritalStatus;//1 = สมรส, 2 = สมรส(ไม่ได้จดทะเบียน), 3 = บิดามารดาหย่าร้าง, 4 = แยกกันอยู่, 5 = หม้าย, 6 = โสด
+                string aliveF = ctInfo.IsAliveFather; //สถานะบิดา 1 = มีชีวิต, 2 = เสียชีวิต
+                string aliveM = ctInfo.IsAliveMother; //สถานะมารดา 1 = มีชีวิต, 2 = เสียชีวิต
+                string liveWithF = ctInfo.IsLiveFather; //อาศัยอยู่ = 1, ไม่อาศัย = 0
+                string liveWithM = ctInfo.IsLiveMother; //อาศัยอยู่ = 1, ไม่อาศัย = 0
+                string liveWithOther = ctInfo.IsLiveOther; //อาศัยอยู่ = 1, ไม่อาศัย = 0
+                string warrantBy = ctInfo.WarrantBy; //ผู้ค้ำประกัน พ่อ = F, แม่ = M, บุคคลอื่น = N
+                string passwordForFather = string.Empty;
+                string passwordForMother = string.Empty;
+
+                DataSet ds = ContractDB.Sp_ectGetStatusReqPasswordParent(maritalStatus, aliveF, aliveM, liveWithF, liveWithM, liveWithOther, warrantBy);
+                int row = ds.Tables[0].Rows.Count;
+
+                if (row > 0) {
+                    passwordForFather = ds.Tables[0].Rows[0]["passwordForFather"].ToString();
+                    passwordForMother = ds.Tables[0].Rows[0]["passwordForMother"].ToString();
+                }
+
+                if (passwordForFather == "1" ||
+                    passwordForMother == "1") {
+                    //internal contract
+                    /*
+                    passwordForFather = ds.Tables[0].Rows[0]["passwordForFather"].ToString();
+                    passwordForMother = ds.Tables[0].Rows[0]["passwordForMother"].ToString();
+
+                    if (passwordForFather == "1" ||
+                        passwordForMother == "1") {
+                    */
+                    html.Append(@"
+                            <div class='row center-align'>
+                                <button type='button' id='submit_confirmRequest' class='waves-effect waves-light btn-large' runat='server'>ขอรับรหัสผ่านของบิดาและมารดา</button>
+                            </div>
+                    ");
+                    /*
+                    }
+                    else {
+                        html.Append(@"
+                            <div class='row'>
+                                <span class='th'>
+                                    <h5 class='red-text'>
+                                        <b>*เป็นกรณีที่ต้องทำสัญญาภายนอกระบบ*</b><br />
+                                    </h5> 
+                                    <h5 class='blue-text' style='text-align: left;'>
+                                        11d. ขอให้นักศึกษาตรวจสอบการบันทึกข้อมูลในระบบ e-profile : ข้อมูลส่วนตัวข้อมูลที่อยู่ และข้อมูลครอบครัว ให้ครบถ้วนทุกรายการ<br />
+                                    </h5>
+                                    <h5 class='blue-text' style='text-align: left;'>
+                                        22d. ให้ศึกษารายละเอียดเพิ่มเติมจาก<a href='https://econtract.mahidol.ac.th/faqContract.aspx'><u>FAQ การทำสัญญาค้ำประกัน ฯ</u></a>และให้นักศึกษา
+                                        กับผู้ค้ำประกันติดต่อทำสัญญาภายนอกระบบ ให้แล้วเสร็จภายในระยะเวลาเดียวกันกับระยะเวลา
+                                        การทำสัญญาการเป็นนักศึกษาในระบบนี้ ได้ที่กองกฎหมาย ชั้น 2 สำนักงานอธิการบดี โดยติดต่อ
+                                        กำหนดวันและเวลาทำสัญญา รวมทั้งสอบถามข้อมูลผ่าน LINE Official Account กองกฎหมาย 
+                                        ม.มหิดล : @csq0251v หรือ โทร. 02 849 6260 ในวันทำการ เวลา 08.30 – 16.30 น.
+                                    </h5>
+                                </span>
+                            </div>
+                        ");
+                    }
+                    */
+                }
+                else {
+                    //external contract 
+                    html.Append(@"
+                            <div class='row'>
+                                <span class='th'>
+                                    <h5 class='red-text'>
+                                        <b>*เป็นกรณีที่ต้องทำสัญญาภายนอกระบบ*</b><br />
+                                    </h5> 
+                                    <h5 class='blue-text' style='text-align: left;'>
+                                        1. ขอให้นักศึกษาตรวจสอบการบันทึกข้อมูลในระบบ e-profile : ข้อมูลส่วนตัวข้อมูลที่อยู่ และข้อมูลครอบครัว ให้ครบถ้วนทุกรายการ<br />
+                                    </h5>
+                                    <h5 class='blue-text' style='text-align: left;'>
+                                        2. ให้ศึกษารายละเอียดเพิ่มเติมจาก<a href='https://econtract.mahidol.ac.th/faqContract.aspx'><u>FAQ การทำสัญญาค้ำประกัน ฯ</u></a>และให้นักศึกษา
+                                        กับผู้ค้ำประกันติดต่อทำสัญญาภายนอกระบบ ให้แล้วเสร็จภายในระยะเวลาเดียวกันกับระยะเวลา
+                                        การทำสัญญาการเป็นนักศึกษาในระบบนี้ ได้ที่กองกฎหมาย ชั้น 2 สำนักงานอธิการบดี โดยติดต่อ
+                                        กำหนดวันและเวลาทำสัญญา รวมทั้งสอบถามข้อมูลผ่าน LINE Official Account กองกฎหมาย 
+                                        ม.มหิดล : @csq0251v หรือ โทร. 02 849 6260 ในวันทำการ เวลา 08.30 – 16.30 น.
+                                    </h5>
+                                </span>
+                            </div>
+                    ");
+                }
+            }
+
+            html.Append(@"
+                            <h3 class='" + csstext + @" center-align'>
+                                <span class='th'>" + contractHeaderTH + @"</span>
+                                <span class='en hide'>" + contractHeaderEN + @"</span>
+                            </h3>
+                            <div class='blue-text center-align'>
+                                <span class='th'>" + contractDate + @"</span>
+                                <span class='en hide'>" + contractDate + @"</span>
+                            </div>
+                            <div class='center-align'>" + btnPrintAll + @"</div>
+                            <br />
+                            <div class='divider'></div>
+                        </div>
+                        <div class='col s12 m4'>
+                            <div class='icon-block'>
+                                <h2 class='center'>" + iconContract + @"<i class='mdi mdi-numeric-1-box blue-text text-darken-3'></i></h2>
+                                <h5 class='center teal-text'>
+                                    <span class='th'>การทำสัญญานักศึกษา" + login.FullNameTH + " " + headContract + @"</span>
+                                    <span class='en hide'>Student Contract Finish</span>
+                                </h5>
+                                <p class='light'>" + message + @"</p>
+                                <p class='white-text center'>" +
+                                    btnPrintContract + @"
+                                    <span class='on-right red-text'>*</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class='col s12 m4'>
+                            <div class='icon-block'>
+                                <h2 class='center'>" + iconGuarantee + @"<i class='mdi mdi-numeric-2-box blue-text text-darken-3'></i></h2>
+                                <h5 class='center " + cssGuarantee + "'>การทำหนังสือแสดงความยินยอมฯ " + headGuarantee + @"</h5>
+                                <p class='light'>" + message + @"</p>
+                                <p class='white-text center'>" +
+                                    btnPrintConsent + @"
+                                    <span class='on-right red-text'>*</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class='col s12 m4'>
+                            <div class='icon-block'>
+                                <h2 class='center'>" + iconWarrant + @"<i class='mdi mdi-numeric-3-box blue-text text-darken-3'></i></h2>
+                                <h5 class='center " + cssWarrant + "'>การทำสัญญาค้ำประกัน " + headWarrant + @"</h5>
+                                <p class='light'>" + message + @"</p>
+                                <p class='white-text center'>" +
+                                    btnPrintWarrant + @"
+                                    <span class='on-right red-text'>*</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class='red-text'>
+                    <span class='th'>*ดาวน์โหลดเอกสารได้เมื่อทำสัญญาครบ 3 ฉบับ</span>
+                    <span class='en hide'>Allow Download Contract at Complete 3 items</span>
+                </div>
+            ");
+
+            return html.ToString();
+        }
+
+        /*
+        Auther  : Odd.Nopparat
+        Date    : 20-11-2015
+        Perpose : footerbanner
+        Method  : footerbanner
+        Sample  : N/A
+        */
+        public static string FooterBanner() {
+            StringBuilder html = new StringBuilder();
+
+            html.Append(@"
+                <div class='container'>
+                    <div class='row'>
+                        <div class='col l9 s12'>
+                            <p class='grey-text text-lighten-5'>
+                                <span class='yellow-text th'>โปรดให้ความสนใจเป็นพิเศษ</span>
+                                <span class='yellow-text en hide'>Important Notice</span>
+                                <span class='th'>
+                                    นักศึกษา บิดา และมารดาจะต้องตรวจสอบข้อมูล และอ่านรายละเอียดเงื่อนไขของสัญญาให้เข้าใจ และเมื่อเห็นว่าข้อมูลถูกต้องครบถ้วน และยอมรับในเงื่อนไขของสัญญาแล้ว นักศึกษา บิดา
+                                    และมารดาจะต้องดำเนินการตามขั้นตอนของการจัดทำสัญญาในระบบอิเล็กทรอนิกส์เพื่อผูกพันกับมหาวิทยาลัยต่อไปตามลำดับ
+                                </span>
+                                <span class='en hide'>
+                                    Student,Parent read all contract, Accept them and follow contract process.
+                                </span>
+                            </p>
+                        </div>
+                        <div class='col l3 s12'>
+                            <ul>
+                                <li class='lime-text'>
+                                    <span class='th'>กองกฎหมาย ชั้น 2 สำนักงานอธิการบดี  มหาวิทยาลัยมหิดล  ศาลายา</span>
+                                    <span class='en hide'>The 2nd Floor,Department of Legal Affairs, Office of the President, Mahidol University (Salaya Campus)</span>
+                                </li>
+                                <li>
+                                    <a class='white-text' href='#'>
+                                        <span class='th'>โทร : 02-849-6262</span>
+                                        <span class='en hide'>Telephone: 66(0) 2849-6262</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class='white-text' href='#'>
+                                        <span class='th'>LINE Official Account: @csq0251v</span>
+                                        <span class='en hide'>LINE Official Account: @csq0251v</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class='footer-copyright'>
+                    <div class='container'>
+                        Copyright ©2015-" + Myconfig.yearEN + @"
+                        Mahidol University. All rights reserved. Legal Affairs Division/Student Application Section
+                    </div>
+                </div>
+            ");
+
+            return html.ToString();
+        }
+
+        /*
+        Auther  : anussara.wan
+        Date    : 07-08-2020
+        Perpose : SetContract
+        Method  : SetContract
+        Sample  : <param name="_dtInput">ข้อมูลสถานะบิดามารดา</param>
+                  <param name="_acaYear">ปีการศึกษา</param>
+                  <param name="_studentId">รหัสนักศึกษา</param>
+                  <param name="_userType">STUDENT,PARENT</param>
+                  <param name="_parentType">F,M</param>
+                  <param name="_docId">รหัสสัญญา</param>
+                  <param name="_username">username</param>
+        */
+        public static void SetContract(
+            DataTable dtInput,
+            string acaYear,
+            string studentID,
+            string userType,
+            string parentType,
+            string docID,
+            string username,
+            string fatherUsername,
+            string motherUsername
+        ) {
+            //ข้อมูลตามตารางเงื่อนไขสถานภาพชีวิตบิดามารดา
+            string warrantBy = dtInput.Rows[0]["warrantBy"].ToString();
+            string consentBy = dtInput.Rows[0]["consentBy"].ToString();
+            string marriage = dtInput.Rows[0]["marriage"].ToString();
+            string aliveF = dtInput.Rows[0]["aliveF"].ToString();
+            string aliveM = dtInput.Rows[0]["aliveM"].ToString();
+            string liveWithF = dtInput.Rows[0]["liveWithF"].ToString();
+            string liveWithM = dtInput.Rows[0]["liveWithM"].ToString();
+            string liveWithOther = dtInput.Rows[0]["liveWithOther"].ToString();
+            string contactFM = dtInput.Rows[0]["contactFm"].ToString();
+
+            if (warrantBy == "N" &&
+                consentBy == "N") {
+                fatherUsername = string.Empty;
+                motherUsername = string.Empty;
+            }
+
+            //ส่งไปบันทึกในตาราง ectDocMgmt
+            ContractDB.SetContract(userType, studentID, acaYear, warrantBy, consentBy, marriage, aliveM, aliveF, liveWithM, liveWithF, liveWithOther, contactFM, parentType, username, docID, fatherUsername, motherUsername);
+        }
+
+        public static string UImenuStudent(string studentID) {
+            StringBuilder html = new StringBuilder();
+            ProgramContract cStsInfo = new ProgramContract(studentID); //เช็คว่าหลักสูตรสามารถทำสัญญาได้หรือไม่
+            ContractInfo ctInfo = new ContractInfo(studentID); //ข้อมูลสัญญานักศึกษา
+            string marriage = ctInfo.MaritalStatus; //1 = สมรส, 2 = สมรส(ไม่ได้จดทะเบียน), 3 = บิดามารดาหย่าร้าง, 4 = แยกกันอยู่, 5 = หม้าย, 6 = โสด
+            string aliveF = ctInfo.IsAliveFather; //สถานะบิดา 1 = มีชีวิต, 2 = เสียชีวิต
+            string aliveM = ctInfo.IsAliveMother; //สถานะมารดา 1 = มีชีวิต, 2 = เสียชีวิต
+            string liveWithF = ctInfo.IsLiveFather; //อาศัยอยู่ =1, ไม่อาศัย = 0
+            string liveWithM = ctInfo.IsLiveMother; //อาศัยอยู่ =1, ไม่อาศัย = 0
+            string liveWithOther = ctInfo.IsLiveOther; //อาศัยอยู่ = 1, ไม่อาศัย = 0
+            string warrantBy = ctInfo.WarrantBy; //ผู้ค้ำประกัน พ่อ=F,แม่=M,บุคคลอื่น=N
+            //string passwordForFather = string.Empty;
+            //string passwordForMother = string.Empty;
+            DataSet ds = ContractDB.Sp_ectGetStatusReqPasswordParent(marriage, aliveF, aliveM, liveWithF, liveWithM, liveWithOther, warrantBy);
+            int row = ds.Tables[0].Rows.Count;
+
+            if (cStsInfo.StatusMakeContract == "MakeContract") {
+                html.Append(@"
+                    <div id='menuStd' style='text-align:center;'>
+                        <div class='row'>
+                            <button type='button' id='submit_frmContract' class='waves-effect waves-light btn-large' runat='server'>ทำสัญญาการเป็นนักศึกษา/ดาวน์โหลดสัญญานักศึกษา</button>
+                        </div>
+                ");
+            }
+            else {
+                html.Append(@"
+                    <div id='menuStd' style='text-align:center;'>
+                        <div class='row'>
+                            <span class='th'>
+                                <h5 class='red-text'>คุณไม่ใช่หลักสูตรที่ต้องทำสัญญาอิเล็กทรอนิกส์ กรุณาตรวจสอบว่าต้องทำสัญญาหรือไม่</h5>
+                            </span>
+                            <span class='en hide'>
+                                <h5 class='red-text'>คุณไม่ใช่หลักสูตรที่ต้องทำสัญญาอิเล็กทรอนิกส์ กรุณาตรวจสอบว่าต้องทำสัญญาหรือไม่</h5>
+                            </span>
+                        </div>
+                ");
+            }
+
+            if (row > 0) {
+                string passwordForFather = ds.Tables[0].Rows[0]["passwordForFather"].ToString();
+                string passwordForMother = ds.Tables[0].Rows[0]["passwordForMother"].ToString();
+
+                if (passwordForFather == "1" ||
+                    passwordForMother == "1") {
+                    html.Append(@"
+                        <div class='row'>
+                            <button type='button' id='submit_confirmRequest' class='waves-effect waves-light btn-large' runat='server'>ขอรับรหัสผ่านของบิดาและมารดา</button>
+                        </div>
+                    ");
+                }
+            }
+
+            html.Append(@"
+                    </div>
+            ");
+
+            return html.ToString();
+        }
+
+        public static string UIconfirmRequestPassStd() {
+            StringBuilder html = new StringBuilder();
+
+            html.Append(@"
+                <div id='termReq' style='text-align:center;margin-top:50px;'>
+                    <iframe src='termRequest.html' width='60%' height='80%' align='center' ></iframe>
+                    <div style='margin-top:10px;text-align:center;'>
+                        <button id='btnAcceptRequest' class='btn btn-outline-secondary' type='button' runat='server'>ยืนยัน</button>
+                    </div>
+                </div>
+            ");
+
+            return html.ToString();
+        }
+
+        public static string UIsetConfirmRequestPassword() {
+            StringBuilder html = new StringBuilder();
+            Login login = new Login("STUDENT");
+            StudentInfo stdInfo = new StudentInfo(login.StudentCode);
+
+            if (stdInfo.CheckConfirmStd != "1") {
+                //insert confirm log 
+                int result = ContractDB.SetConfirmRequestPassword(login.StudentCode, login.StudentID, stdInfo.AcaYear, login.Username);
+
+                if (result == -1) {
+                    html.Append(@"
+                        <h6 style='text-align:center;color:red;'>ไม่สามารถขอรหัสผ่านได้ กรุณาติดต่อเจ้าหน้าที่</h6>
+                    ");
+                }
+                else {
+                    html.Append(@"
+                        <div style='margin-top:10px;text-align:center;'>
+                            <button id='btnPrintPassword' class='btn btn-outline-secondary' type='button' runat='server'>ดาวน์โหลดรหัสผ่าน</button>
+                        </div>
+                    ");
+                }
+            }
+            else {
+                html.Append(@"
+                        <div style='margin-top:10px;text-align:center;'>
+                            <button id='btnPrintPassword' class='btn btn-outline-secondary' type='button' runat='server'>ดาวน์โหลดรหัสผ่าน</button>
+                        </div>
+                ");
+            }
+
+            return html.ToString();
+        }
+
+        public static string UIsetAcceptedRequestPassword() {
+            StringBuilder html = new StringBuilder();
+            //DataSet ds = new DataSet();
+            Login login = new Login("STUDENT");
+            StudentInfo stdInfo = new StudentInfo(login.StudentCode);
+            ParentInfo parentMInfo = new ParentInfo(login.StudentID, "M");
+            ParentInfo parentFInfo = new ParentInfo(login.StudentID, "F");
+            ContractInfo contractInfo = new ContractInfo(login.StudentID);
+
+            if (contractInfo.IsAliveFather == "1" &&
+                parentFInfo.IDCard == null && (parentFInfo.FirstNameEN == null || parentFInfo.FirstNameEN == "" || parentFInfo.LastNameEN == null || parentFInfo.LastNameEN == "")) {
+                //idcard father is empty
+                html.Append("<p>ไม่สามารถขอรหัสผ่านได้ เนื่องจากไม่พบรหัสบัตรประจำตัวประชาชนของบิดา/ชื่อ-นามสกุลภาษาอังกฤษ สามารถกรอกรหัสบัตรประชาชนของบิดาได้ที่<a href='https://smartedu.mahidol.ac.th'>ระบบ e-Profile</a></p>");
+            }
+
+            if (contractInfo.IsAliveFather == "1" &&
+                parentMInfo.IDCard == null && (parentMInfo.FirstNameEN == null || parentMInfo.FirstNameEN == "" || parentMInfo.LastNameEN == null || parentMInfo.LastNameEN == "")) {
+                //idcard mother is empty
+                html.Append("<p>ไม่สามารถขอรหัสผ่านได้ เนื่องจากไม่พบรหัสบัตรประจำตัวประชาชนของมารดา/ชื่อ-นามสกุลภาษาอังกฤษ สามารถกรอกรหัสบัตรประชาชนของมารดาได้ที่<a href='https://smartedu.mahidol.ac.th'>ระบบ e-Profile</a></p>");
+            }
+            else {
+                //check confirm log  
+                int checkAcaYearSTD = Convert.ToInt32(stdInfo.AcaYear);
+                int checkConfirmLog = Convert.ToInt32(stdInfo.CheckConfirmStd);
+
+                if (checkConfirmLog <= 0 &&
+                    checkAcaYearSTD >= 2562) {
+                    html.Append(UIconfirmRequestPassStd());
+                }
+                else {
+                    html.Append(UIsetConfirmRequestPassword());
+                }
+
+            }
+
+            return html.ToString();
+        }
+
+        /*
+        Auther  : anussara.wan
+        Date    : 19-08-2019
+        Perpose : เพื่อแสดงหน้า confirm parent
+        Method  : UiConfirmParent
+        Sample  : N/A
+        */
+        public static string UiConfirmParent(
+            string userType,
+            ContractInfo ctInfo,
+            string username,
+            string parentType,
+            string studentID,
+            string studentCode
+        ) {
+            if (string.IsNullOrEmpty(userType)) {
+                throw new ArgumentException($"'{nameof(userType)}' cannot be null or empty.", nameof(userType));
+            }
+
+            if (ctInfo is null) {
+                throw new ArgumentNullException(nameof(ctInfo));
+            }
+
+            if (string.IsNullOrEmpty(username)) {
+                throw new ArgumentException($"'{nameof(username)}' cannot be null or empty.", nameof(username));
+            }
+
+            if (string.IsNullOrEmpty(parentType)) {
+                throw new ArgumentException($"'{nameof(parentType)}' cannot be null or empty.", nameof(parentType));
+            }
+
+            if (string.IsNullOrEmpty(studentID)) {
+                throw new ArgumentException($"'{nameof(studentID)}' cannot be null or empty.", nameof(studentID));
+            }
+
+            StringBuilder html = new StringBuilder();
+            StudentInfo stdInfo = new StudentInfo(studentCode);
+            string stdNameTH = Myconfig.CvEmpty(stdInfo.StdNameTH, " - ");
+            //string stdNameEN = Myconfig.CvEmpty(stdInfo.StdNameEN, " - ");
+            //string stdStatusNameTH = Myconfig.CvEmpty(stdInfo.StatusNameTH, " - ");
+            //string stdStatusNameEN = Myconfig.CvEmpty(stdInfo.StatusNameEN, " - ");
+            string facultyNameTH = Myconfig.CvEmpty(stdInfo.FacultyNameTH, " - ");
+            //string facultyNameEH = Myconfig.CvEmpty(stdInfo.FacultyNameEN, " - ");
+            //string pCode = Myconfig.CvEmpty(stdInfo.PCode, " - ");
+
+            html.Append(@"
+                <div class='card-panel grey lighten-5'>
+                    <div class='grey-text text-darken-4'>
+                        <div class='section'>
+                            <p>
+                                <input class='chkStay' name='chkStay' type='checkbox' id='chkConP' value='1' />
+                                <label for='chkConP'>
+                                    <span class='th'></span>
+                                    <span class='en hide'></span>
+                                </label>
+                                ข้าพเจ้าขอให้สัตยาบันว่า ข้าพเจ้าได้มอบฉันทะให้  <b> " + stdNameTH + @"</b> นักศึกษา <b> " + facultyNameTH + @"</b> ขอรับชื่อผู้ใช้และรหัสผ่านสำหรับการทำสัญญาค้ำประกัน และหนังสือแสดงความยินยอมของผู้แทนโดยชอบธรรม แทนข้าพเจ้าจริง
+                                โดยข้าพเจ้าได้รับทราบนโยบาย ระเบียบปฏิบัติการจัดทำสัญญาระบบอิเล็กทรอนิกส์กับทางมหาวิทยาลัยมหิดลแล้ว และขอยอมรับผิดชอบในการกระทำของผู้รับมอบฉันทะโดยถือเสมือนว่าเป็นการกระทำของข้าพเจ้าเองทุกประการ</br></br>
+                            </p>
+                        </div>
+                        <span class='waves-effect waves-light btn-large green col s12  accent-12 btnConfirmParent' >ทำหนังสือแสดงความยินยอมของผู้แทนโดยชอบธรรมและ/หรือสัญญาค้ำประกัน</span>
+                    </div>
+                </div>
+            ");
+
+            return html.ToString();
+        }
+
+        /*
+        Auther  : anussara.wan
+        Date    : 07-08-2020
+        Perpose : ParallaxbannerFAQ
+        Method  : ParallaxbannerFAQ
+        Sample  : N/A
+        */
+        public static string ParallaxbannerFAQ() {
+            StringBuilder html = new StringBuilder();
+            string txtDateOpen = "<span class='th' style='font-size:16pt;font-family: courier;font-weight:bold;color:#0035AD;'>FAQ คำถามที่พบบ่อยเกี่ยวกับการทำสัญญาการเป็นนักศึกษา</span>";
+
+            html.Append(@"
+                <div id='index-bannerx' class='parallax-container' style='height: 160px;'>
+                    <div class='section no-pad-bot'>
+                        <div class='container'>
+                            <div class='row'>
+                                <div class='col s12 m12 l12'>
+                                    <img src='http://www.student.mahidol.ac.th/portal/images/logo.png' alt='' class='responsive-img' />
                                 </div>
-                                <div class='card-content'>
-                                    <span class='card-title activator grey-text text-darken-4 th'>สำหรับผู้ปกครอง<i class='mdi mdi-dots-vertical right'></i></span>
-                                    <span class='card-title activator grey-text text-darken-4 en hide'>For Parent<i class='mdi mdi-dots-vertical right'></i></span>
-                                    <p class='center-align'>
-                                        <a href='javascript:void(0);' class='activator btn lime darken-4 th'>เข้าที่นี่</a>
-                                        <a href='javascript:void(0);' class='activator btn lime darken-4 en hide'>Click</a>
-                                    </p>
+                                <div class='col s12 m8 l8 hide-on-small-only'>
+                                    <div class=''>
+                                        <h5 class='light'>" + txtDateOpen + @"</h5>
+                                    </div>
                                 </div>
-                                <div class='card-reveal pink lighten-5'>
-                                    <span class='card-title grey-text text-darken-4'>
-                                        <span class='th'>สำหรับผู้ปกครอง/ผู้คำประกัน-ยินยอม</span>
-                                        <span class='en hide'>For Parent</span>
-                                        <i class='mdi mdi-close right'></i></span>
-                                    <div class='row'>
-                                        <div class='input-field'>
-                                            <i class='mdi mdi-account-circle prefix'></i>
-                                            <input placeholder='' id='citizenid' name='userid' type='text' class='validate' maxlength='50' value='' />
-                                            <label for='citizenid'><span class='th'>รหัสผู้ใช้</span><span class='en hide'>Username</span></label>
-                                        </div>
-                                    </div>
-                                    <div class='row'>
-                                        <div class='input-field'>
-                                            <i class='mdi mdi-multiplication prefix'></i>
-                                            <input placeholder='' id='parentpassword' name='parentpassword' type='password' class='validate' maxlength='30' value='' />
-                                            <label for='parentpassword'><span class='th'>รหัสผ่าน</span><span class='en hide'>Password</span></label>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <p class='teal-text'><i class='mdi mdi-message-alert on-left'></i><span class='blue-text th'>ลืมรหัสผ่าน โทร 0-2849-6260</span>
-                                        <span class='en hide'>Forgot password Call. 0(66)2849-6260</span></p>
-                                        <i class='mdi mdi-undo-variant'></i>
-                                        <span class='pink-text th'>นักศึกษาเป็นผู้รับรหัสผ่านของบิดาและมารดา จากส่วนสำหรับนักศึกษาขอให้บิดาและมารดา<br/>สอบถามข้อมูล Username และ Password จากนักศึกษาก่อนเข้าทำสัญญา</span>
-                                        <span class='pink-text en hide'>The Student will receive Parents' Username and Password from the Student Section. Please ask the student for your Username and Password before entering into a contract.</span>
-                                    </div>
-                                    <div class='card-action center-align'>
-                                        <input type='hidden' id='usertype' name='usertype' value='' />
-                                        <a href='javascript:void(0);' class='activator btn lime darken-4 th parent-login'>เข้าระบบ</a>
-                                        <a href='javascript:void(0);' class='activator btn lime darken-4 en hide parent-login'>LOG-IN</a>
+                                <div class='col s12 m4 l4'>
+                                    <div class='right-align'>
+                                        <img src='Images/contract_string.png' alt='' class='responsive-img' />
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>");
-            return _string.ToString();
+                        <div class='parallax'>
+                            <img src='images/bgs.png' alt='#' />
+                        </div>
+                    </div>
+            ");
+
+            return html.ToString();
         }
 
-        /// <summary>
-        /// Auther : Odd.Nopparat
-        /// Date   : 2015-11-20.
-        /// Perpose: reLoginForm
-        /// Method : reLoginForm
-        /// Sample : N/A
-        /// </summary>
-        public static string UiReLoginForm(string _userType, ContractInfo _ctInfo, string _username, string _parentType)
-        {
-            string _lblUsernameTh = "";
-            string _lblUserNameEn = "";
-            string _lblPasswordTh = "";
-            string _lblPasswordEn = "";
-
-            string _warrantBy = _ctInfo.WarrantBy;
-            string _consentBy = _ctInfo.ConsentBy;
-            string _txtTitle = "ใส่รหัสอีกครั้งเพื่อยืนยันการทำสัญญา";
-            if (_warrantBy == _parentType)
-            {
-                _txtTitle += " ค้ำประกัน";
-            }
-            else if (_consentBy == _parentType)
-            {
-                _txtTitle += " ยินยอมคู่สมรส";
-
-            }
-
-            StringBuilder _string = new StringBuilder();
-
-            if (_userType == "STUDENT")
-            {
-                _lblUsernameTh = "รหัสนักศึกษา";
-                _lblUserNameEn = "STUDENT ID";
-                _lblPasswordTh = "รหัสผ่าน (Internet Account)";
-                _lblPasswordEn = "INTERNET ACCOUNT";
-                _string.Append("   <div class='card-panel blue lighten-5'>" +
-                   "         <div class='row'>" +
-                   "             <h5 class='red-text'><span class='th'>" + _txtTitle + "</span><span class='en hide'>Re-Login for sign contract</span></h5>" +
-                   "             <div class='col s12 m8 l8'>" +
-                   "                 <div class='input-field'>" +
-                   "                     <i class='mdi mdi-account-circle prefix'></i>" +
-                   "                     <input placeholder='' id='username' name='username' type='text' class='validate valid' maxlength='8' value='" + _username + "' />" +
-                   "                     <label for='username' class='active'><span class='th'>" + _lblUsernameTh + "</span><span class='en hide'>" + _lblUserNameEn + "</span></label>" +
-                   "                 </div>" +
-                   "             </div>" +
-                   //"             <div class='col s12 m4 l4'>" +
-                   //"                 <div class='input-field'>" +
-                   //"                     <i class='mdi mdi-multiplication prefix'></i>" +
-                   //"                     <input placeholder='' id='password' name='password' type='password' class='validate' maxlength='50' value='' />" +
-                   //"                     <label for='password'><span class='th'>" + _lblPasswordTh + "</span><span class='en hide'>" + _lblPasswordEn + "</span></label>" +
-                   //"                 </div>" +
-                   //"             </div>" +
-                   "            <div class='col s12 m4 l4'>" +
-                   "                 <div class='center'>" +
-                   "                     <a href='#!' class='waves-effect waves-light btn-large blue accent-4 btnReLogin'><i class='mdi mdi-checkbox-marked-circle-outline'></i>" +
-                   "                         <span class='th'>ทำสัญญา</span><span class='en hide'>Sign Contract</span>" +
-                   "                     </a>" +
-                   "                 </div>" +
-                   "             </div>" +
-                   "         </div>" +
-                   "     </div>");
-            }
-            else if (_userType == "PARENT")
-            {
-                _lblUsernameTh = "รหัสผู้ใช้";
-                _lblUserNameEn = "USERNAME";
-                _lblPasswordTh = "รหัสผ่าน";
-                _lblPasswordEn = "PASSWORD";
-                _string.Append("   <div class='card-panel blue lighten-5'>" +
-                   "         <div class='row'>" +
-                   "             <h5 class='red-text'><span class='th'>" + _txtTitle + "</span><span class='en hide'>Re-Login for sign contract</span></h5>" +
-                   "             <div class='col s12 m4 l4'>" +
-                   "                 <div class='input-field'>" +
-                   "                     <i class='mdi mdi-account-circle prefix'></i>" +
-                   "                     <input placeholder='' id='username' name='username' type='text' class='validate valid' maxlength='30' value='" + _username + "' />" +
-                   "                     <label for='username' class='active'><span class='th'>" + _lblUsernameTh + "</span><span class='en hide'>" + _lblUserNameEn + "</span></label>" +
-                   "                 </div>" +
-                   "             </div>" +
-                   "             <div class='col s12 m4 l4'>" +
-                   "                 <div class='input-field'>" +
-                   "                     <i class='mdi mdi-multiplication prefix'></i>" +
-                   "                     <input placeholder='' id='password' name='password' type='password' class='validate' maxlength='50' value='' />" +
-                   "                     <label for='password'><span class='th'>" + _lblPasswordTh + "</span><span class='en hide'>" + _lblPasswordEn + "</span></label>" +
-                   "                 </div>" +
-                   "             </div>" +
-                   "            <div class='col s12 m4 l4'>" +
-                   "                 <div class='center'>" +
-                   "                     <a href='#!' class='waves-effect waves-light btn-large blue accent-4 btnReLogin'><i class='mdi mdi-checkbox-marked-circle-outline'></i>" +
-                   "                         <span class='th'>ทำสัญญา</span><span class='en hide'>Sign Contract</span>" +
-                   "                     </a>" +
-                   "                 </div>" +
-                   "             </div>" +
-                   "         </div>" +
-                   "     </div>");
-            }
-
-
-
-
-            return _string.ToString();
-        }
-
-        /// <summary>
-        /// Auther : Odd.Nopparat
-        /// Date   : 2015-11-20.
-        /// Perpose: UiComplete
-        /// Method : UiComplete
-        /// Sample : N/A
-        /// </summary>
-        public static string UiComplete(ContractInfo _ctInfo, StudentInfo _stdInfo, ParentInfo _parentMInfo, ParentInfo _parentFInfo, string _userType)
-        {
-            StringBuilder _string = new StringBuilder();
-            const string _teal = "teal-text";
-            const string _amber = "amber-text";
-            const string _red = "red-text";
-            const string _contractTh = "การทำสัญญา";
-            const string _contractEn = "Contract";
-            const string _completeTh = "เสร็จสิ้น";
-            const string _completeEn = "Complete";
-            const string _incompleteTh = "ยังไม่เสร็จสิ้น";
-            const string _incompleteEn = "not complete";
-
-            const string _messageIncomplete = "กรุณาติดต่อผู้ปกครองให้ดำเนินการจัดทำ หนังสือแสดงความยินยอมของผู้แทนโดยชอบธรรม และ สัญญาค้ำประกัน";
-            const string _messageComplete = "ดาวน์โหลดเอกสารเก็บไว้เป็นหลักฐาน";
-            Login _login = new Login("STUDENT");
-
-
-            string _message = _messageIncomplete;
-            string _iconPass = "<i class='mdi mdi-check green-text'></i>";
-            string _iconNotpass = "<i class='mdi mdi-close-box-outline red-text'></i>";
-            string _contractHeaderTh = "";
-            string _contractHeaderEn = "";
-            string _csstext = _amber;
-            // fill parameter
-
-            string _contractDate = _ctInfo.DateLongContractStudent;
-
-            string _iconContract = string.Empty, _iconGuarantee = string.Empty, _iconWarrant = string.Empty;
-            string _cssContract = string.Empty, _cssGuarantee = string.Empty, _cssWarrant = string.Empty;
-            string _headContract = string.Empty, _headGuarantee = string.Empty, _headWarrant = string.Empty;
-
-
-            string _btnPrintContract = "";
-            string _btnPrintConsent = "";
-            string _btnPrintWarrant = "";
-            string _btnPrintAll = "";
-
-            // check 3 pass items. active on download .pdf button
-            if ((_ctInfo.StatusComplete == "S") || (_ctInfo.SignStudent == "True" && _ctInfo.SignParent1 == "True" && _ctInfo.SignParent2 == "True"))
-            {
-                _csstext = _teal;
-                _message = _messageComplete;
-                _contractHeaderTh = "การทำสัญญาสมบูรณ์ครบถ้วน";
-                _contractHeaderEn = "Sign Contract is Successfully";
-
-                //_btnPrintAll = "<a href='printContract.aspx?action=printAll&userType=" + _userType + "' target='printContract' class='waves-effect waves-light btn-large green'>" +
-                //               "    <span class='th'>ดาวน์โหลดเอกสาร 3 ฉบับ</span><span class='en hide'>Download All items</span><i class='mdi mdi-file-pdf'></i>" +
-                //               "</a>";
-
-
-                _btnPrintContract = "<a href='printContract.aspx?action=printContract&userType=" + _userType + "' target='printContract' class='waves-effect waves-light btn-large  green darken-1'>" +
-                                        "<span class='th'>สัญญา</span><span class='en hide'>Contract</span><i class='mdi mdi-file-pdf'></i>" +
-                                    "</a>";
-                _btnPrintConsent = "<a href='printContract.aspx?action=printConsent&userType=" + _userType + "' target='printContract' class='waves-effect waves-light btn-large green darken-1'>" +
-                                        "<span class='th'>สัญญา</span><span class='en hide'>Contract</span><i class='mdi mdi-file-pdf'></i>" +
-                                    "</a>";
-
-                _btnPrintWarrant = "<a href='printContract.aspx?action=printWarrant&userType=" + _userType + "' target='printContract' class='waves-effect waves-light btn-large green darken-1'>" +
-                            "<span class='th'>สัญญา</span><span class='en hide'>Contract</span><i class='mdi mdi-file-pdf'></i>" +
-                        "</a>";
-
-            }
-            else
-            {
-
-                _csstext = _red;
-                if (_ctInfo.SignStudent == "True" && (_ctInfo.SignParent1 == "False" || _ctInfo.SignParent2 == "False"))
-                {
-                    _contractHeaderTh = "การทำสัญญายังไม่สมบูรณ์ครบถ้วน<br>กรุณาแจ้งผู้ค้ำประกัน/ยินยอม ให้เข้ามาทำสัญญา";
-                    _contractHeaderEn = "Sign Contract is Unsuccessfully";
-
-                }
-
-
-                //_btnPrintAll = "<span  class='waves-effect waves-light btn-large red darken-4 disabled'>" +
-                //               "    <span class='th'>ดาวน์โหลดเอกสาร 3 ฉบับ</span><span class='en hide'>Download All items</span><i class='mdi mdi-file-pdf'></i>" +
-                //               "</span>";
-                _btnPrintContract = "<span class='waves-effect waves-light btn-large red accent-2 disabled'>" +
-                                        "<span class='th'>สัญญา</span><span class='en hide'>Contract</span><i class='mdi mdi-file-pdf'></i>" +
-                                   "</span>";
-                _btnPrintConsent = "<span class='waves-effect waves-light btn-large red accent-2 disabled'>" +
-                                    "   <span class='th'>สัญญา</span><span class='en hide'>Contract</span><i class='mdi mdi-file-pdf'></i>" +
-                                    "</span>";
-
-                _btnPrintWarrant = "<span class='waves-effect waves-light btn-large red accent-2 disabled'>" +
-                                    "   <span class='th'>สัญญา</span><span class='en hide'>Contract</span><i class='mdi mdi-file-pdf'></i>" +
-                                    "</span>";
-            }
-
-            _iconGuarantee = _ctInfo.StatusSignMother == "Y" ? _iconPass : _iconNotpass;
-            _iconWarrant = _ctInfo.StatusSignMother == "Y" ? _iconPass : _iconNotpass;
-
-            // นักศึกษาทำสํญญาแล้ว หรือสถานะสำเร็จ
-            if (_ctInfo.StatusComplete == "S" || _ctInfo.SignStudent == "True")
-            {
-
-                _iconContract = _iconPass;
-                _cssContract = _teal;
-                _headContract = _completeTh;
-                _btnPrintContract = "<a href='printContract.aspx?action=printContract&userType=" + _userType + "' target='printContract' class='waves-effect waves-light btn-large  green darken-1'>" +
-                                        "<span class='th'>สัญญา</span><span class='en hide'>Contract</span><i class='mdi mdi-file-pdf'></i>" +
-                                    "</a>";
-
-
-            }
-            else
-            {
-                _iconContract = _iconNotpass;
-                _cssContract = _red;
-                _headContract = _incompleteTh;
-
-            }
-
-            // warrant
-            //ถ้าผู้ค้ำประกัน สถานะสำเร็จ
-            if (_ctInfo.StatusComplete == "S" || _ctInfo.SignParent1 == "True")
-            {
-                _iconWarrant = _iconPass;
-                _cssWarrant = _teal;
-                _headWarrant = _completeTh;
-
-            }
-            else
-            {
-                _iconWarrant = _iconNotpass;
-                _cssWarrant = _red;
-                _headWarrant = _incompleteTh;
-
-            }
-
-            // guarantee
-            //ถ้าผู้ยินยอมคู่สมรส สถานะสำเร็จ
-            if (_ctInfo.StatusComplete == "S" || _ctInfo.SignParent2 == "True")
-            {
-                _iconGuarantee = _iconPass;
-                _cssGuarantee = _teal;
-                _headGuarantee = _completeTh;
-
-            }
-            else
-            {
-                _iconGuarantee = _iconNotpass;
-                _cssGuarantee = _red;
-                _headGuarantee = _incompleteTh;
-
-            }
-
-
-
-            _string.Append("   <div class='section'>" +
-                            "        <div class='row'>" +
-                            "            <div class='col s12 m12'>");
-            if (_userType == "STUDENT")
-            {
-                string _marriage = _ctInfo.IsMarriage;//Case When 1=สมรส,2=สมรส(ไม่ได้จดทะเบียน),3=บิดามารดาหย่าร้าง
-                string __maritalStatus = _ctInfo.maritalStatus;//1=สมรส,2=สมรส(ไม่ได้จดทะเบียน),3=บิดามารดาหย่าร้าง,4=แยกกันอยู่,5=หม้าย,6=โสด
-                string _aliveF = _ctInfo.IsAliveFather;//สถานะบิดา 1=มีชีวิต , 2 = เสียชีวิต
-                string _aliveM = _ctInfo.IsAliveMother;//สถานะมารดา 1=มีชีวิต , 2 = เสียชีวิต
-                string _liveWithF = _ctInfo.IsLiveFather;//อาศัยอยู่=1,ไม่อาศัย=0
-                string _liveWithM = _ctInfo.IsLiveMother;//อาศัยอยู่=1,ไม่อาศัย=0
-                string _liveWithOther = _ctInfo.IsLiveOther;//อาศัยอยู่=1,ไม่อาศัย=0
-                string _warrantBy = _ctInfo.WarrantBy; //ผู้ค้ำประกัน พ่อ=F,แม่=M,บุคคลอื่น=N
-                DataSet _ds = ContractDB.Sp_ectGetStatusReqPasswordParent(__maritalStatus, _aliveF, _aliveM, _liveWithF, _liveWithM, _liveWithOther, _warrantBy);
-                int _row = _ds.Tables[0].Rows.Count;
-                string _passwordForFather = string.Empty
-                     , _passwordForMother = string.Empty;
-                if (_row > 0)
-                {
-                    _passwordForFather = _ds.Tables[0].Rows[0]["passwordForFather"].ToString();
-                    _passwordForMother = _ds.Tables[0].Rows[0]["passwordForMother"].ToString();
-                }
-
-                if (_passwordForFather == "1" || _passwordForMother == "1")
-                {
-                    //Internal Contract
-                    //_passwordForFather = _ds.Tables[0].Rows[0]["passwordForFather"].ToString();
-                    //_passwordForMother = _ds.Tables[0].Rows[0]["passwordForMother"].ToString();
-                    //if (_passwordForFather == "1" || _passwordForMother == "1")
-                    //{
-                    _string.Append("<div class='row center-align'><button type='button' id='submit_confirmRequest' class='waves-effect waves-light btn-large' runat='server'>ขอรับรหัสผ่านของบิดาและมารดา</button></div>");
-                    //}
-                    //else
-                    //{
-                    //    _string.Append(@"<div class='row'><span class='th'><h5 class='red-text'><b>*เป็นกรณีที่ต้องทำสัญญาภายนอกระบบ*</b></br></h5> 
-                    //                <h5 class='blue-text' style='text-align: left;'>11d. ขอให้นักศึกษาตรวจสอบการบันทึกข้อมูลในระบบ e-profile : ข้อมูลส่วนตัวข้อมูลที่อยู่ และข้อมูลครอบครัว ให้ครบถ้วนทุกรายการ</br></h5>
-                    //                <h5 class='blue-text' style='text-align: left;'>22d. ให้ศึกษารายละเอียดเพิ่มเติมจาก<a href='https://econtract.mahidol.ac.th/faqContract.aspx'><u>FAQ การทำสัญญาค้ำประกัน ฯ</u></a>และให้นักศึกษา
-                    //                                        กับผู้ค้ำประกันติดต่อทำสัญญาภายนอกระบบ ให้แล้วเสร็จภายในระยะเวลาเดียวกันกับระยะเวลา
-                    //                                        การทำสัญญาการเป็นนักศึกษาในระบบนี้ ได้ที่กองกฎหมาย ชั้น 2 สำนักงานอธิการบดี โดยติดต่อ
-                    //                                        กำหนดวันและเวลาทำสัญญา รวมทั้งสอบถามข้อมูลผ่าน LINE Official Account กองกฎหมาย 
-                    //                                        ม.มหิดล : @csq0251v หรือ โทร. 02 849 6260 ในวันทำการ เวลา 08.30 – 16.30 น.
-                    //                                        </h5></span></div>");
-                    //}
-                }
-                else
-                {
-                    //External Contract 
-                    _string.Append(@"<div class='row'><span class='th'><h5 class='red-text'><b>*เป็นกรณีที่ต้องทำสัญญาภายนอกระบบ*</b></br></h5> 
-                                <h5 class='blue-text' style='text-align: left;'>1. ขอให้นักศึกษาตรวจสอบการบันทึกข้อมูลในระบบ e-profile : ข้อมูลส่วนตัวข้อมูลที่อยู่ และข้อมูลครอบครัว ให้ครบถ้วนทุกรายการ</br></h5>
-                                <h5 class='blue-text' style='text-align: left;'>2. ให้ศึกษารายละเอียดเพิ่มเติมจาก<a href='https://econtract.mahidol.ac.th/faqContract.aspx'><u>FAQ การทำสัญญาค้ำประกัน ฯ</u></a>และให้นักศึกษา
-                                                        กับผู้ค้ำประกันติดต่อทำสัญญาภายนอกระบบ ให้แล้วเสร็จภายในระยะเวลาเดียวกันกับระยะเวลา
-                                                        การทำสัญญาการเป็นนักศึกษาในระบบนี้ ได้ที่กองกฎหมาย ชั้น 2 สำนักงานอธิการบดี โดยติดต่อ
-                                                        กำหนดวันและเวลาทำสัญญา รวมทั้งสอบถามข้อมูลผ่าน LINE Official Account กองกฎหมาย 
-                                                        ม.มหิดล : @csq0251v หรือ โทร. 02 849 6260 ในวันทำการ เวลา 08.30 – 16.30 น.
-                                                        </h5></span></div>");
-                }
-
-            }
-            _string.Append("        <h3 class='" + _csstext + " center-align'>" +
-                           "        <span class='th'>" + _contractHeaderTh + "</span><span class='en hide'>" + _contractHeaderEn + "</span>" +
-                           "        </h3>" +
-                           "               <div class='blue-text center-align'>" +
-                           "                   <span class='th'>" + _contractDate + "</span>" +
-                           "                   <span class='en hide'>" + _contractDate + "</span>" +
-                           "               </div>" +
-                           "               <div class='center-align'>" + _btnPrintAll + "</div><br />" +
-                           "               <div class='divider'></div>" +
-                           "        </div>");
-            _string.Append("        <div class='col s12 m4'>" +
-                           "             <div class='icon-block'>" +
-                           "                   <h2 class='center'>" + _iconContract + "<i class='mdi mdi-numeric-1-box blue-text text-darken-3'></i></h2>" +
-                           "                   <h5 class='center teal-text'><span class='th'>การทำสัญญานักศึกษา" + _login.FullNameTh + " " + _headContract + "</span><span class='en hide'>Student Contract Finish</span></h5>" +
-                           "                   <p class='light'>" + _message + "</p>" +
-                           "                   <p class='white-text center'>" +
-                                                _btnPrintContract +
-                           "                   <span class='on-right red-text'>*</span>" +
-                           "                   </p>" +
-                           "               </div>" +
-                           "           </div>");
-
-            _string.Append("           <div class='col s12 m4'>" +
-                            "               <div class='icon-block'>" +
-                            "                   <h2 class='center'>" + _iconGuarantee + "<i class='mdi mdi-numeric-2-box blue-text text-darken-3'></i></h2>" +
-                            "                   <h5 class='center " + _cssGuarantee + "'>การทำหนังสือแสดงความยินยอมฯ " + _headGuarantee + "</h5>" +
-                            "                   <p class='light'>" + _message + "</p>" +
-                            "                   <p class='white-text center'>" +
-                                                    _btnPrintConsent +
-                            "                       <span class='on-right red-text'>*</span>" +
-                            "                   </p>" +
-                            "               </div>" +
-                            "           </div>");
-
-
-            _string.Append("           <div class='col s12 m4'>" +
-                            "               <div class='icon-block'>" +
-                            "                   <h2 class='center'>" + _iconWarrant + "<i class='mdi mdi-numeric-3-box blue-text text-darken-3'></i></h2>" +
-                            "                   <h5 class='center " + _cssWarrant + "'>การทำสัญญาค้ำประกัน " + _headWarrant + "</h5>" +
-                            "                   <p class='light'>" + _message + "</p>" +
-                            "                   <p class='white-text center'>" +
-                                                    _btnPrintWarrant +
-                            "                       <span class='on-right red-text'>*</span>" +
-                            "                   </p>" +
-                            "               </div>" +
-                            "           </div>" +
-                            "       </div>" +
-                            "   </div>");
-
-            _string.Append("   <div class='red-text'><span class='th'>*ดาวน์โหลดเอกสารได้เมื่อทำสัญญาครบ 3 ฉบับ</span><span class='en hide'>Allow Download Contract at Complete 3 items</span></div>");
-
-
-            return _string.ToString();
-        }
-
-        /// <summary>
-        /// Auther : Odd.Nopparat
-        /// Date   : 2015-11-20.
-        /// Perpose: footerbanner
-        /// Method : footerbanner
-        /// Sample : N/A
-        /// </summary>
-        public static string FooterBanner()
-        {
-            StringBuilder _string = new StringBuilder();
-            _string.Append(@"<div class='container'>
-            <div class='row'>
-                <div class='col l9 s12'>
-                    <p class='grey-text text-lighten-5'>
-                        <span class='yellow-text th'>โปรดให้ความสนใจเป็นพิเศษ</span>
-                        <span class='yellow-text en hide'>Important Notice</span>
-                        <span class='th'>
-                        นักศึกษา บิดา และมารดาจะต้องตรวจสอบข้อมูล และอ่านรายละเอียดเงื่อนไขของสัญญาให้เข้าใจ และเมื่อเห็นว่าข้อมูลถูกต้องครบถ้วน และยอมรับในเงื่อนไขของสัญญาแล้ว นักศึกษา บิดา
-                        และมารดาจะต้องดำเนินการตามขั้นตอนของการจัดทำสัญญาในระบบอิเล็กทรอนิกส์เพื่อผูกพันกับมหาวิทยาลัยต่อไปตามลำดับ
-                        </span>
-                        <span class='en hide'>
-                        Student,Parent read all contract, Accept them and follow contract process.
-                        </span>
-                    </p>
-                </div>
-                <div class='col l3 s12'>
-                    <ul>
-                        <li class='lime-text'><span class='th'>กองกฎหมาย ชั้น 2 สำนักงานอธิการบดี  มหาวิทยาลัยมหิดล  ศาลายา</span><span class='en hide'>The 2nd Floor,Department of Legal Affairs, Office of the President, Mahidol University (Salaya Campus)</span></li>
-                        <li><a class='white-text' href='#'><span class='th'>โทร : 02-849-6262</span><span class='en hide'>Telephone: 66(0) 2849-6262</span></a></li>
-                        <li><a class='white-text' href='#'><span class='th'>LINE Official Account: @csq0251v</span><span class='en hide'>LINE Official Account: @csq0251v</span></a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class='footer-copyright'>
-            <div class='container'>");
-            _string.Append(@"Copyright ©2015-" + Myconfig._yearEn);
-            _string.Append(@" Mahidol University. All rights reserved. Legal Affairs Division/Student Application Section
-            </div>
-        </div>");
-            return _string.ToString();
-        }
-
-
-        /// <summary>
-        /// Auther : anussara.wan
-        /// Date   : 07-08-2020
-        /// Perpose: SetContract
-        /// Method : SetContract
-        /// Sample : N/A
-        /// </summary>
-        /// <param name="_dtInput">ข้อมูลสถานะบิดามารดา</param>
-        /// <param name="_acaYear">ปีการศึกษา</param>
-        /// <param name="_studentId">รหัสนักศึกษา</param>
-        /// <param name="_userType">STUDENT,PARENT</param>
-        /// <param name="_parentType">F,M</param>
-        /// <param name="_docId">รหัสสัญญา</param>
-        /// <param name="_username">username</param>
-        public static void SetContract(DataTable _dtInput, string _acaYear, string _studentId, string _userType, string _parentType, string _docId, string _username, string _fatherUsername, string _motherUsername)
-        {
-            //ข้อมูลตามตารางเงื่อนไขสถานภาพชีวิตบิดามารดา
-            string _warrantBy
-                 , _consentBy
-                 , _marriage
-                 , _aliveM
-                 , _aliveF
-                 , _liveWithM
-                 , _liveWithF
-                 , _liveWithOther
-                 , _contactFm;
-            _warrantBy = _dtInput.Rows[0]["warrantBy"].ToString();
-            _consentBy = _dtInput.Rows[0]["consentBy"].ToString();
-            _marriage = _dtInput.Rows[0]["marriage"].ToString();
-            _aliveM = _dtInput.Rows[0]["aliveM"].ToString();
-            _aliveF = _dtInput.Rows[0]["aliveF"].ToString();
-            _liveWithM = _dtInput.Rows[0]["liveWithM"].ToString();
-            _liveWithF = _dtInput.Rows[0]["liveWithF"].ToString();
-            _liveWithOther = _dtInput.Rows[0]["liveWithOther"].ToString();
-            _contactFm = _dtInput.Rows[0]["contactFm"].ToString();
-            if (_warrantBy == "N" && _consentBy == "N")
-            {
-                _fatherUsername = String.Empty;
-                _motherUsername = String.Empty;
-            }
-            //ส่งไปบันทึกในตาราง ectDocMgmt
-            ContractDB.SetContract(_userType, _studentId, _acaYear, _warrantBy, _consentBy, _marriage, _aliveM, _aliveF, _liveWithM, _liveWithF, _liveWithOther, _contactFm, _parentType, _username, _docId, _fatherUsername, _motherUsername);
-        }
-
-        public static string UImenuStudent(string _studentId)
-        {
-            StringBuilder _string = new StringBuilder();
-            programContract _cStsInfo = new programContract(_studentId); //เช็คว่าหลักสูตรสามารถทำสัญญาได้หรือไม่
-            ContractInfo _ctInfo = new ContractInfo(_studentId);//ข้อมูลสัญญานักศึกษา
-            string _marriage = _ctInfo.maritalStatus;//1=สมรส,2=สมรส(ไม่ได้จดทะเบียน),3=บิดามารดาหย่าร้าง,4=แยกกันอยู่,5=หม้าย,6=โสด
-            string _aliveF = _ctInfo.IsAliveFather;//สถานะบิดา 1=มีชีวิต , 2 = เสียชีวิต
-            string _aliveM = _ctInfo.IsAliveMother;//สถานะมารดา 1=มีชีวิต , 2 = เสียชีวิต
-            string _liveWithF = _ctInfo.IsLiveFather;//อาศัยอยู่=1,ไม่อาศัย=0
-            string _liveWithM = _ctInfo.IsLiveMother;//อาศัยอยู่=1,ไม่อาศัย=0
-            string _liveWithOther = _ctInfo.IsLiveOther;//อาศัยอยู่=1,ไม่อาศัย=0
-            string _warrantBy = _ctInfo.WarrantBy; //ผู้ค้ำประกัน พ่อ=F,แม่=M,บุคคลอื่น=N
-
-
-            DataSet _ds = ContractDB.Sp_ectGetStatusReqPasswordParent(_marriage, _aliveF, _aliveM, _liveWithF, _liveWithM, _liveWithOther, _warrantBy);
-            int _row = _ds.Tables[0].Rows.Count;
-            string _passwordForFather = string.Empty
-                 , _passwordForMother = string.Empty;
-            if (_cStsInfo.statusMakeContract == "MakeContract")
-            {
-                _string.Append(@"<div id='menuStd' style='text-align:center;'>");
-                _string.Append(@"<div class='row'>
-                                <button type='button' id='submit_frmContract' class='waves-effect waves-light btn-large' runat='server'>ทำสัญญาการเป็นนักศึกษา/ดาวน์โหลดสัญญานักศึกษา</button>
-                            </div>");
-            }
-            else
-            {
-                _string.Append(@"<div id='menuStd' style='text-align:center;'>");
-                _string.Append(@"<div class='row'>
-                                <span class='th'><h5 class='red-text'>คุณไม่ใช่หลักสูตรที่ต้องทำสัญญาอิเล็กทรอนิกส์ กรุณาตรวจสอบว่าต้องทำสัญญาหรือไม่</h5></span><span class='en hide'><h5 class='red-text'>คุณไม่ใช่หลักสูตรที่ต้องทำสัญญาอิเล็กทรอนิกส์ กรุณาตรวจสอบว่าต้องทำสัญญาหรือไม่</h5></span>
-                            </div>");
-            }
-
-            if (_row > 0)
-            {
-                _passwordForFather = _ds.Tables[0].Rows[0]["passwordForFather"].ToString();
-                _passwordForMother = _ds.Tables[0].Rows[0]["passwordForMother"].ToString();
-                if (_passwordForFather == "1" || _passwordForMother == "1")
-                {
-                    _string.Append(@"       <div class='row'>
-                                <button type='button' id='submit_confirmRequest' class='waves-effect waves-light btn-large' runat='server'>ขอรับรหัสผ่านของบิดาและมารดา</button>
-                            </div>");
-                }
-            }
-
-
-            _string.Append(@" </div>");
-            return _string.ToString();
-        }
-        public static string UIconfirmRequestPassStd()
-        {
-            StringBuilder _string = new StringBuilder();
-            _string.Append(@"<div id='termReq' style='text-align:center;margin-top:50px;'>
-                            <iframe src='termRequest.html' width='60%' height='80%' align='center' ></iframe>
-                            <div style='margin-top:10px;text-align:center;'>
-                                <button id='btnAcceptRequest' class='btn btn-outline-secondary' type='button' runat='server'>ยืนยัน</button>
+        /*
+        Auther  : anussara.wan
+        Date    : 2020-08-07
+        Perpose : ParallaxbannerHelp
+        Method  : ParallaxbannerHelp
+        Sample  : N/A
+        */
+        public static string ParallaxbannerHelp() {
+            StringBuilder html = new StringBuilder();
+            string txtDateOpen = "<span class='th' style='font-size:16pt;font-family: courier;font-weight:bold;color:#0035AD;'>Help คู่มือการใช้งานระบบการทำสัญญาการเป็นนักศึกษา</span>";
+            
+            html.Append(@"
+                <div id='index-bannerx' class='parallax-container' style='height: 160px;'>
+                    <div class='section no-pad-bot'>
+                        <div class='container'>
+                            <div class='row'>
+                                <div class='col s12 m12 l12'>
+                                    <img src='http://www.student.mahidol.ac.th/portal/images/logo.png' alt='' class='responsive-img' />
+                                </div>
+                                <div class='col s12 m8 l8 hide-on-small-only'>
+                                    <div class=''>
+                                        <h5 class='light'>" + txtDateOpen + @"</h5>
+                                    </div>
+                                </div>
+                                <div class='col s12 m4 l4'>
+                                    <div class='right-align'>
+                                        <img src='Images/contract_string.png' alt='' class='responsive-img' />
+                                    </div>
+                                </div>
                             </div>
-                        </div>");
-            return _string.ToString();
-        }
-        public static string UIsetConfirmRequestPassword()
-        {
-
-            StringBuilder _string = new StringBuilder();
-            Login _login = new Login("STUDENT");
-            StudentInfo _stdInfo = new StudentInfo(_login.StudentCode);
-            if (_stdInfo.CheckConfirmStd != "1")
-            {
-                //Insert Confirm Log 
-                int _result = ContractDB.setConfirmRequestPassword(_login.StudentCode, _login.StudentId, _stdInfo.AcaYear, _login.Username);
-                if (_result == -1)
-                {
-                    _string.Append("<h6 style='text-align:center;color:red;'>ไม่สามารถขอรหัสผ่านได้ กรุณาติดต่อเจ้าหน้าที่</h6>");
-                }
-                else
-                {
-                    _string.Append(@"<div style='margin-top:10px;text-align:center;'>
-                                <button id='btnPrintPassword' class='btn btn-outline-secondary' type='button' runat='server'>ดาวน์โหลดรหัสผ่าน</button>
-                         </div>
-                      ");
-                }
-            }
-            else
-            {
-                _string.Append(@"<div style='margin-top:10px;text-align:center;'>
-                                <button id='btnPrintPassword' class='btn btn-outline-secondary' type='button' runat='server'>ดาวน์โหลดรหัสผ่าน</button>
-                         </div>
-                      ");
-            }
-            return _string.ToString();
-        }
-        public static string UIsetAcceptedRequestPassword()
-        {
-            StringBuilder _string = new StringBuilder();
-            DataSet _ds = new DataSet();
-            Login _login = new Login("STUDENT");
-            StudentInfo _stdInfo = new StudentInfo(_login.StudentCode);
-            ParentInfo _parentMInfo = new ParentInfo(_login.StudentId, "M");
-            ParentInfo _parentFInfo = new ParentInfo(_login.StudentId, "F");
-            ContractInfo _contractInfo = new ContractInfo(_login.StudentId);
-
-            if (_contractInfo.IsAliveFather == "1" && _parentFInfo.IdCard == null && (_parentFInfo.enFirstName == null || _parentFInfo.enFirstName == "" || _parentFInfo.enLastName == null || _parentFInfo.enLastName == ""))
-            {
-                //idcard Father is empty
-                _string.Append("<p>ไม่สามารถขอรหัสผ่านได้ เนื่องจากไม่พบรหัสบัตรประจำตัวประชาชนของบิดา/ชื่อ-นามสกุลภาษาอังกฤษ สามารถกรอกรหัสบัตรประชาชนของบิดาได้ที่<a href='https://smartedu.mahidol.ac.th'>ระบบ e-Profile</a></p>");
-            }
-            if (_contractInfo.IsAliveFather == "1" && _parentMInfo.IdCard == null && (_parentMInfo.enFirstName == null || _parentMInfo.enFirstName == "" || _parentMInfo.enLastName == null || _parentMInfo.enLastName == ""))
-            {
-                //idcard Mother is empty
-                _string.Append("<p>ไม่สามารถขอรหัสผ่านได้ เนื่องจากไม่พบรหัสบัตรประจำตัวประชาชนของมารดา/ชื่อ-นามสกุลภาษาอังกฤษ สามารถกรอกรหัสบัตรประชาชนของมารดาได้ที่<a href='https://smartedu.mahidol.ac.th'>ระบบ e-Profile</a></p>");
-            }
-            else
-            {
-                //Check Confirm Log  
-                int _checkAcaYearSTD = Convert.ToInt32(_stdInfo.AcaYear);
-                int _checkConfirmLog = Convert.ToInt32(_stdInfo.CheckConfirmStd);
-                if (_checkConfirmLog <= 0 && _checkAcaYearSTD >= 2562)
-                {
-                    _string.Append(UIconfirmRequestPassStd());
-                }
-                else
-                {
-                    _string.Append(UIsetConfirmRequestPassword());
-                }
-
-            }
-            return _string.ToString();
-        }
-
-        /// <summary>
-        /// Auther : anussara.wan
-        /// Date   : 2019-08-19
-        /// Perpose: เพื่อแสดงหน้า confirm parent
-        /// Method : UiConfirmParent
-        /// Sample : N/A
-        /// </summary>
-        public static string UiConfirmParent(string _userType, ContractInfo _ctInfo, string _username, string _parentType, string _studentId, string _studentCode)
-        {
-            StringBuilder _string = new StringBuilder();
-            StudentInfo _stdInfo = new StudentInfo(_studentCode);
-            string _stdNameTh, _stdNameEn, _stdStatusEn, _stdStatusTh;
-            string _facultyNameTh, _facultyNameEn, _pCode;
-
-            _stdNameEn = Myconfig.CvEmpty(_stdInfo.StdNameEn, " - ");
-            _stdNameTh = Myconfig.CvEmpty(_stdInfo.StdNameTh, " - ");
-            _facultyNameTh = Myconfig.CvEmpty(_stdInfo.FacultyNameTh, " - ");
-            _facultyNameEn = Myconfig.CvEmpty(_stdInfo.FacultyNameEn, " - ");
-            _pCode = Myconfig.CvEmpty(_stdInfo.PCode, " - ");
-            _stdStatusEn = Myconfig.CvEmpty(_stdInfo.StatusEn, " - ");
-            _stdStatusTh = Myconfig.CvEmpty(_stdInfo.StatusTh, " - ");
-            _string.Append(@"<div class='card-panel grey lighten-5'>
-                                <div class='grey-text text-darken-4'>
-                                    <div class='section'>
-                                        <p>
-                                        <input class='chkStay' name='chkStay' type='checkbox' id='chkConP' value='1' />
-                                        <label for='chkConP'>
-                                        <span class='th'></span><span class='en hide'></span>
-                                        </label>
-                                            ข้าพเจ้าขอให้สัตยาบันว่า ข้าพเจ้าได้มอบฉันทะให้  <b> " + _stdNameTh + @"</b> นักศึกษา <b> " + _facultyNameTh + @"</b> ขอรับชื่อผู้ใช้และรหัสผ่านสำหรับการทำสัญญาค้ำประกัน และหนังสือแสดงความยินยอมของผู้แทนโดยชอบธรรม แทนข้าพเจ้าจริง
-                                            โดยข้าพเจ้าได้รับทราบนโยบาย ระเบียบปฏิบัติการจัดทำสัญญาระบบอิเล็กทรอนิกส์กับทางมหาวิทยาลัยมหิดลแล้ว และขอยอมรับผิดชอบในการกระทำของผู้รับมอบฉันทะโดยถือเสมือนว่าเป็นการกระทำของข้าพเจ้าเองทุกประการ</br></br>
-                                        </p>
-                                    </div>");
-            _string.Append("<span class='waves-effect waves-light btn-large green col s12  accent-12 btnConfirmParent' >ทำหนังสือแสดงความยินยอมของผู้แทนโดยชอบธรรมและ/หรือสัญญาค้ำประกัน</span>");
-            _string.Append(@"</div></div>");
-            return _string.ToString();
-        }
-
-        /// <summary>
-        /// Auther : anussara.wan
-        /// Date   : 2020-08-07
-        /// Perpose: ParallaxbannerFAQ
-        /// Method : ParallaxbannerFAQ
-        /// Sample : N/A
-        /// </summary>
-        public static string ParallaxbannerFAQ()
-        {
-            string _txtDateOpen = "";
-
-            _txtDateOpen = "<span class='th' style='font-size:16pt;font-family: courier;font-weight:bold;color:#0035AD;'>FAQ คำถามที่พบบ่อยเกี่ยวกับการทำสัญญาการเป็นนักศึกษา</span>";
-
-
-
-            StringBuilder _string = new StringBuilder();
-            _string.Append(@"<div id='index-bannerx' class='parallax-container' style='height: 160px;'>
-        <div class='section no-pad-bot '>
-            <div class='container'>
-                <div class='row'>
-                    <div class='col s12 m12 l12'><img src='http://www.student.mahidol.ac.th/portal/images/logo.png' alt='' class='responsive-img' /></div>
-                    <div class='col s12 m8 l8 hide-on-small-only'>");
-            _string.Append(@"<div class=''><h5 class='light'>" + _txtDateOpen + "</h5></div>");
-            _string.Append(@"</div>
-                    <div class='col s12 m4 l4'>
-                        <div class='right-align'><img src='Images/contract_string.png' alt='' class='responsive-img' /></div>
+                        </div>
+                        <div class='parallax'>
+                            <img src='images/bgs.png' alt='#' />
+                        </div>
                     </div>
-                </div>
-            </div>
-        <div class='parallax'>
-            <img src='images/bgs.png' alt='#' />
-        </div>
-    </div>");
-            return _string.ToString();
-        }
-        /// <summary>
-        /// Auther : anussara.wan
-        /// Date   : 2020-08-07
-        /// Perpose: ParallaxbannerHelp
-        /// Method : ParallaxbannerHelp
-        /// Sample : N/A
-        /// </summary>
-        public static string ParallaxbannerHelp()
-        {
-            string _txtDateOpen = "";
+            ");
 
-            _txtDateOpen = "<span class='th' style='font-size:16pt;font-family: courier;font-weight:bold;color:#0035AD;'>Help คู่มือการใช้งานระบบการทำสัญญาการเป็นนักศึกษา</span>";
-
-
-
-            StringBuilder _string = new StringBuilder();
-            _string.Append(@"<div id='index-bannerx' class='parallax-container' style='height: 160px;'>
-        <div class='section no-pad-bot '>
-            <div class='container'>
-                <div class='row'>
-                    <div class='col s12 m12 l12'><img src='http://www.student.mahidol.ac.th/portal/images/logo.png' alt='' class='responsive-img' /></div>
-                    <div class='col s12 m8 l8 hide-on-small-only'>");
-            _string.Append(@"<div class=''><h5 class='light'>" + _txtDateOpen + "</h5></div>");
-            _string.Append(@"</div>
-                    <div class='col s12 m4 l4'>
-                        <div class='right-align'><img src='Images/contract_string.png' alt='' class='responsive-img' /></div>
-                    </div>
-                </div>
-            </div>
-        <div class='parallax'>
-            <img src='images/bgs.png' alt='#' />
-        </div>
-    </div>");
-            return _string.ToString();
+            return html.ToString();
         }
     }
 }

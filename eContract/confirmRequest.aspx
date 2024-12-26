@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" EnableViewStateMac="false" EnableEventValidation="false" CodeBehind="confirmRequest.aspx.cs" Inherits="eContract.confirmRequest" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" EnableViewStateMac="false" EnableEventValidation="false" CodeBehind="confirmRequest.aspx.cs" Inherits="eContract.ConfirmRequest" %>
 
 <!DOCTYPE html>
 
@@ -9,14 +9,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="msapplication-tap-highlight" content="no" />
-    <meta name="description" content="Mahidol University, MU Contract,ทำสัญญาการเป็นนักศึกษา, มหาวิทยาลัยมหิดล" />
-    <link rel="apple-touch-icon-precomposed" href="images/logo.png" />
+    <meta name="description" content="Mahidol University, MU Contract,ทำสัญญาการเป็นนักศึกษา, มหาวิทยาลัยมหิดล" />    
     <meta name="msapplication-TileColor" content="#FFFFFF" />
     <meta name="msapplication-TileImage" content="images/logo.png" />
-    <link rel="icon" href="images/logo.png" sizes="32x32" />
-    <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css" />
-    <!--  Android 5 Chrome Color-->
     <meta name="theme-color" content="#EE6E73" />
+    <link rel="apple-touch-icon-precomposed" href="images/logo.png" />
+    <link rel="icon" href="images/logo.png" sizes="32x32" />
+    <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css" />    
     <style type="text/css">
         .overlay {
             display: none;
@@ -80,7 +79,7 @@
 <script type="text/javascript">
     $(function () {
         $('.parallax').parallax();
-        // mobile display mini - message
+        //mobile display mini - message
         //$('.minimessage').text($('#messenger').text());
 
         $('.btnThai').click(function () {
@@ -92,28 +91,27 @@
         });
     });
 
-    /// <summary>
-    /// Auther : Odd.Nopparat
-    /// Date   : 2015-08-20.
-    /// Perpose: สลับภาษาอังกฤษ.
-    /// Method : english-active.
-    /// </summary>
+    /*
+    Auther  : Odd.Nopparat
+    Date    : 20-08-2015
+    Perpose : สลับภาษาอังกฤษ.
+    Method  : english-active.
+    */
     function thaiAcitive() {
         $('.lang-active').data('lang', 'th');
         $('.en').addClass('hide');
         $('.th').removeClass('hide');
     }
 
-    // english active
+    //english active
     function engAcitive() {
         $('.lang-active').data('lang', 'en');
         $('.th').addClass('hide');
         $('.en').removeClass('hide');
     }
 </script>
-
 <script type="text/javascript">
-    // original code from http://stackoverflow.com/questions/13478303/correct-way-to-use-modernizr-to-detect-ie
+    //original code from http://stackoverflow.com/questions/13478303/correct-way-to-use-modernizr-to-detect-ie
     var BrowserDetect = {
         init: function () {
             this.browser = this.searchString(this.dataBrowser) || "Other";
@@ -144,23 +142,67 @@
         },
 
         dataBrowser: [
-            { string: navigator.userAgent, subString: "Edge", identity: "MS Edge" },
-            { string: navigator.userAgent, subString: "Chrome", identity: "Chrome" },
-            { string: navigator.userAgent, subString: "MSIE", identity: "Explorer" },
-            { string: navigator.userAgent, subString: "Trident", identity: "Explorer" },
-            { string: navigator.userAgent, subString: "Firefox", identity: "Firefox" },
-            { string: navigator.userAgent, subString: "Safari", identity: "Safari" },
-            { string: navigator.userAgent, subString: "Opera", identity: "Opera" }
+            {
+                string: navigator.userAgent,
+                subString: "Edge",
+                identity: "MS Edge"
+            },
+            {
+                string: navigator.userAgent,
+                subString: "Chrome",
+                identity: "Chrome"
+            },
+            {
+                string: navigator.userAgent,
+                subString: "MSIE",
+                identity: "Explorer"
+            },
+            {
+                string: navigator.userAgent,
+                subString: "Trident",
+                identity: "Explorer"
+            },
+            {
+                string: navigator.userAgent,
+                subString: "Firefox",
+                identity: "Firefox"
+            },
+            {
+                string: navigator.userAgent,
+                subString: "Safari",
+                identity: "Safari"
+            },
+            {
+                string: navigator.userAgent,
+                subString: "Opera",
+                identity: "Opera"
+            }
         ]
-
     };
 
-//    BrowserDetect.init();
-//    if (BrowserDetect.browser == 'Chrome' && BrowserDetect.version <= 42) window.location = 'http://outdatedbrowser.com/en';
-//    if (BrowserDetect.browser == 'Explorer' && BrowserDetect.version <= 9) window.location = 'http://outdatedbrowser.com/en';
-//    if (BrowserDetect.browser == 'Firefox' && BrowserDetect.version <= 39) window.location = 'http://outdatedbrowser.com/en';
-//    if (BrowserDetect.browser == 'Opera' && BrowserDetect.version <= 31) window.location = 'http://outdatedbrowser.com/en';
-//    if (BrowserDetect.browser == 'Safari' && BrowserDetect.version <= 7) window.location = 'http://outdatedbrowser.com/en';
+    /*
+    BrowserDetect.init();
+
+    if (BrowserDetect.browser == 'Chrome' &&
+        BrowserDetect.version <= 42)
+        window.location = 'http://outdatedbrowser.com/en';
+
+    if (BrowserDetect.browser == 'Explorer' &&
+        BrowserDetect.version <= 9)
+        window.location = 'http://outdatedbrowser.com/en';
+
+    if (BrowserDetect.browser == 'Firefox' &&
+        BrowserDetect.version <= 39)
+        window.location = 'http://outdatedbrowser.com/en';
+
+    if (BrowserDetect.browser == 'Opera' &&
+        BrowserDetect.version <= 31)
+        window.location = 'http://outdatedbrowser.com/en';
+
+    if (BrowserDetect.browser == 'Safari' &&
+        BrowserDetect.version <= 7)
+        window.location = 'http://outdatedbrowser.com/en';
+    */
 </script>
 <script type="text/javascript">
     $(document).on({
@@ -171,7 +213,9 @@
             $("body").removeClass("loading");
         }
     });
+
     onloadUITerm();
+
     function onloadUITerm() {
         var _post = $.param({ action: "UIsetAcceptedRequestPassword" });
         $.ajax({
@@ -180,7 +224,6 @@
             data: _post,
             beforeSend: function () { },
             success: function (data) {
-
                 $(document).ready(function () {
                     //onloadDataReceipt();
                     $("#divBody").html(data);
@@ -201,11 +244,11 @@
     }
 
     function setRequestPassword() {
-        var _post = $.param({ action: "UIsetConfirmRequestPassword" });
+        var post = $.param({ action: "UIsetConfirmRequestPassword" });
         $.ajax({
             type: "POST",
             url: "ContractHandler.ashx",
-            data: _post,
+            data: post,
             beforeSend: function () { },
             success: function (data) {
 
@@ -224,4 +267,3 @@
         });
     }
 </script>
-

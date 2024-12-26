@@ -1,127 +1,106 @@
-﻿using eContract;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Web;
+﻿using System;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 
-namespace eContract
-{
-    public partial class menuStudent : System.Web.UI.Page
-    {
-        protected void Page_Load(object sender, EventArgs e)
-        {
-            string _path = Myconfig.GetVirtualPath();
-            Myconfig.GetMeteriaUi(Page, _path);
-            string _userType = Request.Form["txtUserTypeActive"]; // get user type (student/parent)
-                                                                  //string _userType = "student";
+namespace eContract {
+    public partial class MenuStudent : Page {
+        protected void Page_Load(
+            object sender,
+            EventArgs e
+        ) {
+            string path = Myconfig.GetVirtualPath();
+            Myconfig.GetMeteriaUi(Page, path);
+            string userType = Request.Form["txtUserTypeActive"]; //get user type (student/parent)
+            //string userType = "student";
+
             HiddenField txtUserTypeActive = ((HiddenField)FindControl("txtUserTypeActive"));
-            txtUserTypeActive.Value = _userType;
+            txtUserTypeActive.Value = userType;
+
             HtmlGenericControl navBar = FindControl("navBar") as HtmlGenericControl;
-            navBar.InnerHtml = Myconfig.NavBar(_userType);
+            navBar.InnerHtml = Myconfig.NavBar(userType);
+
             //divBody.InnerHtml = ContractUI.UImenuStudent(_studentId);
+
             HtmlGenericControl divFooter = FindControl("divFooter") as HtmlGenericControl;
             divFooter.InnerHtml = ContractUI.FooterBanner();
-            // student profile
+
+            //student profile
             //divUserProfile.InnerHtml = ContractUI.UiStudentProfile();
 
-            // -- END OF REQUEST PROCESS --
+            //Login login = new Login(userType);
+            //login.StudentCode = "5809009"; //"5415001"; // "5402001" // hardcode
 
-            // -- REQUEST PROCESS --
-            Login _login = new Login(_userType);
-            //_login.StudentCode = "5809009"; //"5415001"; // "5402001" // hardcode
-
-            if (!Request.IsAuthenticated)
-            {
-                Login.ClearCookie(_userType);
+            if (!Request.IsAuthenticated) {
+                Login.ClearCookie(userType);
                 Response.Redirect("login.aspx");
             }
 
-
-            if (_userType == "STUDENT")
-            {
-                UiContractStudent(_userType);
+            if (userType == "STUDENT") {
+                UIContractStudent(userType);
             }
         }
 
-        private void UiContractStudent(string _userType)
-        {
-            // prepare default parameter
-            Login _login = new Login(_userType);
-            string _studentId = _login.StudentId;
-            string _parentType = _login.UserType;
-            //string _acaYear = Myconfig.GetYearContract();
-            // -- END OF STUDENT PROCESS --
+        private void UIContractStudent(string userType) {
+            //StringBuilder html = new StringBuilder();
+            Login login = new Login(userType);
+            string studentID = login.StudentID;
+            //string parentType = login.UserType;
+            //string acaYear = Myconfig.GetYearContract();
+
             HtmlGenericControl divBody = FindControl("divBody") as HtmlGenericControl;
-            divBody.InnerHtml = ContractUI.UImenuStudent(_studentId);
-            StringBuilder _string = new StringBuilder();
+            divBody.InnerHtml = ContractUI.UImenuStudent(studentID);
+            
+            //StudentInfo stdInfo = new StudentInfo(login.StudentCode);
+            //ParentInfo parentInfo = new ParentInfo(studentID, parentType);
+            //ParentInfo parentMInfo = new ParentInfo(studentID, "M");
+            //ParentInfo parentFInfo = new ParentInfo(studentID, "F");
+            //string acaYear = Myconfig.CvEmpty(stdInfo.AcaYear, " - ");
+            /*
+            DataSet ds = ContractDB.Sp_ectGetDateEventLogin(acaYear);
+            int row = ds.Tables[0].Rows.Count;
+            string isBetween;
 
-            StudentInfo _stdInfo = new StudentInfo(_login.StudentCode);
-            ParentInfo _parentInfo = new ParentInfo(_studentId, _parentType);
-            ParentInfo _parentMInfo = new ParentInfo(_studentId, "M");
-            ParentInfo _parentFInfo = new ParentInfo(_studentId, "F");
-            string _acaYear = Myconfig.CvEmpty(_stdInfo.AcaYear, " - ");
-
-            DataSet _ds = ContractDB.Sp_ectGetDateEventLogin(_acaYear);
-            int _row = _ds.Tables[0].Rows.Count;
-            string _isBetween = "";
-            if (_row > 0)
-            {
-                _isBetween = _ds.Tables[0].Rows[0]["isBetween"].ToString();
-
+            if (row > 0) {
+                isBetween = ds.Tables[0].Rows[0]["isBetween"].ToString();
             }
-            else
-            {
-
-                _isBetween = "0";
-
+            else {
+                isBetween = "0";
             }
-            ContractInfo _ctInfo = new ContractInfo(_studentId);// check already sign contract
+            */
+            
+            //ContractInfo ctInfo = new ContractInfo(studentID); //check already sign contract
 
-            // student profile
+            //student profile
             HtmlGenericControl divUserProfile = FindControl("divUserProfile") as HtmlGenericControl;
-            divUserProfile.InnerHtml = ContractUI.UiStudentProfile(_login.StudentCode);
+            divUserProfile.InnerHtml = ContractUI.UiStudentProfile(login.StudentCode);
+            /*
+            string isSuccess;
 
-            string _isSuccess = "0";
-            if (_ctInfo.StatusSignStudent == "Y")
-            {
-                _isSuccess = "1";
+            if (ctInfo.StatusSignStudent == "Y") {
+                isSuccess = "1";
             }
-            else
-            {
+            else {
                 //ตรวจสอบสถานะผู้ปกครอง
-                _isSuccess = ContractInfo.IsParentSuccess(_ctInfo, _parentType);
-
+                isSuccess = ContractInfo.IsParentSuccess(ctInfo, parentType);
             }
-
-
-            //if (_isSuccess == "1")
-            //{
-            //    divComplete.InnerHtml = ContractUI.UiComplete(_ctInfo, _stdInfo, _parentMInfo, _parentFInfo, _userType);
-
-            //}
-            //else
-            //{
-            //    //  check  วันที่เปิดปิดระบบ
-            //    //check วันที่เปิดปิดระบบ
-            //    if (_isBetween == "0")
-            //    {
-            //        Response.Redirect("logout.aspx");
-            //    }
-            //    else
-            //    {
-            //        divParentStatus.InnerHtml = ContractUI.UiParentCheckingStatus(_studentId);
-            //        // ปุ่มยืนยัน Status
-            //        //divParentStatus.InnerHtml += "<span class='waves-effect waves-light btn-large green col s12  accent-12 btnConfirmInfo' >ยืนยันข้อมูล</span>";
-            //    }
-            //}
-
-
+            */
+            /*
+            if (isSuccess == "1") {
+                divComplete.InnerHtml = ContractUI.UiComplete(ctInfo, stdInfo, parentMInfo, parentFInfo, userType);
+            }
+            else {
+                //check วันที่เปิดปิดระบบ
+                if (isBetween == "0") {
+                    Response.Redirect("logout.aspx");
+                }
+                else {
+                    divParentStatus.InnerHtml = ContractUI.UiParentCheckingStatus(studentID);
+                    // ปุ่มยืนยัน Status
+                    // divParentStatus.InnerHtml += "<span class='waves-effect waves-light btn-large green col s12  accent-12 btnConfirmInfo' >ยืนยันข้อมูล</span>";
+                }
+            }
+            */
         }
-
     }
 }

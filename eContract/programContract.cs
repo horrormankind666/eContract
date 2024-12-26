@@ -1,63 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
 
-/// <summary>
-/// Summary description for programContract
-/// </summary>
-namespace eContract
-{
-    public class programContract
-    {
-
-        //
-        // TODO: Add constructor logic here
-        //
-        string _studentId;
-        public string studentId
-        {
-            get { return _studentId; }
-            set { _studentId = value; }
-        }
-        string _statusMakeContract;
-        public string statusMakeContract
-        {
-            get { return _statusMakeContract; }
-            set { _statusMakeContract = value; }
+namespace eContract {
+    public class ProgramContract {
+        string studentID;
+        public string StudentID {
+            get { return studentID; }
+            set { studentID = value; }
         }
 
-        public programContract(string _studentId)
-        {
-
-            getStatusInfo(_studentId);
+        string statusMakeContract;
+        public string StatusMakeContract {
+            get { return statusMakeContract; }
+            set { statusMakeContract = value; }
         }
 
-        public void getStatusInfo(string _studentId)
-        {
+        public ProgramContract(string studentID) {
 
+            GetStatusInfo(studentID);
+        }
+
+        public void GetStatusInfo(string studentID) {
             SetEmpty();
-            string _query = "sp_ectGetStatusContractInfo '" + _studentId + "'";
-            SqlConnection _con = new SqlConnection(ConfigurationManager.ConnectionStrings["conn"].ToString());
-            SqlDataAdapter _adp = new SqlDataAdapter(_query, _con);
-            DataSet _dsEctStsInfo = new DataSet();
-            _adp.Fill(_dsEctStsInfo);
-            int _rowInfo = _dsEctStsInfo.Tables[0].Rows.Count;
 
+            string query = ("sp_ectGetStatusContractInfo '" + studentID + "'");
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["conn"].ToString());
+            SqlDataAdapter adp = new SqlDataAdapter(query, con);
+            DataSet dsEctStsInfo = new DataSet();
+            adp.Fill(dsEctStsInfo);
+            int rowInfo = dsEctStsInfo.Tables[0].Rows.Count;
 
-            if (_rowInfo > 0)
-            {
-                _studentId = _dsEctStsInfo.Tables[0].Rows[0]["studentId"].ToString();
-                _statusMakeContract = _dsEctStsInfo.Tables[0].Rows[0]["statusMakeContract"].ToString();
+            if (rowInfo > 0) {
+                studentID = dsEctStsInfo.Tables[0].Rows[0]["studentId"].ToString();
+                statusMakeContract = dsEctStsInfo.Tables[0].Rows[0]["statusMakeContract"].ToString();
             }
         }
-        public void SetEmpty()
-        {
-            _studentId = "";
-            _statusMakeContract = "";
+
+        public void SetEmpty() {
+            studentID = "";
+            statusMakeContract = "";
         }
     }
 }

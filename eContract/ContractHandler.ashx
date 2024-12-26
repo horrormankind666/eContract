@@ -6,21 +6,16 @@ using System.Data;
 using System.Text;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
-//using authen;
 
-namespace eContract
-{
-    public class ContractHandler : IHttpHandler
-    {
+namespace eContract {
+    public class ContractHandler : IHttpHandler {
+        HttpContext c;
 
-        HttpContext _c;
-        public void ProcessRequest(HttpContext context)
-        {
-            _c = context;
-            string _action = _c.Request.Form["action"];
+        public void ProcessRequest(HttpContext context) {
+            c = context;
+            string action = c.Request.Form["action"];
 
-            switch (_action)
-            {
+            switch (action) {
                 case "SignLogin":
                     SignLogin();
                     break;
@@ -36,92 +31,84 @@ namespace eContract
                 case "SetConfirmParent":
                     SetConfirmParent();
                     break;
-                //case "CheckConsent":
-                //    CheckConsent();
-                //    break;
+                /*
+                case "CheckConsent":
+                    CheckConsent();
+                    break;
+                */
                 case "CheckENFullNameParent":
                     CheckENFullNameParent();
                     break;
-
-
-
             }
         }
 
-        public string GenerateUsername(string enFirstName, string enLastName)
-        {
+        public string GenerateUsername(
+            string firstNameEN,
+            string lastNameEN
+        ) {
             string username = "";
-            bool _checkStatus = false;
+            bool checkStatus = false;
             Regex rgx = new Regex("[^a-zA-Z]");
-            enFirstName = rgx.Replace(enFirstName, "").ToLower();
-            enLastName = rgx.Replace(enLastName, "").ToLower();
-            int lengthLastName = enLastName.Length;
-            if (enLastName != "" || enLastName != string.Empty || lengthLastName != 0)
-            {
-                if (lengthLastName < 3)
-                {
-                    username = enFirstName + "." + enLastName;
-                    _checkStatus = CheckAvailableUsername(username);
-                    if(_checkStatus == false)
-                    {
-                        for(int i = 1; i <= 10; i++)
-                        {
-                            username = username + i.ToString();
-                            _checkStatus = CheckAvailableUsername(username);
-                            if(_checkStatus == true)
-                            {
+            firstNameEN = rgx.Replace(firstNameEN, "").ToLower();
+            lastNameEN = rgx.Replace(lastNameEN, "").ToLower();
+            int lengthLastName = lastNameEN.Length;
+
+            if (lastNameEN != "" ||
+                lastNameEN != string.Empty ||
+                lengthLastName != 0) {
+                if (lengthLastName < 3) {
+                    username = (firstNameEN + "." + lastNameEN);
+                    checkStatus = CheckAvailableUsername(username);
+
+                    if(checkStatus == false) {
+                        for(int i = 1; i <= 10; i++) {
+                            username = (username + i.ToString());
+                            checkStatus = CheckAvailableUsername(username);
+
+                            if(checkStatus == true) {
                                 break;
                             }
                         }
                     }
                 }
-                else
-                {
-                    // FirstName.LastName(Left, 3)
-                    for (int charAt = 2; charAt <= lengthLastName; charAt++)
-                    {
-                        username = enFirstName + "." + enLastName.Substring(0, 2) + enLastName.Substring(charAt, 1);
-                        _checkStatus = CheckAvailableUsername(username);
-                        if (_checkStatus == true)
-                        {
+                else {
+                    //FirstName.LastName(Left, 3)
+                    for (int charAt = 2; charAt <= lengthLastName; charAt++) {
+                        username = (firstNameEN + "." + lastNameEN.Substring(0, 2) + lastNameEN.Substring(charAt, 1));
+                        checkStatus = CheckAvailableUsername(username);
+
+                        if (checkStatus == true) {
                             break;
                         }
                     }
 
-
-                    //If checkStatus == false after Loop first
-                    if (_checkStatus == false)
-                    {
+                    //if checkStatus == false after Loop first
+                    if (checkStatus == false) {
                         //FirstName.LastName(Right, 3)
-                        for (int charAt = 3; charAt <= lengthLastName; charAt++)
-                        {
-                            username = enFirstName + "." + enLastName.Substring(lengthLastName - 1, 1) + enLastName.Substring(lengthLastName - 2, 1) + enLastName.Substring(lengthLastName - charAt, 1);
-                            _checkStatus = CheckAvailableUsername(username);
-                            if (_checkStatus == true)
-                            {
+                        for (int charAt = 3; charAt <= lengthLastName; charAt++) {
+                            username = (firstNameEN + "." + lastNameEN.Substring(lengthLastName - 1, 1) + lastNameEN.Substring(lengthLastName - 2, 1) + lastNameEN.Substring(lengthLastName - charAt, 1));
+                            checkStatus = CheckAvailableUsername(username);
+
+                            if (checkStatus == true) {
                                 break;
                             }
                         }
                     }
                 }
-
             }
-            else
-            {//enLastName = null
-                for (int increment = 0; increment <= 100; increment++)
-                {
-                    if (increment == 0)
-                    {
-                        username = enFirstName;
+            else {
+                //enLastName = null
+                for (int increment = 0; increment <= 100; increment++) {
+                    if (increment == 0) {
+                        username = firstNameEN;
                     }
-                    else
-                    {
-                        username = enFirstName + "_" + increment;
+                    else {
+                        username = (firstNameEN + "_" + increment);
                     }
 
-                    _checkStatus = CheckAvailableUsername(username);
-                    if (_checkStatus == true)
-                    {
+                    checkStatus = CheckAvailableUsername(username);
+
+                    if (checkStatus == true) {
                         break;
                     }
                 }
@@ -130,424 +117,403 @@ namespace eContract
             return username;
         }
 
-        public bool CheckAvailableUsername(string username)
-        {
-            bool _status = false;
-            DataSet _result = new DataSet();
-            _result = ContractDB.CheckAvailableUsername(username);
-            if (_result.Tables[0].Rows.Count > 0)
-            {
-                //Unavailable
-                _status = false;
+        public bool CheckAvailableUsername(string username) {
+            bool status = false;
+            DataSet result = new DataSet();
+            result = ContractDB.CheckAvailableUsername(username);
+
+            if (result.Tables[0].Rows.Count > 0) {
+                //unavailable
+                status = false;
             }
-            else
-            {
-                //Available
-                _status = true;
+            else {
+                //available
+                status = true;
             }
-            return _status;
+
+            return status;
         }
 
-        public void SignLogin()
-        {
-            StringBuilder _xml = new StringBuilder();
-            string _username, _password, _userType;
-            string FatherUsername = "";
-            string MotherUsername = "";
-            string _authen = "false";
-            string _isSuccess = "0";
-            string _msgTh = "";
-            string _msgEn = "";
-            try
-            {
-                DataTable _dtSign = Newtonsoft.Json.JsonConvert.DeserializeObject<DataTable>(_c.Request.Form["strSign"]);
-                DataTable _dtInput = Newtonsoft.Json.JsonConvert.DeserializeObject<DataTable>(_c.Request.Form["strInput"]);
+        public void SignLogin() {
+            StringBuilder xml = new StringBuilder();
+            string username;
+            string password;
+            string userType;
+            string fatherUsername = "";
+            string motherUsername = "";
+            string authen = "false";
+            string isSuccess = "0";
+            string msgTH = "";
+            string msgEN = "";
 
-                int _row = _dtSign.Rows.Count;
+            try {
+                DataTable dtSign = Newtonsoft.Json.JsonConvert.DeserializeObject<DataTable>(c.Request.Form["strSign"]);
+                DataTable dtInput = Newtonsoft.Json.JsonConvert.DeserializeObject<DataTable>(c.Request.Form["strInput"]);
+                int row = dtSign.Rows.Count;
 
-                if (_row > 0)
-                {
-
+                if (row > 0) {
                     //ข้อมูล re-login
-                    _username = _dtSign.Rows[0]["username"].ToString();
-                    _password = _dtSign.Rows[0]["password"].ToString();
-                    _userType = _dtSign.Rows[0]["userType"].ToString();
+                    username = dtSign.Rows[0]["username"].ToString();
+                    password = dtSign.Rows[0]["password"].ToString();
+                    userType = dtSign.Rows[0]["userType"].ToString();
 
-                    Login _login = new Login(_userType);
-                    string _studentId = _login.StudentId;
-                    //string _acaYear = Myconfig.GetYearContract();
+                    Login login = new Login(userType);
+                    string studentID = login.StudentID;
+                    //string acaYear = Myconfig.GetYearContract();
 
+                    StudentInfo stdInfo = new StudentInfo(login.StudentCode);
+                    ParentInfo parentMInfo = new ParentInfo(studentID, "M");
+                    ParentInfo parentFInfo = new ParentInfo(studentID, "F");
 
-                    StudentInfo _stdInfo = new StudentInfo(_login.StudentCode);
-                    ParentInfo _parentMInfo = new ParentInfo(_studentId, "M");
-                    ParentInfo _parentFInfo = new ParentInfo(_studentId, "F");
-
-                    ContractInfo _ctInfo = new ContractInfo(_studentId);// check already sign contract
-                    string _acaYear = Myconfig.CvEmpty(_stdInfo.AcaYear, " - ");
-                    string _parentType = _login.UserType; //F M or student
-
-
+                    ContractInfo ctInfo = new ContractInfo(studentID); // check already sign contract
+                    string acaYear = Myconfig.CvEmpty(stdInfo.AcaYear, " - ");
+                    string parentType = login.UserType; // F M or student
 
                     //ตรวจสอบ ประเภท ผู้ใช้งาน เพื่อตรวจสอบสิทธิ์
-                    if (_userType == "STUDENT")
-                    {
-                        //Generate Username
-                        FatherUsername = GenerateUsername(_parentFInfo.enFirstName, _parentFInfo.enLastName).ToLower();
-                        MotherUsername = GenerateUsername(_parentMInfo.enFirstName, _parentMInfo.enLastName).ToLower();
-                        _authen = Login.AuthenSignStudent(_username, _userType);
+                    if (userType == "STUDENT") {
+                        //generate Username
+                        fatherUsername = GenerateUsername(parentFInfo.FirstNameEN, parentFInfo.LastNameEN).ToLower();
+                        motherUsername = GenerateUsername(parentMInfo.FirstNameEN, parentMInfo.LastNameEN).ToLower();
+                        authen = Login.AuthenSignStudent(username, userType);
                     }
-                    else if (_userType == "PARENT")
-                    {
-                        _authen = Login.AuthenSignParent(_username, _password, _userType);
-
+                    else {
+                        if (userType == "PARENT") {
+                            authen = Login.AuthenSignParent(username, password, userType);
+                        }
                     }
-
-                    //จบ
 
                     //ตรวจสอบ รหัสผ่านอีกครั้งก่อนทำการบันทึกการทำสัญญา ทั้งสัญญานักศึกษา สัญญาค้ำประกัน หนังสือแสดงความยินยอมของผู้แทนโดยชอบธรรม
-                    if (_authen == "true")
-                    {
+                    if (authen == "true") {
                         //save data
-                        ContractUI.SetContract(_dtInput, _acaYear, _studentId, _userType, _parentType, _ctInfo.DocId, _username, FatherUsername, MotherUsername);
-
+                        ContractUI.SetContract(dtInput, acaYear, studentID, userType, parentType, ctInfo.DocID, username, fatherUsername, motherUsername);
 
                         //after finish save
                         //refill data
-                        _ctInfo = new ContractInfo(_studentId);//refresh data for checkstatus complete
-                        if (_userType == "STUDENT")
-                        {
-                            if (_ctInfo.StatusSignStudent == "Y" || _ctInfo.StatusComplete == "S")
-                            {
-                                _isSuccess = "1";
+                        ctInfo = new ContractInfo(studentID); // refresh data for checkstatus complete
+
+                        if (userType == "STUDENT") {
+                            if (ctInfo.StatusSignStudent == "Y" ||
+                                ctInfo.StatusComplete == "S") {
+                                isSuccess = "1";
                             }
                         }
-                        else if (_userType == "PARENT")
-                        {
-
-                            //ผู้ใช้งาน เป็นผู้ค้ำประกัน และได้ทำสัญญาแล้ว
-                            if (_ctInfo.WarrantBy == _parentType && _ctInfo.SignParent1 == "True")
-                            {
-                                _isSuccess = "1";
-
+                        else {
+                            if (userType == "PARENT") {
+                                //ผู้ใช้งาน เป็นผู้ค้ำประกัน และได้ทำสัญญาแล้ว
+                                if (ctInfo.WarrantBy == parentType &&
+                                    ctInfo.SignParent1 == "True") {
+                                    isSuccess = "1";
+                                }                                
+                                else {
+                                    //ผู้ใช้งาน เป็นยินยอม และได้ทำสัญญาแล้ว
+                                    if (ctInfo.ConsentBy == parentType &&
+                                        ctInfo.SignParent2 == "True") {
+                                        isSuccess = "1";
+                                    }
+                                    else {
+                                        if (ctInfo.StatusComplete == "S") {
+                                            isSuccess = "1";
+                                        }
+                                    }
+                                }
                             }
-                            //ผู้ใช้งาน เป็นยินยอม และได้ทำสัญญาแล้ว
-                            else if (_ctInfo.ConsentBy == _parentType && _ctInfo.SignParent2 == "True")
-                            {
-                                _isSuccess = "1";
-                            }
-                            else if (_ctInfo.StatusComplete == "S")
-                            {
-
-                                _isSuccess = "1";
-                            }
-
                         }
 
 
-                        if (_isSuccess == "1")
-                        {
-                            _msgTh = "<span class=\"green-text\"><h5>ดำเนินการบันทึกสัญญาเข้าระบบแล้ว</h5></span>";
-                            _msgEn = "<span class=\"green-text\"><h5>Successfully Sign Contract</h5></span>";
-                            _xml.Append(ContractUI.UiComplete(_ctInfo, _stdInfo, _parentMInfo, _parentFInfo, _userType));
+                        if (isSuccess == "1") {
+                            msgTH = "<span class=\"green-text\"><h5>ดำเนินการบันทึกสัญญาเข้าระบบแล้ว</h5></span>";
+                            msgEN = "<span class=\"green-text\"><h5>Successfully Sign Contract</h5></span>";
+                            xml.Append(ContractUI.UiComplete(ctInfo, stdInfo, parentMInfo, parentFInfo, userType));
                         }
-                        else
-                        {
-                            _msgTh = "<span class=\"red-text\"><h5>ระบบขัดข้อง!!! ไม่สามารถบันทึกข้อมูลได้</h5></span>";
-                            _msgEn = "<span class=\"red-text\"><h5>System Error!!!</h5></span>";
+                        else {
+                            msgTH = "<span class=\"red-text\"><h5>ระบบขัดข้อง!!! ไม่สามารถบันทึกข้อมูลได้</h5></span>";
+                            msgEN = "<span class=\"red-text\"><h5>System Error!!!</h5></span>";
                         }
-
                     }
-                    else if (_authen == "false")
-                    {
-                        _msgTh = "<span class=\"red-text\"><h5>ผู้ใช้งาน/รหัสผ่าน ไม่ถูกต้อง!!!</h5></span>";
-                        _msgEn = "<span class=\"red-text\"><h5>User/Password Incorrect!!!</h5></span>";
-                    }//จบ
+                    else {
+                        if (authen == "false") {
+                            msgTH = "<span class=\"red-text\"><h5>ผู้ใช้งาน/รหัสผ่าน ไม่ถูกต้อง!!!</h5></span>";
+                            msgEN = "<span class=\"red-text\"><h5>User/Password Incorrect!!!</h5></span>";
+                        }
+                    }
                 }
-                else
-                {
-                    _msgTh = "<span class=\"red-text\"><h5>ไม่พบการส่งค่าข้อมูล!!!</h5></span>";
-                    _msgEn = "<span class=\"red-text\"><h5>Post Data Not Found!!!</h5></span>";
+                else {
+                    msgTH = "<span class=\"red-text\"><h5>ไม่พบการส่งค่าข้อมูล!!!</h5></span>";
+                    msgEN = "<span class=\"red-text\"><h5>Post Data Not Found!!!</h5></span>";
                 }
             }
-            catch (Exception _ex)
-            {
-                _msgTh = "<span class=\"red-text\"><h5>ระบบผิดพลาด : " + _ex.Message.Replace("'", " ") + "</h5></span>";
-                _msgEn = "<span class=\"red-text\"><h5>CODE ERROR : " + _ex.Message.Replace("'", " ") + "</h5></span>"; ;
+            catch (Exception ex) {
+                msgTH = ("<span class=\"red-text\"><h5>ระบบผิดพลาด : " + ex.Message.Replace("'", " ") + "</h5></span>");
+                msgEN = ("<span class=\"red-text\"><h5>CODE ERROR : " + ex.Message.Replace("'", " ") + "</h5></span>");
             }
-            _xml.Append("<input type='hidden' class='txtProcessStatus' value='" + _isSuccess + "' data-msg_th='" + _msgTh + "' data-msg_en='" + _msgEn + "' >");
-            _c.Response.Write(_xml.ToString());
+
+            xml.Append("<input type='hidden' class='txtProcessStatus' value='" + isSuccess + "' data-msg_th='" + msgTH + "' data-msg_en='" + msgEN + "' >");
+
+            c.Response.Write(xml.ToString());
         }
 
-        public void UiPreviewContrat()
-        {
-            StringBuilder _string = new StringBuilder();
-            string _userType = _c.Request.Form["userType"];
-            string _warranty = _c.Request.Form["warranty"];
-            string _consent = _c.Request.Form["consent"];
-            Login _login = new Login(_userType);
-            string _studentId = _login.StudentId;
-            //string _acaYear = Myconfig.GetYearContract();
-            string _username = _login.Username;
-            StudentInfo _stdInfo = new StudentInfo(_login.StudentCode);
-            string _acaYear = Myconfig.CvEmpty(_stdInfo.AcaYear, " - ");
-            string _quotaCode = _stdInfo.QuotaCode;
-            string _programCode = _stdInfo.ProgramCode;
-            string _checkDataStd = _stdInfo.CheckDataStd;
-            ContractInfo _ctInfo = new ContractInfo(_studentId);
-            //_string.Append(ContractPreview.SIMDB_Preview(_acaYear,_studentId));
-            string _statusContract = "";
-            int _checkAcaYear = Convert.ToInt32(_acaYear);
-            //int _checkAcaYear = 2565;
-            if (_checkAcaYear < 2565)
-            {
-                _statusContract = "OLD";
-            }
+        public void UiPreviewContrat() {
+            StringBuilder html = new StringBuilder();
+            string userType = c.Request.Form["userType"];
+            string warranty = c.Request.Form["warranty"];
+            string consent = c.Request.Form["consent"];
+
+            Login login = new Login(userType);
+            string studentID = login.StudentID;
+            //string acaYear = Myconfig.GetYearContract();
+            string username = login.Username;
+
+            StudentInfo stdInfo = new StudentInfo(login.StudentCode);
+            string acaYear = Myconfig.CvEmpty(stdInfo.AcaYear, " - ");
+            string quotaCode = stdInfo.QuotaCode;
+            string programCode = stdInfo.ProgramCode;
+            string checkDataStd = stdInfo.CheckDataStd;
+            ContractInfo ctInfo = new ContractInfo(studentID);
+            //str.Append(ContractPreview.SIMDB_Preview(acaYear, studentID));
+            string statusContract = "";
+            int checkAcaYear = Convert.ToInt32(acaYear);
+            //int checkAcaYear = 2565;
+
+            if (checkAcaYear < 2565)
+                statusContract = "OLD";
             else
-            {
-                _statusContract = "NEW";
-            }
-            switch (_programCode)
-            {
+                statusContract = "NEW";
+
+            switch (programCode) {
                 case "SIMDB":
-                    switch (_statusContract)
-                    {
+                    switch (statusContract) {
                         case "NEW":
-                            _string.Append(ContractPreview.Preview_SIMDBNEW(_acaYear, _studentId, _warranty, _consent, _stdInfo.StudentCode));
+                            html.Append(ContractPreview.Preview_SIMDBNEW(acaYear, studentID, warranty, consent, stdInfo.StudentCode));
                             break;
                         case "OLD":
-                            _string.Append(ContractPreview.Preview_SIMDB(_acaYear, _studentId, _stdInfo.StudentCode));
+                            html.Append(ContractPreview.Preview_SIMDB(acaYear, studentID, stdInfo.StudentCode));
                             break;
                     }
                     break;
-
                 case "RAMDB":
-                    switch (_statusContract)
-                    {
+                    switch (statusContract) {
                         case "NEW":
-                            _string.Append(ContractPreview.Preview_RAMDBNEW(_acaYear, _studentId, _warranty, _consent, _stdInfo.StudentCode));
+                            html.Append(ContractPreview.Preview_RAMDBNEW(acaYear, studentID, warranty, consent, stdInfo.StudentCode));
                             break;
                         case "OLD":
-                            _string.Append(ContractPreview.Preview_RAMDB(_acaYear, _studentId, _stdInfo.StudentCode));
+                            html.Append(ContractPreview.Preview_RAMDB(acaYear, studentID, stdInfo.StudentCode));
                             break;
                     }
                     break;
-
                 case "PYPYB":
-                    _string.Append(ContractPreview.Preview_PYPYB(_acaYear, _studentId, _stdInfo.StudentCode));
+                    html.Append(ContractPreview.Preview_PYPYB(acaYear, studentID, stdInfo.StudentCode));
                     break;
-
                 case "DTDSB":
-                    switch (_statusContract)
-                    {
+                    switch (statusContract) {
                         case "NEW":
-                            _string.Append(ContractPreview.Preview_DTDSBNEW(_acaYear, _studentId, _warranty, _consent, _stdInfo.StudentCode));
+                            html.Append(ContractPreview.Preview_DTDSBNEW(acaYear, studentID, warranty, consent, stdInfo.StudentCode));
                             break;
                         case "OLD":
-                            _string.Append(ContractPreview.Preview_DTDSB(_acaYear, _studentId, _stdInfo.StudentCode));
+                            html.Append(ContractPreview.Preview_DTDSB(acaYear, studentID, stdInfo.StudentCode));
                             break;
                     }
                     break;
                 case "RANSB":
-                    _string.Append(ContractPreview.Preview_RANSB(_acaYear, _studentId, _stdInfo.StudentCode));
+                    html.Append(ContractPreview.Preview_RANSB(acaYear, studentID, stdInfo.StudentCode));
                     break;
-
                 case "NSNSB":
-                    switch (_quotaCode) // specification nurse program project
-                    {
-                        default: // siriraj hospital
-                            _string.Append(ContractPreview.Preview_NSNSB(_acaYear, _studentId, _stdInfo.StudentCode));
+                    switch (quotaCode) {
+                        //specification nurse program project
+                        //siriraj hospital
+                        default:                            
+                            html.Append(ContractPreview.Preview_NSNSB(acaYear, studentID, stdInfo.StudentCode));
                             break;
-
-                        case "354": // chula research
-                            _string.Append(ContractPreview.Preview_NSNSB_CL(_acaYear, _studentId, _stdInfo.StudentCode));
+                        //chula research
+                        case "354":                            
+                            html.Append(ContractPreview.Preview_NSNSB_CL(acaYear, studentID, stdInfo.StudentCode));
                             break;
-
-                        case "351": // faculty of tropical medicine
-                            _string.Append(ContractPreview.Preview_NSNSB_TM(_acaYear, _studentId, _stdInfo.StudentCode));
+                        // faculty of tropical medicine
+                        case "351":                            
+                            html.Append(ContractPreview.Preview_NSNSB_TM(acaYear, studentID, stdInfo.StudentCode));
                             break;
                     }
                     break;
             }
-            if (_checkDataStd == "N")
-            {
-                _string.Append(GetMessageProfilevalidated());
+
+            if (checkDataStd == "N") {
+                html.Append(GetMessageProfilevalidated());
             }
-            else
-            {
-                _string.Append(ContractUI.UiReLoginForm(_userType, _ctInfo, _username, "student"));
+            else {
+                html.Append(ContractUI.UiReLoginForm(userType, ctInfo, username, "student"));
             }
-            _string.Append("<span class='waves-effect waves-light btn-large grey col s12  accent-12 btnBack' >ย้อนกลับ</span><br><br>");
-            _c.Response.Write(_string.ToString());
+
+            html.Append("<span class='waves-effect waves-light btn-large grey col s12  accent-12 btnBack' >ย้อนกลับ</span><br><br>");
+
+            c.Response.Write(html.ToString());
         }
 
+        public string GetMessageProfilevalidated() {
+            StringBuilder html = new StringBuilder();
 
-        public string GetMessageProfilevalidated()
-        {
-            StringBuilder _string = new StringBuilder();
-            _string.Append("<div class='card-panel blue lighten-5'>");
-            _string.Append("<div class='row'>");
-            _string.Append("<h5 class='red-text'><center>เนื่องจากนักศึกษากรอกข้อมูลในระบบ e-Profile ไม่ครบถ้วน</center><p><center>ให้นักศึกษาเข้าระบบ e-Profile เพื่อกรอกข้อมูลในช่องที่ขาดหาย</center></p></h5>");
-            _string.Append("<h5 class='green-text'><center>hint : ข้อมูลที่อยู่ที่ปรากฏในสัญญาชื่อ-นามสกุล, วันเกิด<br>ที่อยู่ปัจจุบันที่ติดต่อได้ บ้านเลขที่, ตำบล, อำเภอ, จังหวัด, รหัสไปรษณีย์<br> เบอร์โทรศัพท์, บัตรประชาชน, ชื่อ-นามสกุล บิดา, ชื่อ-นามสกุล มารดา <br>และที่อยู่ปัจจุบันของบิดา มารดา</center></h5>");
-            _string.Append("<h5><center><a href='https://smartedu.mahidol.ac.th'>คลิกที่นี่เพื่อเข้าสู่ระบบ e-Profile</a></center></p><p><center>ถ้าระบบ e-Profile ไม่เปิดให้บริการ กรุณาติดต่อ 02-849-4562 </center></p><p><center>เพื่อให้เจ้าหน้าที่เปิดระบบ</center></h5>");
-            _string.Append("</div>");
-            _string.Append("</div>");
-            return _string.ToString();
+            html.Append(
+                "<div class='card-panel blue lighten-5'>" +
+                "<div class='row'>" +
+                "<h5 class='red-text'><center>เนื่องจากนักศึกษากรอกข้อมูลในระบบ e-Profile ไม่ครบถ้วน</center><p><center>ให้นักศึกษาเข้าระบบ e-Profile เพื่อกรอกข้อมูลในช่องที่ขาดหาย</center></p></h5>" +
+                "<h5 class='green-text'><center>hint : ข้อมูลที่อยู่ที่ปรากฏในสัญญาชื่อ-นามสกุล, วันเกิด<br>ที่อยู่ปัจจุบันที่ติดต่อได้ บ้านเลขที่, ตำบล, อำเภอ, จังหวัด, รหัสไปรษณีย์<br> เบอร์โทรศัพท์, บัตรประชาชน, ชื่อ-นามสกุล บิดา, ชื่อ-นามสกุล มารดา <br>และที่อยู่ปัจจุบันของบิดา มารดา</center></h5>" +
+                "<h5><center><a href='https://smartedu.mahidol.ac.th'>คลิกที่นี่เพื่อเข้าสู่ระบบ e-Profile</a></center></p><p><center>ถ้าระบบ e-Profile ไม่เปิดให้บริการ กรุณาติดต่อ 02-849-4562 </center></p><p><center>เพื่อให้เจ้าหน้าที่เปิดระบบ</center></h5>" +
+                "</div>" +
+                "</div>"
+            );
+
+            return html.ToString();
         }
 
-        public void UIsetConfirmRequestPassword()
-        {
-            StringBuilder _string = new StringBuilder();
-            _string.Append(ContractUI.UIsetConfirmRequestPassword());
-            _c.Response.Write(_string.ToString());
+        public void UIsetConfirmRequestPassword() {
+            StringBuilder html = new StringBuilder();
+
+            html.Append(ContractUI.UIsetConfirmRequestPassword());
+
+            c.Response.Write(html.ToString());
         }
 
-        public void UIsetAcceptedRequestPassword()
-        {
-            StringBuilder _string = new StringBuilder();
-            _string.Append(ContractUI.UIsetAcceptedRequestPassword());
-            _c.Response.Write(_string.ToString());
+        public void UIsetAcceptedRequestPassword() {
+            StringBuilder html = new StringBuilder();
+
+            html.Append(ContractUI.UIsetAcceptedRequestPassword());
+
+            c.Response.Write(html.ToString());
         }
 
-        /// <summary>
-        /// Auther : anussara.wan
-        /// Date   : 2019-08-20
-        /// Perpose: SetConfirmParent
-        /// Method : SetConfirmParent
-        /// Sample : N/A
-        /// </summary>
-        public void SetConfirmParent()
-        {
-            string _userType = _c.Request.Form["userType"];
-            Login _login = new Login(_userType);
-            string _studentId = _login.StudentId;
-            string _username = _login.Username;
-            StringBuilder _string = new StringBuilder();
-            ContractInfo _ctInfo = new ContractInfo(_studentId);// check already sign contract
-            string _parentType = _login.UserType; //F M or student
-            string _confirmStatus = "Y";
-            ContractDB.SetConfirmParent(_username, _studentId, _confirmStatus);
-            _string.Append(ContractPreview.Preview_Guarantee(_studentId, _parentType, _login.StudentCode));
-            _string.Append(ContractPreview.Preview_Warrant(_studentId, _parentType, _login.StudentCode));
-            _string.Append(ContractUI.UiReLoginForm(_userType, _ctInfo, _username, _userType));
-            _c.Response.Write(_string.ToString());
+        /*
+        Auther  : anussara.wan
+        Date    : 2019-08-20
+        Perpose : SetConfirmParent
+        Method  : SetConfirmParent
+        Sample  : N/A
+        */
+        public void SetConfirmParent() {
+            StringBuilder html = new StringBuilder();
+            string userType = c.Request.Form["userType"];
+            Login login = new Login(userType);
+            string studentID = login.StudentID;
+            string username = login.Username;            
+            ContractInfo ctInfo = new ContractInfo(studentID); //check already sign contract
+            string parentType = login.UserType; //F M or student
+            string confirmStatus = "Y";
+
+            ContractDB.SetConfirmParent(username, studentID, confirmStatus);
+            html.Append(ContractPreview.Preview_Guarantee(studentID, parentType, login.StudentCode));
+            html.Append(ContractPreview.Preview_Warrant(studentID, parentType, login.StudentCode));
+            html.Append(ContractUI.UiReLoginForm(userType, ctInfo, username, userType));
+
+            c.Response.Write(html.ToString());
         }
 
-        public bool IsReusable
-        {
-            get
-            {
+        public bool IsReusable {
+            get{
                 return false;
             }
         }
 
-        //public void CheckConsent()
-        //{
-        //    DataSet _ds = new DataSet();
-        //    string _consentStatus = "";
-        //    string _userType = _c.Request.Form["userType"];
-        //    Login _login = new Login(_userType);
-        //    string _studentId = _login.StudentId;
-        //    _ds = ContractDB.GetConsent(_studentId);
-        //    if (_ds.Tables[0].Rows.Count > 0)
-        //    {
-        //        _consentStatus = "true";
-        //    }
-        //    else
-        //    {
-        //        _consentStatus = "false";
-        //    }
-        //    _c.Response.Write(_consentStatus);
-        //}
+        /*
+        public void CheckConsent() {
+            DataSet ds = new DataSet();
+            string consentStatus = "";
+            string userType = c.Request.Form["userType"];
+            Login login = new Login(userType);
+            string studentID = login.StudentId;
+        
+            ds = ContractDB.GetConsent(studentID);
 
-        public void CheckENFullNameParent()
-        {
-            DataSet _ds = new DataSet();
-            string _userType = _c.Request.Form["userType"];
-            string _warranty = _c.Request.Form["warranty"];
-            string _consent = _c.Request.Form["consent"];
-            Login _login = new Login(_userType);
-            string _studentId = _login.StudentId;
+            if (ds.Tables[0].Rows.Count > 0) {
+                consentStatus = "true";
+            }
+            else {
+                consentStatus = "false";
+            }
+        
+            c.Response.Write(_consentStatus);
+        }
+        */
+
+        public void CheckENFullNameParent() {
+            DataSet ds = new DataSet();
+            string userType = c.Request.Form["userType"];
+            string warranty = c.Request.Form["warranty"];
+            string consent = c.Request.Form["consent"];
+            Login login = new Login(userType);
+            string studentID = login.StudentID;
             ParentInfo parentInfoWarranty = null;
             ParentInfo parentInfoConsent = null;
             ParentInfo parentInfo = null;
-            if (_warranty == _consent)
-            {
-                //Same person
-                parentInfo = new ParentInfo(_studentId, _warranty);
 
-                string _enFirstName = parentInfo.enFirstName;
-                string _enLastName = parentInfo.enLastName;
-                if (_enFirstName == "" || _enLastName == "" && parentInfo.nationalityId == "177")
-                {
-                    _c.Response.Write(JsonConvert.SerializeObject(new
-                    {
+            if (warranty == consent) {
+                //same person
+                parentInfo = new ParentInfo(studentID, warranty);
+
+                string firstNameEN = parentInfo.FirstNameEN;
+                string lastNameEN = parentInfo.LastNameEN;
+
+                if ((firstNameEN == "" || lastNameEN == "") &&
+                    parentInfo.NationalityID == "177") {
+                    c.Response.Write(JsonConvert.SerializeObject(new {
                         Status = "False",
                         Person = "Same",
-                        enFirstName = _enFirstName,
-                        enLastName = _enLastName,
-
+                        enFirstName = firstNameEN,
+                        enLastName = lastNameEN
                     }));
                 }
-                else if (parentInfo.nationalityId != "177" && _enFirstName == "")
-                {
-                    _c.Response.Write(JsonConvert.SerializeObject(new
-                    {
-                        Status = "False",
-                        Person = "Same",
-                        enFirstName = _enFirstName,
-                        enLastName = _enLastName,
-
-                    }));
-                }
-                else
-                {
-                    _c.Response.Write(JsonConvert.SerializeObject(new
-                    {
-                        Status = "True",
-                        Person = "Same"
-                    }));
+                else {
+                    if (parentInfo.NationalityID != "177" &&
+                        firstNameEN == "") {
+                        c.Response.Write(JsonConvert.SerializeObject(new {
+                            Status = "False",
+                            Person = "Same",
+                            enFirstName = firstNameEN,
+                            enLastName = lastNameEN
+                        }));
+                    }
+                    else {
+                        c.Response.Write(JsonConvert.SerializeObject(new {
+                            Status = "True",
+                            Person = "Same"
+                        }));
+                    }
                 }
             }
-            else
-            {
-                //Different person
-                parentInfoWarranty = new ParentInfo(_studentId, _warranty);
-                parentInfoConsent = new ParentInfo(_studentId, _consent);
-                string _enFirstNameWarranty = parentInfoWarranty.enFirstName;
-                string _enLastNameWarranty = parentInfoWarranty.enLastName;
-                string _enFirstNameConsent = parentInfoConsent.enFirstName;
-                string _enLastNameConsent = parentInfoConsent.enLastName;
-                if ((_enFirstNameWarranty == "" || _enLastNameWarranty == "" || _enFirstNameConsent == "" || _enLastNameConsent == "") && (parentInfoWarranty.nationalityId == "177" && parentInfoConsent.nationalityId == "177"))
-                {
-                    _c.Response.Write(JsonConvert.SerializeObject(new
-                    {
+            else {
+                //different person
+                parentInfoWarranty = new ParentInfo(studentID, warranty);
+                parentInfoConsent = new ParentInfo(studentID, consent);
+                string firstNameENWarranty = parentInfoWarranty.FirstNameEN;
+                string lastNameENWarranty = parentInfoWarranty.LastNameEN;
+                string firstNameENConsent = parentInfoConsent.FirstNameEN;
+                string lastNameENConsent = parentInfoConsent.LastNameEN;
+
+                if ((firstNameENWarranty == "" || lastNameENWarranty == "" || firstNameENConsent == "" || lastNameENConsent == "") &&
+                    (parentInfoWarranty.NationalityID == "177" && parentInfoConsent.NationalityID == "177")) {
+                    c.Response.Write(JsonConvert.SerializeObject(new {
                         Status = "False",
                         Person = "Different",
-                        enFirstNameWarranty = _enFirstNameWarranty,
-                        enLastNameWarranty = _enLastNameWarranty,
-                        enFirstNameConsent = _enFirstNameConsent,
-                        enLastNameConsent = _enLastNameConsent
+                        enFirstNameWarranty = firstNameENWarranty,
+                        enLastNameWarranty = lastNameENWarranty,
+                        enFirstNameConsent = firstNameENConsent,
+                        enLastNameConsent = lastNameENConsent
                     }));
                 }
-                else if ((parentInfoWarranty.nationalityId != "177" || parentInfoConsent.nationalityId != "177") && (_enFirstNameWarranty == "" || _enFirstNameConsent == ""))
-                {
-                    _c.Response.Write(JsonConvert.SerializeObject(new
-                    {
-                        Status = "False",
-                        Person = "Different",
-                        enFirstNameWarranty = _enFirstNameWarranty,
-                        enLastNameWarranty = _enLastNameWarranty,
-                        enFirstNameConsent = _enFirstNameConsent,
-                        enLastNameConsent = _enLastNameConsent
-                    }));
-                }
-                else
-                {
-                    _c.Response.Write(JsonConvert.SerializeObject(new
-                    {
-                        Status = "True",
-                        Person = "Different"
-                    }));
+                else {
+                    if ((parentInfoWarranty.NationalityID != "177" || parentInfoConsent.NationalityID != "177") &&
+                        (firstNameENWarranty == "" || firstNameENConsent == "")) {
+                        c.Response.Write(JsonConvert.SerializeObject(new {
+                            Status = "False",
+                            Person = "Different",
+                            enFirstNameWarranty = firstNameENWarranty,
+                            enLastNameWarranty = lastNameENWarranty,
+                            enFirstNameConsent = firstNameENConsent,
+                            enLastNameConsent = lastNameENConsent
+                        }));
+                    }
+                    else {
+                        c.Response.Write(JsonConvert.SerializeObject(new {
+                            Status = "True",
+                            Person = "Different"
+                        }));
+                    }
                 }
             }
         }

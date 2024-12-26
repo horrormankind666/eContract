@@ -1,204 +1,149 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
 
-/// <summary>
-/// Summary description for CurDate
-/// </summary>
-namespace eContract
-{
-
-
-    public class CurDate
-    {
-
-        string _dateLongTh;
-
-        public string DateLongTh
-        {
-            get { return _dateLongTh; }
-            set { _dateLongTh = value; }
+namespace eContract {
+    public class CurDate {
+        string dateLongTH;
+        public string DateLongTH {
+            get { return dateLongTH; }
+            set { dateLongTH = value; }
         }
 
-
-
-        string _dateMidTh;
-
-        public string DateMidTh
-        {
-            get { return _dateMidTh; }
-            set { _dateMidTh = value; }
-        }
-        string _dateTh;
-
-        public string DateTh
-        {
-            get { return _dateTh; }
-            set { _dateTh = value; }
-        }
-        string _dateLongEn;
-
-        public string DateLongEn
-        {
-            get { return _dateLongEn; }
-            set { _dateLongEn = value; }
-        }
-        string _dateMidEn;
-
-        public string DateMidEn
-        {
-            get { return _dateMidEn; }
-            set { _dateMidEn = value; }
-        }
-        string _dateEn;
-
-        public string DateEn
-        {
-            get { return _dateEn; }
-            set { _dateEn = value; }
-        }
-        string _dateISO;
-
-        public string DateISO
-        {
-            get { return _dateISO; }
-            set { _dateISO = value; }
-        }
-        string _day;
-
-        public string Day
-        {
-            get { return _day; }
-            set { _day = value; }
-        }
-        string _monthNameEn;
-
-        public string MonthNameEn
-        {
-            get { return _monthNameEn; }
-            set { _monthNameEn = value; }
-        }
-        string _monthNameTh;
-
-        public string MonthNameTh
-        {
-            get { return _monthNameTh; }
-            set { _monthNameTh = value; }
-        }
-        string _yearEn;
-
-        public string YearEn
-        {
-            get { return _yearEn; }
-            set { _yearEn = value; }
-        }
-        string _yearTh;
-
-        public string YearTh
-        {
-            get { return _yearTh; }
-            set { _yearTh = value; }
-        }
-        string _date;
-
-        public string Date
-        {
-            get { return _date; }
-            set { _date = value; }
-        }
-        string _strDateLongTh;
-
-        public string StrDateLongTh
-        {
-            get { return _strDateLongTh; }
-            set { _strDateLongTh = value; }
-        }
-        string _strDateLongEn;
-
-        public string StrDateLongEn
-        {
-            get { return _strDateLongEn; }
-            set { _strDateLongEn = value; }
+        string dateMidTH;
+        public string DateMidTH {
+            get { return dateMidTH; }
+            set { dateMidTH = value; }
         }
 
+        string dateTH;
+        public string DateTH {
+            get { return dateTH; }
+            set { dateTH = value; }
+        }
 
-        public CurDate()
-        {
-            //
-            // TODO: Add constructor logic here
-            //
+        string dateLongEN;
+        public string DateLongEN {
+            get { return dateLongEN; }
+            set { dateLongEN = value; }
+        }
+        
+        string dateMidEN;
+        public string DateMidEN {
+            get { return dateMidEN; }
+            set { dateMidEN = value; }
+        }
 
+        string dateEN;
+        public string DateEN {
+            get { return dateEN; }
+            set { dateEN = value; }
+        }
+
+        string dateISO;
+        public string DateISO {
+            get { return dateISO; }
+            set { dateISO = value; }
+        }
+
+        string day;
+        public string Day {
+            get { return day; }
+            set { day = value; }
+        }
+
+        string monthNameEN;
+        public string MonthNameEN {
+            get { return monthNameEN; }
+            set { monthNameEN = value; }
+        }
+
+        string monthNameTH;
+        public string MonthNameTH {
+            get { return monthNameTH; }
+            set { monthNameTH = value; }
+        }
+
+        string yearEN;
+        public string YearEN {
+            get { return yearEN; }
+            set { yearEN = value; }
+        }
+
+        string yearTH;
+        public string YearTH {
+            get { return yearTH; }
+            set { yearTH = value; }
+        }
+
+        string date;
+        public string Date {
+            get { return date; }
+            set { date = value; }
+        }
+
+        string strDateLongTH;
+        public string StrDateLongTH {
+            get { return strDateLongTH; }
+            set { strDateLongTH = value; }
+        }
+
+        string strDateLongEN;
+        public string StrDateLongEN {
+            get { return strDateLongEN; }
+            set { strDateLongEN = value; }
+        }
+
+        public CurDate() {
             GetInfo();
         }
 
-
-
-
-        private void GetInfo()
-        {
-
+        private void GetInfo() {
             SetEmpty();
 
-            string _query = "sp_sysGetDate";
-            SqlConnection _con = new SqlConnection(ConfigurationManager.ConnectionStrings["conn"].ToString());
-            SqlDataAdapter _adp = new SqlDataAdapter(_query, _con);
-            DataSet _ds = new DataSet();
-            _adp.Fill(_ds);
-            int _row = _ds.Tables[0].Rows.Count;
+            string query = "sp_sysGetDate";
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["conn"].ToString());
+            SqlDataAdapter adp = new SqlDataAdapter(query, con);
+            DataSet ds = new DataSet();
+            adp.Fill(ds);
+            int row = ds.Tables[0].Rows.Count;
 
-            // Parent Info
-            if (_row > 0)
-            {
-
-                _dateLongTh = _ds.Tables[0].Rows[0]["dateLognTh"].ToString();
-                _dateMidTh = _ds.Tables[0].Rows[0]["dateMidTh"].ToString();
-                _dateTh = _ds.Tables[0].Rows[0]["dateTh"].ToString();
-                _dateLongEn = _ds.Tables[0].Rows[0]["dateLongEn"].ToString();
-                _dateMidEn = _ds.Tables[0].Rows[0]["dateMidEn"].ToString();
-                _dateEn = _ds.Tables[0].Rows[0]["dateEn"].ToString();
-                _dateISO = _ds.Tables[0].Rows[0]["dateISO"].ToString();
-                _day = _ds.Tables[0].Rows[0]["cDay"].ToString();
-                _monthNameEn = _ds.Tables[0].Rows[0]["cMonthNameEn"].ToString();
-                _monthNameTh = _ds.Tables[0].Rows[0]["cMonthNameTh"].ToString();
-                _yearEn = _ds.Tables[0].Rows[0]["yearEn"].ToString();
-                _yearTh = _ds.Tables[0].Rows[0]["YearTh"].ToString();
-                _date = _ds.Tables[0].Rows[0]["cDate"].ToString();
-                _strDateLongTh = _day + " เดือน " + _monthNameTh + " พ.ศ. " + _yearTh;
-                _strDateLongEn = _day + " " + _monthNameEn + " ค.ศ. " + _yearTh;
-
+            //parent info
+            if (row > 0) {
+                dateLongTH = ds.Tables[0].Rows[0]["dateLognTh"].ToString();
+                dateMidTH = ds.Tables[0].Rows[0]["dateMidTh"].ToString();
+                dateTH = ds.Tables[0].Rows[0]["dateTh"].ToString();
+                dateLongEN = ds.Tables[0].Rows[0]["dateLongEn"].ToString();
+                dateMidEN = ds.Tables[0].Rows[0]["dateMidEn"].ToString();
+                dateEN = ds.Tables[0].Rows[0]["dateEn"].ToString();
+                dateISO = ds.Tables[0].Rows[0]["dateISO"].ToString();
+                day = ds.Tables[0].Rows[0]["cDay"].ToString();
+                monthNameEN = ds.Tables[0].Rows[0]["cMonthNameEn"].ToString();
+                monthNameTH = ds.Tables[0].Rows[0]["cMonthNameTh"].ToString();
+                yearEN = ds.Tables[0].Rows[0]["yearEn"].ToString();
+                yearTH = ds.Tables[0].Rows[0]["YearTh"].ToString();
+                date = ds.Tables[0].Rows[0]["cDate"].ToString();
+                strDateLongTH = (day + " เดือน " + monthNameTH + " พ.ศ. " + yearTH);
+                strDateLongEN = (day + " " + monthNameEN + " ค.ศ. " + yearTH);
             }
-
-
-
         }
 
-
-        public void SetEmpty()
-        {
-
-            _dateLongTh = "";
-            _dateMidTh = "";
-            _dateTh = "";
-            _dateLongEn = "";
-            _dateMidEn = "";
-            _dateEn = "";
-            _dateISO = "";
-            _day = "";
-            _monthNameEn = "";
-            _monthNameTh = "";
-            _yearEn = "";
-            _yearTh = "";
-            _date = "";
-            _strDateLongEn = "";
-            _strDateLongTh = "";
-
-
+        public void SetEmpty() {
+            dateLongTH = "";
+            dateMidTH = "";
+            dateTH = "";
+            dateLongEN = "";
+            dateMidEN = "";
+            dateEN = "";
+            dateISO = "";
+            day = "";
+            monthNameEN = "";
+            monthNameTH = "";
+            yearEN = "";
+            yearTH = "";
+            date = "";
+            strDateLongEN = "";
+            strDateLongTH = "";
         }
-
-
     }
 }

@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" EnableViewStateMac="false" EnableEventValidation="false" CodeBehind="frmContract.aspx.cs" Inherits="eContract.frmContract" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" EnableViewStateMac="false" EnableEventValidation="false" CodeBehind="frmContract.aspx.cs" Inherits="eContract.FrmContract" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -10,12 +10,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="msapplication-tap-highlight" content="no" />
     <meta name="description" content="Mahidol University, MU Contract,ทำสัญญาการเป็นนักศึกษา, มหาวิทยาลัยมหิดล" />
-    <link rel="apple-touch-icon-precomposed" href="images/logo.png" />
     <meta name="msapplication-TileColor" content="#FFFFFF" />
     <meta name="msapplication-TileImage" content="images/logo.png" />
-    <link rel="icon" href="images/logo.png" sizes="32x32" />
-    <!--  Android 5 Chrome Color-->
     <meta name="theme-color" content="#EE6E73" />
+    <link rel="apple-touch-icon-precomposed" href="images/logo.png" />    
+    <link rel="icon" href="images/logo.png" sizes="32x32" />    
     <style type="text/css">
         .hoverMarital {
             display: none;
@@ -25,8 +24,7 @@
             background: #ccc;
             position: absolute;
         }
-    </style>
-    <style type="text/css">
+
         .overlay {
             display: none;
             position: fixed;
@@ -35,23 +33,23 @@
             top: 0;
             left: 0;
             z-index: 999;
-            background: rgba(255,255,255,0.8) url("/Images/Spinner-2.gif") center no-repeat;
+            background: rgba(255, 255, 255, 0.8) url("/Images/Spinner-2.gif") center no-repeat;
         }
-        /* Turn off scrollbar when body element has the loading class */
+
         body.loading {
             overflow: hidden;
         }
-            /* Make spinner image visible when body element has the loading class */
-            body.loading .overlay {
-                display: block;
-            }
+
+        body.loading .overlay {
+            display: block;
+        }
     </style>
 </head>
 <body style="background-color: #F2F0EF;">
     <form id="form1" runat="server" method="post">
         <nav id="navBar" runat="server" class='' style="background-color: #253988" role='navigation'></nav>
         <div id="index-bannerx" class="parallax-container" style="height: 170px;">
-            <!--Profile-->
+            <!-- Profile -->
             <div class="container transp" id="divUserProfile" runat="server"></div>
             <div class="parallax">
                 <img src="images/building009-s.jpg" alt="#" />
@@ -80,8 +78,9 @@
                 </div>
             </div>
         </div>
-
-<%--        <div class="container" id="divComplete" runat="server"></div>--%>
+        <%--
+        <div class="container" id="divComplete" runat="server"></div>
+        --%>
         <!-- footer banner -->
         <div class="page-footer" style="background-color: #A5802E;" id="divFooter" runat="server"></div>
 
@@ -89,28 +88,27 @@
         <div id="modalMsg" class="modal">
             <div class="modal-content">
                 <h4 class="red-text lblTitle">Warning message.</h4>
-                <p class="message red-text text-darken-3">
-                </p>
+                <p class="message red-text text-darken-3"></p>
             </div>
             <div class="modal-footer">
                 <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-green btn-flat">
                     <span style='font-weight: bold; font-size: 16pt;' class='th'>ปิด</span>
-                    <span style='font-weight: bold; font-size: 16pt;' class='en hide'>CLOSE</span></a>
+                    <span style='font-weight: bold; font-size: 16pt;' class='en hide'>CLOSE</span>
+                </a>
             </div>
         </div>
-
 
         <!-- Modal Check Consent From e-Profile -->
         <div id="modalConsent" class="modal">
             <div class="modal-content">
                 <h4 class="red-text lblTitle">Warning message.</h4>
-                <p class="message red-text text-darken-3">
-                </p>
+                <p class="message red-text text-darken-3"></p>
             </div>
             <div class="modal-footer">
                 <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-green btn-flat">
                     <span style='font-weight: bold; font-size: 16pt;' class='th'>ปิด</span>
-                    <span style='font-weight: bold; font-size: 16pt;' class='en hide'>CLOSE</span></a>
+                    <span style='font-weight: bold; font-size: 16pt;' class='en hide'>CLOSE</span>
+                </a>
             </div>
         </div>
 
@@ -138,7 +136,8 @@
             <div class="modal-footer">
                 <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-green btn-flat">
                     <span style='font-weight: bold; font-size: 16pt;' class='th'>ปิด</span>
-                    <span style='font-weight: bold; font-size: 16pt;' class='en hide'>CLOSE</span></a>
+                    <span style='font-weight: bold; font-size: 16pt;' class='en hide'>CLOSE</span>
+                </a>
             </div>
         </div>
         <!-- Modal Check ENName (Different Person) From e-Profile -->
@@ -180,7 +179,8 @@
             <div class="modal-footer">
                 <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-green btn-flat">
                     <span style='font-weight: bold; font-size: 16pt;' class='th'>ปิด</span>
-                    <span style='font-weight: bold; font-size: 16pt;' class='en hide'>CLOSE</span></a>
+                    <span style='font-weight: bold; font-size: 16pt;' class='en hide'>CLOSE</span>
+                </a>
             </div>
         </div>
         <asp:hiddenfield id="hidStatusViewParent" runat="server" />
@@ -200,18 +200,17 @@
             $("body").removeClass("loading");
         }
     });
-    /// <summary>
-    /// Auther : Odd.Nopparat
-    /// Date   : 2015-11-20.
-    /// Perpose: initial parameter
-    /// Method : .
-    /// </summary>
+
+    /*
+    Auther  : Odd.Nopparat
+    Date    : 20-11-2015
+    Perpose : initial parameter
+    Method  :
+    */
     $(function () {
-
         $('.parallax').parallax();
-        // mobile display mini - message
+        //mobile display mini - message
         $('.minimessage').text($('#messenger').text());
-
 
         $('.btnThai').click(function () {
             thaiAcitive();
@@ -225,10 +224,12 @@
             signLoginContract($(this));
         });
 
-        //$('#submit_confirmRequest').click(function () {
-        //    $('form#form1').attr('action', 'confirmRequest.aspx');
-        //    $('form#form1').submit();
-        //});
+        /*
+        $('#submit_confirmRequest').click(function () {
+            $('form#form1').attr('action', 'confirmRequest.aspx');
+            $('form#form1').submit();
+        });
+        */
 
         menuStd();
         //checkConsent();
@@ -241,20 +242,22 @@
 
         //ปุ่มยืนยันข้อมูล page กรอกสถานะภาพ บิดา มารดา
         $('.btnConfirmInfo').click(function () {
-            var _userType = $('#txtUserTypeActive').val();
+            var userType = $('#txtUserTypeActive').val();
             var warrantyBy = $('input:radio[name=rdoWarrant]:checked').val();
             var consentBy = $('#txtConsentBy').val();
-            if (warrantyBy != "N" || consentBy != "N") {
-                //Only In System
-                var _post = "&userType=" + _userType + "&warranty=" + warrantyBy + "&consent=" + consentBy;
+
+            if (warrantyBy != "N" ||
+                consentBy != "N") {
+                //only in system
+                var post = ("&userType=" + userType + "&warranty=" + warrantyBy + "&consent=" + consentBy);
+
                 $.ajax({
                     type: "POST",
                     url: "ContractHandler.ashx",
-                    data: "action=CheckENFullNameParent" + _post,
+                    data: ("action=CheckENFullNameParent" + post),
                     dataType: "json",
                     //charset: 'tis-620',
                     beforeSend: function () {
-
                     },
                     error: function (err) {
                     },
@@ -262,9 +265,10 @@
                         if (data.Status == "False") {
                             //FirstNameEN || LastNameEN == Null
                             if (data.Person == "Same") {
-                                //alert(data.enFirstName);
+                                // alert(data.enFirstName);
                                 var firstName = data.enFirstName;
                                 var lastName = data.enLastName;
+
                                 if (firstName == "") {
                                     $("#modalCheckENNameSame").find("#txtENFirstName").addClass("invalid");
                                     $("#modalCheckENNameSame").find("#txtENFirstName").val(" ")
@@ -286,12 +290,14 @@
                                 Materialize.updateTextFields();
                                 $("#modalCheckENNameSame").openModal();
                             }
+
                             if (data.Person == "Different") {
                                 //alert(data.Person);
                                 var firstNameWarranty = data.enFirstNameWarranty;
                                 var lastNameWarranty = data.enLastNameWarranty;
                                 var firstNameConsent = data.enFirstNameConsent;
                                 var lastNameConsent = data.enLastNameConsent;
+
                                 if (firstNameWarranty == "") {
                                     $("#modalCheckENNameDiff").find("#txtENFirstNameWarranty").addClass("invalid");
                                     $("#modalCheckENNameDiff").find("#txtENFirstNameWarranty").val(" ")
@@ -329,37 +335,41 @@
                                 Materialize.updateTextFields();
                                 $("#modalCheckENNameDiff").openModal();
                             }
-
                         }
-                        else if (data.Status == "True") {
-                            uiPreviewStudentContract($(this));
+                        else {
+                            if (data.Status == "True") {
+                                uiPreviewStudentContract($(this));
+                            }
                         }
                     }
                 });
-            } else if (warrantyBy == "N" && consentBy == "N") {
-                //Contract Out
-                uiPreviewStudentContract($(this));
+            } else {
+                if (warrantyBy == "N" &&
+                    consentBy == "N") {
+                    //contract out
+                    uiPreviewStudentContract($(this));
+                }
             }
-
-
         });
 
         $('.rdoMarried').change(function () {
             enabledAlive();
             resetAlive();
-            /*            resetStayWith();*/
+            //resetStayWith();
             resetWarrant();
             //disabledWarrant();
             //showTextWarrant();
         });
+
         $('.rdoFatherSts').change(function () {
             var id = $(this).attr("id");
-            /*            enabledStayWith();*/
-            /*            resetStayWith();*/
+            //enabledStayWith();
+            //resetStayWith();
             resetWarrant();
             onchangeAlive(id);
             showTextWarrant();
         });
+
         $('.rdoMotherSts').change(function () {
             var id = $(this).attr("id");
             //enabledStayWith();
@@ -368,113 +378,110 @@
             onchangeAlive(id);
             showTextWarrant();
         });
-        //$('.chkStay').change(function () {
-        //    var id = $(this).attr("id");
-        //    //ValidationInputData();
-        //    onchangeAlive("");
-        //    resetWarrant();
-        //    onchangeStayWith(id);
-        //    enabledWarrant();
-        //    showTextWarrant();
-        //    //enabledWarrant();
 
-        //});
+        /*
+        $('.chkStay').change(function () {
+            var id = $(this).attr("id");
+            //validationInputData();
+            onchangeAlive("");
+            resetWarrant();
+            onchangeStayWith(id);
+            enabledWarrant();
+            showTextWarrant();
+            //enabledWarrant();
+        });
+        */
 
         //ปุ่ม confirmParent 2019-08-20
         $('.btnConfirmParent').click(function () {
-            SetConfirmParent();
+            setConfirmParent();
         });
 
     });
 
-
-    /// <summary>
-    /// Auther : Odd.Nopparat
-    /// Date   : 2015-08-20.
-    /// Perpose: สลับภาษาอังกฤษ.
-    /// Method : english-active.
-    /// </summary>
+    /*
+    Auther  : Odd.Nopparat
+    Date    : 20-08-2015
+    Perpose : สลับภาษาอังกฤษ.
+    Method  : english-active.
+    */
     function thaiAcitive() {
         $('.lang-active').data('lang', 'th');
         $('.en').addClass('hide');
         $('.th').removeClass('hide');
     }
 
-    // english active
+    //english active
     function engAcitive() {
         $('.lang-active').data('lang', 'en');
         $('.th').addClass('hide');
         $('.en').removeClass('hide');
     }
 
-    // memory of language
+    //memory of language
     function memoryLanguage() {
         if ($('.lang-active').data('lang') == 'th') {
             thaiAcitive();
         }
+
         if ($('.lang-active').data('lang') == 'en') {
             engAcitive();
         }
     }
 
+    /*
+    Auther  : Odd.Nopparat
+    Date    : 2015-06-20.
+    Perpose : เตือนข้อมูลไม่ครบ
+    Method  : myDialog.
+    */
+    function myDialog(
+        messageTH,
+        messageEN
+    ) {
+        if ($('.lang-active').data('lang') == 'th')
+            $('.message').html(messageTH);
 
-    /// <summary>
-    /// Auther : Odd.Nopparat
-    /// Date   : 2015-06-20.
-    /// Perpose: เตือนข้อมูลไม่ครบ
-    /// Method : myDialog.
-    /// </summary>
-    function myDialog(_message_th, _message_en) {
+        if ($('.lang-active').data('lang') == 'en')
+            $('.message').html(messageEN);
 
-        if ($('.lang-active').data('lang') == 'th') {
-            $('.message').html(_message_th);
-        }
-        if ($('.lang-active').data('lang') == 'en') {
-            $('.message').html(_message_en);
-        }
         $(".lblTitle").html("Warning message.");
-
         $(".lblTitle").removeClass("blue-text");
 
         if (!$(".lblTitle").hasClass("red-text"))
             $(".lblTitle").addClass("red-text");
 
-
         $('#modalMsg').openModal();
-
     }
 
-
-    function myDialogMsg(_message_th, _message_en) {
-
-        if ($('.lang-active').data('lang') == 'th') {
-            $('.message').html(_message_th);
-        }
-        if ($('.lang-active').data('lang') == 'en') {
-            $('.message').html(_message_en);
-        }
+    function myDialogMsg(
+        messageTH,
+        messageEN
+    ) {
+        if ($('.lang-active').data('lang') == 'th')
+            $('.message').html(messageTH);
+        
+        if ($('.lang-active').data('lang') == 'en')
+            $('.message').html(messageEN);
 
         $(".lblTitle").html("Message Box");
         $(".lblTitle").removeClass("red-text");
 
-        if (!$(".lblTitle").hasClass("blue-text")) {
+        if (!$(".lblTitle").hasClass("blue-text"))
             $(".lblTitle").addClass("blue-text");
-        }
-
-
 
         $('#modalMsg').openModal();
-
     }
 
-    function myDialogConsentMsg(_message_th, _message_en) {
+    function myDialogConsentMsg(
+        messageTH,
+        messageEN
+    ) {
+        if ($('.lang-active').data('lang') == 'th')
+            $('.message').html(messageTH);
 
-        if ($('.lang-active').data('lang') == 'th') {
-            $('.message').html(_message_th);
-        }
         if ($('.lang-active').data('lang') == 'en') {
-            $('.message').html(_message_en);
-        }
+            $('.message').html(messageEN);
 
         $(".lblTitle").html("Warning Message");
         $(".lblTitle").removeClass("red-text");
@@ -482,582 +489,886 @@
         $('#modalConsent').openModal();
     }
 
-    //function checkConsent() {
-    //    var _userType = $('#txtUserTypeActive').val();
-    //    if (_userType == "STUDENT") {
-    //        var _post = "&userType=" + _userType;
-    //        $.ajax({
-    //            type: "POST",
-    //            url: "ContractHandler.ashx",
-    //            data: "action=CheckConsent" + _post,
-    //            charset: 'tis-620',
-    //            beforeSend: function () {
-
-    //            },
-    //            error: function (err) {
-    //                alert(err);
-    //            },
-    //            success: function (data) {
-    //                //alert(data);
-    //                if (data == "false") {
-    //                    myDialogConsentMsg("<p style='font-size:20px'>ไม่สามารถดำเนินการได้ เนื่องจากยังไม่ได้ดำเนินการยินยอมให้ใช้ข้อมูลที่ระบบ e-Profile โปรดเข้าสู่ระบบ e-Profile เพื่อดำเนินการยินยอมให้ใช้ข้อมูล</p> <a href='https://smartedu.mahidol.ac.th/Authen/login.aspx'>คลิกที่นี่</a>", "<h3>Unable to perform Because the system has not yet consented to the use of information</h3> <a href='https://smartedu.mahidol.ac.th/Authen/login.aspx'>Click here</a>")
-    //                } else {
-    //                    $("#submit_frmContract").prop("disabled", false);
-    //                }
-    //            }
-    //        });
-    //    }
-    //}
-
+    /*
+    function checkConsent() {
+        var userType = $('#txtUserTypeActive').val();
+    
+        if (userType == "STUDENT") {
+            var post = ("&userType=" + userType);
+            
+            $.ajax({
+                type: "POST",
+                url: "ContractHandler.ashx",
+                data: ("action=CheckConsent" + post),
+                charset: 'tis-620',
+                beforeSend: function () {
+                },
+                error: function (err) {
+                    alert(err);
+                },
+                success: function (data) {
+                    alert(data);
+                    
+                    if (data == "false")
+                        myDialogConsentMsg("<p style='font-size:20px'>ไม่สามารถดำเนินการได้ เนื่องจากยังไม่ได้ดำเนินการยินยอมให้ใช้ข้อมูลที่ระบบ e-Profile โปรดเข้าสู่ระบบ e-Profile เพื่อดำเนินการยินยอมให้ใช้ข้อมูล</p> <a href='https://smartedu.mahidol.ac.th/Authen/login.aspx'>คลิกที่นี่</a>", "<h3>Unable to perform Because the system has not yet consented to the use of information</h3> <a href='https://smartedu.mahidol.ac.th/Authen/login.aspx'>Click here</a>");
+                    else
+                        $("#submit_frmContract").prop("disabled", false);
+                }
+            });
+        }
+    }
+    */
 
     function getParentStatusCondition() {
+        var married = $('input:radio[name=rdoMarried]:checked').val();
+        var fatherSts = $('input:radio[name=rdoFatherSts]:checked').val();
+        var motherSts = $('input:radio[name=rdoMotherSts]:checked').val();
+        var chkStay = $(".chkStay");
+        var stayFather = "0";
+        var stayMother = "0";
+        var stayOther = "0";
+        var contactLost = "0";
+        var arrSts = new Array();
+        var arrStay = new Array();
 
-        var _married = $('input:radio[name=rdoMarried]:checked').val();
-        var _fatherSts = $('input:radio[name=rdoFatherSts]:checked').val();
-        var _motherSts = $('input:radio[name=rdoMotherSts]:checked').val();
-        var _chkStay = $(".chkStay");
-        var _stayFather = "0";
-        var _stayMother = "0";
-        var _stayOther = "0";
-        var _contactLost = "0";
+        if (typeof (married) == "undefined")
+            married = null;
 
-        var _arrSts = new Array();
-        var _arrStay = new Array();
+        if (typeof (fatherSts) == "undefined")
+            fatherSts = null;
 
+        if (typeof (motherSts) == "undefined")
+            motherSts = null;
 
-        if (typeof (_married) == "undefined")
-            _married = null;
-        if (typeof (_fatherSts) == "undefined")
-            _fatherSts = null;
-        if (typeof (_motherSts) == "undefined")
-            _motherSts = null;
-
-
-
-        _arrSts.push({
-            married: _married
-            , fatherSts: _fatherSts
-            , motherSts: _motherSts
-
+        arrSts.push({
+            married: married,
+            fatherSts: fatherSts,
+            motherSts: motherSts
         });
 
-        //if (_chkStay[0].checked)
-        //    _stayFather = "1";
+        /*
+        if (chkStay[0].checked)
+            stayFather = "1";
 
-        //if (_chkStay[1].checked)
-        //    _stayMother = "1";
+        if (chkStay[1].checked)
+            stayMother = "1";
 
-        //if (_chkStay[2].checked)
-        //    _stayOther = "1";
+        if (chkStay[2].checked)
+            stayOther = "1";
 
-        //if (_chkStay[3].checked) {
-        //    _contactLost = "1";
-        //    //alert("AAAAA");
-        //}
-
-        if (_chkStay[0]) {
-            _contactLost = "1";
+        if (chkStay[3].checked) {
+            contactLost = "1";
+            //alert("AAAAA");
         }
+        */
 
-        _arrStay.push({
-            father: null
-            , mother: null
-            , other: null
-            , contactLost: _contactLost
+        if (chkStay[0])
+            contactLost = "1";
+
+        arrStay.push({
+            father: null,
+            mother: null,
+            other: null,
+            contactLost: contactLost
         });
 
+        //alert(JSON.stringify(arrSts));
+        //alert(JSON.stringify(arrStay));
 
-        //alert(JSON.stringify(_arrSts));
-        //alert(JSON.stringify(_arrStay));
+        var arrData = new Array();
 
-        var _arrData = new Array();
-        _arrData.push({
-            arrSts: _arrSts
-            , arrStay: _arrStay
+        arrData.push({
+            arrSts: arrSts,
+            arrStay: arrStay
 
         });
 
-
-        return _arrData;
-
+        return arrData;
     }
 
-
     function showTextWarrant() {
-
         $(".panelContactLost").hide();
         $(".panelContactTolaw").hide();
-        var _arrData = getParentStatusCondition();
-        var _arrSts = _arrData[0].arrSts[0];
-        var _arrStay = _arrData[0].arrStay[0];
-        var _married = _arrSts.married;
-        var _fatherSts = _arrSts.fatherSts;
-        var _motherSts = _arrSts.motherSts;
-        //var _stayFather = _arrStay.father;
-        //var _stayMother = _arrStay.mother;
-        //var _stayOther = _arrStay.other;
+
+        var arrData = getParentStatusCondition();
+        var arrSts = arrData[0].arrSts[0];
+        var arrStay = arrData[0].arrStay[0];
+        var married = arrSts.married;
+        var fatherSts = arrSts.fatherSts;
+        var motherSts = arrSts.motherSts;
+        //var stayFather = arrStay.father;
+        //var stayMother = arrStay.mother;
+        //var stayOther = arrStay.other;
 
         //Check Alredy Choose Status Father And Mother
-        if (_fatherSts == null || _motherSts == null) {
+        if (fatherSts == null ||
+            motherSts == null)
             return
-        }
+
+        /*
         //if Uncheck All Stay With Then Reset Warrant
-        //if (_stayFather == "0" && _stayMother == "0" && _stayOther == "0") {
-        //    resetWarrant();
-        //    return;
-        //}
+        if (stayFather == "0" &&
+            stayMother == "0" &&
+            stayOther == "0") {
+            resetWarrant();
+            
+            return;
+        }
+        */
 
-        //var _warrantBy = "ohter";
-        //var _guaranteeBy = "other";
+        //var warrantBy = "ohter";
+        //var guaranteeBy = "other";
+        var chkStay = $(".chkStay");
+        var warrantBy = "";
+        var guaranteeBy = "";
+        var gVal = "";
 
-        var _chkStay = $(".chkStay");
-
-        var _warrantBy = "";
-        var _guaranteeBy = "";
-
-
-
-
-        var _gVal = "";
-
-        if (_married == "1") {//จดทะเบียน
-
-            if (_fatherSts == "1" && _motherSts == "1") {//พ่อและแม่ มีชีวิต และอาศัยอยู่ด้วยกัน
-                /*            if ((_fatherSts == "1" && _motherSts == "1") && (_stayFather == "1" && _stayMother == "1")) {//พ่อและแม่ มีชีวิต และอาศัยอยู่ด้วยกัน*/
-                _warrantBy = "mother_father";
-                _guaranteeBy = "mother_father";
-                _gVal = "F"; //set default เป็น แม่ค้ำ พ่อยินยอม
+        //จดทะเบียน
+        if (married == "1") {
+            //พ่อและแม่ มีชีวิต และอาศัยอยู่ด้วยกัน
+            if (fatherSts == "1" &&
+                motherSts == "1") {
+                /*
+                //พ่อและแม่ มีชีวิต และอาศัยอยู่ด้วยกัน
+                if ((fatherSts == "1" && motherSts == "1") &&
+                    (stayFather == "1" && stayMother == "1")) {
+                */
+                warrantBy = "mother_father";
+                guaranteeBy = "mother_father";
+                gVal = "F"; // set default เป็น แม่ค้ำ พ่อยินยอม
 
                 $(".panelContactLost").show();
-                //} else if ((_fatherSts == "1" && _motherSts == "1") && (_stayFather == "1" && _stayMother != "1")) {//พ่อและแม่ มีชีวิต และอาศัยอยู่กับพ่อ
-                //    _warrantBy = "father";
-                //    _guaranteeBy = "mother";
-                //    _gVal = "M";
-                //    $(".panelContactLost").show();
-                //} else if ((_fatherSts == "1" && _motherSts == "1") && (_stayFather != "1" && _stayMother == "1")) {//พ่อและแม่ มีชีวิต และอาศัยอยู่กับแม่
-                //    _warrantBy = "mother";
-                //    _guaranteeBy = "father";
-                //    _gVal = "F";
-                //    $(".panelContactLost").show();
-            } else if (_fatherSts == "1" && _motherSts != "1") {//พ่อมีชีวิต แม่ตาย
-                /*            } else if ((_fatherSts == "1" && _motherSts != "1") && (_stayFather == "1")) {//พ่อมีชีวิต แม่ตาย*/
-                _warrantBy = "father";
-                _guaranteeBy = "";
-                _gVal = "F";
-                $(".panelContactLost").show();
-            } else if (_fatherSts != "1" && _motherSts == "1") {//แม่มีชีวิต พ่อตาย
-                /*            } else if ((_fatherSts != "1" && _motherSts == "1") && (_stayMother == "1")) {//แม่มีชีวิต พ่อตาย*/
-                _warrantBy = "mother";
-                _guaranteeBy = "";
-                _gVal = "M";
-                $(".panelContactLost").show();
-            } else if (_fatherSts != "1" && _motherSts != "1") {
-                _warrantBy = "other";
-                _guaranteeBy = "ohter";
-                _gVal = "N";
-                $(".panelContactTolaw").show();
+                /*
+                }
+
+                //พ่อและแม่ มีชีวิต และอาศัยอยู่กับพ่อ
+                if ((fatherSts == "1" && motherSts == "1") &&
+                    (stayFather == "1" && stayMother != "1")) {
+                    warrantBy = "father";
+                    guaranteeBy = "mother";
+                    gVal = "M";
+
+                    $(".panelContactLost").show();
+                }
+                        
+                //พ่อและแม่ มีชีวิต และอาศัยอยู่กับแม่
+                if ((fatherSts == "1" && motherSts == "1") &&
+                    (stayFather != "1" && stayMother == "1")) {
+                    warrantBy = "mother";
+                    guaranteeBy = "father";
+                    gVal = "F";
+                    
+                    $(".panelContactLost").show();
+                }
+                */
             }
-            //} else if (_stayOther == "1") {
-            //    _warrantBy = "other";
-            //    _guaranteeBy = "ohter";
-            //    _gVal = "N";
-            //    $(".panelContactTolaw").show();
-            //}
-            //ไม่ต้องตรวจสอบเงื่อนไข อาศัยอยู่กับ
+            else {
+                //พ่อมีชีวิต แม่ตาย
+                if (fatherSts == "1" &&
+                    motherSts != "1") {
+                    /*
+                    //พ่อมีชีวิต แม่ตาย
+                    if ((fatherSts == "1" && motherSts != "1") &&
+                        (stayFather == "1")) {
+                    */
+                    warrantBy = "father";
+                    guaranteeBy = "";
+                    gVal = "F";
 
-            //ห้าม check สถานะติดต่อ
-            //_chkStay[3].checked = false;
+                    $(".panelContactLost").show();
+                }
+                else {
+                    //แม่มีชีวิต พ่อตาย
+                    if (fatherSts != "1" &&
+                        motherSts == "1") {
+                        /*
+                        //แม่มีชีวิต พ่อตาย
+                        if ((fatherSts != "1" && motherSts == "1") &&
+                            (stayMother == "1")) {
+                        */
+                        warrantBy = "mother";
+                        guaranteeBy = "";
+                        gVal = "M";
 
+                        $(".panelContactLost").show();
+                    }
+                    else {
+                        if (fatherSts != "1" &&
+                            motherSts != "1") {
+                            warrantBy = "other";
+                            guaranteeBy = "ohter";
+                            gVal = "N";
 
+                            $(".panelContactTolaw").show();
+                        }
+                        /*
+                        else {
+                            //ไม่ต้องตรวจสอบเงื่อนไข อาศัยอยู่กับ
+                            if (stayOther == "1") {
+                                warrantBy = "other";
+                                guaranteeBy = "ohter";
+                                gVal = "N";
+
+                                $(".panelContactTolaw").show();
+                            }
+                        }
+
+                        //ห้าม check สถานะติดต่อ
+                        //_chkStay[3].checked = false;
+                        */
+                    }
+                }
+            }
         }
 
-        if (_married == "2") {//ไม่จดทะเบียน
+        //ไม่จดทะเบียน
+        if (married == "2") {
             //alert(_married);
-            if (_fatherSts == "1" && _motherSts == "1") {//พ่อและแม่ มีชีวิต และอาศัยอยู่ด้วยกัน
-                /*            if ((_fatherSts == "1" && _motherSts == "1") && (_stayFather == "1" && _stayMother == "1")) {//พ่อและแม่ มีชีวิต และอาศัยอยู่ด้วยกัน*/
-                //alert("พ่อและแม่ มีชีวิต และอาศัยอยู่ด้วยกัน");
-                _warrantBy = "mother";
-                _guaranteeBy = "";
-                _gVal = "M";
-                $(".panelContactLost").show();
-                //} else if ((_fatherSts == "1" && _motherSts == "1") && (_stayFather != "1" && _stayMother == "1")) {//พ่อและแม่ มีชีวิต และอาศัยอยู่กับแม่
-                //    //alert("พ่อและแม่ มีชีวิต และอาศัยอยู่กับแม่");
-                //    _warrantBy = "mother";
-                //    _guaranteeBy = "";
-                //    _gVal = "M";
-                //    $(".panelContactLost").show();
-                //} else if ((_fatherSts == "1" && _motherSts == "1") && (_stayFather == "1" && _stayMother != "1")) {//พ่อและแม่ มีชีวิต และอาศัยอยู่กับพ่อ
-                //    //alert("พ่อและแม่ มีชีวิต และอาศัยอยู่กับพ่อ");
-                //    _warrantBy = "father";
-                //    _guaranteeBy = "";
-                //    _gVal = "-"; // 2020/12/14 ปรับจากค่าว่างเป็น "-" anussara.wan
-                //    $(".panelContactTolaw").show();
-            } else if (_fatherSts == "1" && _motherSts != "1") {//พ่อมีชีวิต แม่ตาย
-                /*            } else if ((_fatherSts == "1" && _motherSts != "1") && (_stayFather == "1" && _stayMother != "1")) {//พ่อมีชีวิต แม่ตาย และอาศัยอยู่กับพ่อ*/
-                //alert("พ่อมีชีวิต แม่ตาย และอาศัยอยู่กับพ่อ");
-                //_warrantBy = "father";
-                //_guaranteeBy = "";
-                //_gVal = "-"; // 2020/12/14 ปรับจากค่าว่างเป็น "-" anussara.wan
-                _warrantBy = "other";
-                _guaranteeBy = "";
-                _gVal = "-"; // 2020/12/14 ปรับจากค่าว่างเป็น "-" anussara.wan
-                $(".panelContactTolaw").show();
-            } else if (_fatherSts != "1" && _motherSts == "1") {//แม่มีชีวิต พ่อตาย
-                /*            } else if ((_fatherSts != "1" && _motherSts == "1") && (_stayFather != "1" && _stayMother == "1")) {//แม่มีชีวิต พ่อตาย และอาศัยอยู่กับแม่*/
-                //alert("แม่มีชีวิต พ่อตาย และอาศัยอยู่กับแม่");
-                _warrantBy = "mother";
-                _guaranteeBy = "";
-                _gVal = "M";
-                $(".panelContactLost").show();
-            } else if (_fatherSts != "1" && _motherSts != "1") { //พ่อและแม่ตาย อาศัยอบู่กับบุคคลอื่น
-                //alert("before last");
-                _warrantBy = "other";
-                _guaranteeBy = "other";
-                _gVal = "N";
-                $(".panelContactTolaw").show();
-            }
+            //พ่อและแม่ มีชีวิต
+            if (fatherSts == "1" &&
+                motherSts == "1") {
+                /*
+                //พ่อและแม่ มีชีวิต และอาศัยอยู่ด้วยกัน
+                if ((fatherSts == "1" && motherSts == "1") &&
+                    (stayFather == "1" && stayMother == "1")) {
+                */
+                // alert("พ่อและแม่ มีชีวิต และอาศัยอยู่ด้วยกัน");
+                warrantBy = "mother";
+                guaranteeBy = "";
+                gVal = "M";
 
+                $(".panelContactLost").show();
+                /*
+                }
+                else {
+                    //พ่อและแม่ มีชีวิต และอาศัยอยู่กับแม่
+                    if ((fatherSts == "1" && motherSts == "1") &&
+                        (stayFather != "1" && stayMother == "1")) {
+                        // alert("พ่อและแม่ มีชีวิต และอาศัยอยู่กับแม่");
+                        warrantBy = "mother";
+                        guaranteeBy = "";
+                        gVal = "M";
+
+                        $(".panelContactLost").show();
+                    }
+                    else {
+                        //พ่อและแม่ มีชีวิต และอาศัยอยู่กับพ่อ
+                        if ((fatherSts == "1" && motherSts == "1") &&
+                            (stayFather == "1" && stayMother != "1")) {
+                            // alert("พ่อและแม่ มีชีวิต และอาศัยอยู่กับพ่อ");
+                            warrantBy = "father";
+                            guaranteeBy = "";
+                            gVal = "-"; // 2020/12/14 ปรับจากค่าว่างเป็น "-" anussara.wan
+                            
+                            $(".panelContactTolaw").show();
+                        }
+                    }
+                }
+                */
+            }
+            else {
+                //พ่อมีชีวิต แม่ตาย
+                if (fatherSts == "1" &&
+                    motherSts != "1") {
+                /*
+                }
+                else {
+                    //พ่อมีชีวิต แม่ตาย และอาศัยอยู่กับพ่อ
+                    if ((fatherSts == "1" && motherSts != "1") &&
+                        (stayFather == "1" && stayMother != "1")) {
+                        alert("พ่อมีชีวิต แม่ตาย และอาศัยอยู่กับพ่อ");
+                        warrantBy = "father";
+                        guaranteeBy = "";
+                        gVal = "-"; //2020/12/14 ปรับจากค่าว่างเป็น "-" anussara.wan
+                    }
+                */
+                    warrantBy = "other";
+                    guaranteeBy = "";
+                    gVal = "-"; //2020/12/14 ปรับจากค่าว่างเป็น "-" anussara.wan
+                    $(".panelContactTolaw").show();
+                }
+                else {
+                    //แม่มีชีวิต พ่อตาย
+                    if (fatherSts != "1" &&
+                        motherSts == "1") {
+                    /*            
+                    }
+                    else {
+                        //แม่มีชีวิต พ่อตาย และอาศัยอยู่กับแม่
+                        if ((fatherSts != "1" && motherSts == "1") &&
+                            (stayFather != "1" && stayMother == "1")) {
+                            alert("แม่มีชีวิต พ่อตาย และอาศัยอยู่กับแม่");
+                        }
+                    */
+                        warrantBy = "mother";
+                        guaranteeBy = "";
+                        gVal = "M";
+
+                        $(".panelContactLost").show();
+                    }
+                    else {
+                        //พ่อและแม่ตาย อาศัยอบู่กับบุคคลอื่น
+                        if (fatherSts != "1" &&
+                            motherSts != "1") { 
+                            //alert("before last");
+                            warrantBy = "other";
+                            guaranteeBy = "other";
+                            gVal = "N";
+
+                            $(".panelContactTolaw").show();
+                        }
+                    }
+                }
+            }
         }
 
-        if (_married == "3") {//หย่าร้าง 
+        //หย่าร้าง 
+        if (married == "3") {
             //alert("หย่าร้าง");
-            if (_fatherSts == "1" && _motherSts == "1") {//พ่อและแม่ มีชีวิต 
-                /*            if ((_fatherSts == "1" && _motherSts == "1") && (_stayFather == "1" && _stayMother == "1")) {//พ่อและแม่ มีชีวิต อาศัยอยู่ด้วยกัน*/
+            //พ่อและแม่ มีชีวิต 
+            if (fatherSts == "1" &&
+                motherSts == "1") {
+                /*
+                //พ่อและแม่ มีชีวิต อาศัยอยู่ด้วยกัน
+                if ((fatherSts == "1" && motherSts == "1") &&
+                    (stayFather == "1" && stayMother == "1")) {
+                */
+                warrantBy = "mother_father";
+                guaranteeBy = "mother_father";
+                gVal = "M";
 
-                _warrantBy = "mother_father";
-                _guaranteeBy = "mother_father";
-                _gVal = "M";
                 $(".panelContactLost").show();
-                //} else if ((_fatherSts == "1" && _motherSts == "1") && (_stayFather == "1" && _stayMother != "1")) {//พ่อและแม่ มีชีวิต อาศัยอยู่กับพ่อ
-                //    _warrantBy = "father";
-                //    _guaranteeBy = "";
-                //    _gVal = "F";
-                //    $(".panelContactLost").show();
-                //} else if ((_fatherSts == "1" && _motherSts == "1") && (_stayFather != "1" && _stayMother == "1")) {//พ่อและแม่ มีชีวิต อาศัยอยู่กับแม่
-                //    _warrantBy = "mother";
-                //    _guaranteeBy = "";
-                //    _gVal = "M";
-                //    $(".panelContactLost").show();
-            } else if (_fatherSts == "1" && _motherSts != "1") {//พ่อมีชีวิต แม่ตาย 
-                /*            } else if (_fatherSts == "1" && _motherSts != "1" && (_stayFather == "1" && _stayMother != "1")) {//พ่อมีชีวิต แม่ตาย อาศัยอยู่กับพ่อ*/
-                _warrantBy = "father";
-                _guaranteeBy = "";
-                _gVal = "F";
-                $(".panelContactLost").show();
-            } else if (_fatherSts != "1" && _motherSts == "1") {//แม่มีชีวิต พ่อตาย 
-                /*            } else if ((_fatherSts != "1" && _motherSts == "1") && (_stayFather != "1" && _stayMother == "1")) {//แม่มีชีวิต พ่อตาย อาศัยอยู่กับแม่*/
-                _warrantBy = "mother";
-                _guaranteeBy = "";
-                _gVal = "M";
-                $(".panelContactLost").show();
-            } else {
-                _warrantBy = "other";
-                _guaranteeBy = "ohter";
-                _gVal = "N";
-                $(".panelContactTolaw").show();
+                /*
+                } else
+                    //พ่อและแม่ มีชีวิต อาศัยอยู่กับพ่อ
+                    if ((fatherSts == "1" && motherSts == "1") &&
+                        (stayFather == "1" && stayMother != "1")) {
+                        warrantBy = "father";
+                        guaranteeBy = "";
+                        gVal = "F";
+
+                        $(".panelContactLost").show();
+                    } else
+                        //พ่อและแม่ มีชีวิต อาศัยอยู่กับแม่
+                        if ((fatherSts == "1" && motherSts == "1") &&
+                            (stayFather != "1" && stayMother == "1")) {
+                            warrantBy = "mother";
+                            guaranteeBy = "";
+                            gVal = "M";
+                
+                            $(".panelContactLost").show();
+                */
             }
+            else {
+                //พ่อมีชีวิต แม่ตาย 
+                if (fatherSts == "1" &&
+                    motherSts != "1") {
+                    /*
+                    } else
+                        //พ่อมีชีวิต แม่ตาย อาศัยอยู่กับพ่อ
+                        if (fatherSts == "1" &&
+                            motherSts != "1" &&
+                            (stayFather == "1" && stayMother != "1")) {
+                    */
+                    warrantBy = "father";
+                    guaranteeBy = "";
+                    gVal = "F";
 
+                    $(".panelContactLost").show();
+                }
+                else {
+                    //แม่มีชีวิต พ่อตาย 
+                    if (fatherSts != "1" &&
+                        motherSts == "1") {
+                        /*
+                        } else
+                            //แม่มีชีวิต พ่อตาย อาศัยอยู่กับแม่
+                            if ((fatherSts != "1" && motherSts == "1") &&
+                                (stayFather != "1" && stayMother == "1")) {
+                        */
+                        warrantBy = "mother";
+                        guaranteeBy = "";
+                        gVal = "M";
+
+                        $(".panelContactLost").show();
+                    }
+                    else {
+                        warrantBy = "other";
+                        guaranteeBy = "ohter";
+                        gVal = "N";
+
+                        $(".panelContactTolaw").show();
+                    }
+                }
+            }
         }
-        if (_married == "4") {//แยกกันอยู่ 
+
+        //แยกกันอยู่ 
+        if (married == "4") {
             //alert("แยกกันอยู่");
-            if (_fatherSts == "1" && _motherSts == "1") {//พ่อและแม่ มีชีวิต 
-                /*            if ((_fatherSts == "1" && _motherSts == "1") && (_stayFather == "1" && _stayMother == "1")) {//พ่อและแม่ มีชีวิต อาศัยอยู่ด้วยกัน*/
-                _warrantBy = "mother_father";
-                _guaranteeBy = "mother_father";
-                _gVal = "M";
+            //พ่อและแม่ มีชีวิต 
+            if (fatherSts == "1" &&
+                motherSts == "1") {
+                /*
+                //พ่อและแม่ มีชีวิต อาศัยอยู่ด้วยกัน
+                if ((fatherSts == "1" && motherSts == "1") &&
+                    (stayFather == "1" && stayMother == "1")) {
+                */
+                warrantBy = "mother_father";
+                guaranteeBy = "mother_father";
+                gVal = "M";
+
                 $(".panelContactLost").show();
-                //} else if ((_fatherSts == "1" && _motherSts == "1") && (_stayFather == "1" && _stayMother != "1")) {//พ่อและแม่ มีชีวิต อาศัยอยู่กับพ่อ
-                //    _warrantBy = "father";
-                //    _guaranteeBy = "mother";
-                //    _gVal = "F";
-                //    $(".panelContactLost").show();
-                //} else if ((_fatherSts == "1" && _motherSts == "1") && (_stayFather != "1" && _stayMother == "1")) {//พ่อและแม่ มีชีวิต อาศัยอยู่กับแม่
-                //    _warrantBy = "mother";
-                //    _guaranteeBy = "father";
-                //    _gVal = "M";
-                //    $(".panelContactLost").show();
-            } else {
-                _warrantBy = "other";
-                _guaranteeBy = "ohter";
-                _gVal = "N";
-                $(".panelContactTolaw").show();
+                /*
+                }
+                else {
+                    //พ่อและแม่ มีชีวิต อาศัยอยู่กับพ่อ
+                    if ((fatherSts == "1" && motherSts == "1") &&
+                        (stayFather == "1" && stayMother != "1")) {
+                        warrantBy = "father";
+                        guaranteeBy = "mother";
+                        gVal = "F";
+
+                        $(".panelContactLost").show();
+                    }
+                    else {
+                        //พ่อและแม่ มีชีวิต อาศัยอยู่กับแม่
+                        if ((fatherSts == "1" && motherSts == "1") &&
+                            (stayFather != "1" && stayMother == "1")) {
+                            warrantBy = "mother";
+                            guaranteeBy = "father";
+                            gVal = "M";
+
+                            $(".panelContactLost").show();
+                        }
+                    }
+                }
+                */
             }
+            else {
+                warrantBy = "other";
+                guaranteeBy = "ohter";
+                gVal = "N";
 
-
-
-        }
-        if (_married == "5") {//หม้าย 
-            if (_fatherSts == "1" && _motherSts != "1") {//พ่อมีชีวิต แม่ตาย
-                /*            if ((_fatherSts == "1" && _motherSts != "1") && (_stayFather == "1" && _stayMother != "1")) {//พ่อมีชีวิต แม่ตาย และอาศัยอยู่กับพ่อ*/
-                _warrantBy = "father";
-                _guaranteeBy = "";
-                _gVal = "F";
-                $(".panelContactLost").show();
-            } else if (_fatherSts != "1" && _motherSts == "1") {//แม่มีชีวิต พ่อตาย 
-                /*            } else if (_fatherSts != "1" && _motherSts == "1" && (_stayFather != "1" && _stayMother == "1")) {//แม่มีชีวิต พ่อตาย และอาศัยอยู่กับแม่*/
-                _warrantBy = "mother";
-                _guaranteeBy = "";
-                _gVal = "M";
-                $(".panelContactLost").show();
-            }
-            //} else if (_stayFather != "1" && _stayMother != "1") { //อาศัยอยู่กับบุคคลอื่น
-            //    _warrantBy = "other";
-            //    _guaranteeBy = "ohter";
-            //    _gVal = "N";
-            //    $(".panelContactTolaw").show();
-            //}
-        }
-        if (_married == "6") {//โสด 
-            if (_fatherSts == "1" && _motherSts == "1") {//พ่อและแม่ มีชีวิต อาศัยอยู่ด้วยกัน
-                /*            if ((_fatherSts == "1" && _motherSts == "1") && (_stayFather == "1" && _stayMother == "1")) {//พ่อและแม่ มีชีวิต อาศัยอยู่ด้วยกัน*/
-
-                _warrantBy = "mother";
-                _guaranteeBy = "";
-                _gVal = "M";
-                //_warrantBy = "mother_father";
-                //_guaranteeBy = "mother_father";
-                //_gVal = "M";
-                $(".panelContactLost").show();
-                //} else if ((_fatherSts == "1" && _motherSts == "1") && (_stayFather == "1" && _stayMother != "1")) {//พ่อและแม่ มีชีวิต อาศัยอยู่กับพ่อ
-                //    _warrantBy = "father";
-                //    _guaranteeBy = "";
-                //    _gVal = "-"; // 2020/12/14 ปรับจากค่าว่างเป็น "-" anussara.wan
-                //    $(".panelContactTolaw").show();
-                //} else if ((_fatherSts == "1" && _motherSts == "1") && (_stayFather != "1" && _stayMother == "1")) {//พ่อและแม่ มีชีวิต อาศัยอยู่กับแม่
-                //    _warrantBy = "mother";
-                //    _guaranteeBy = "";
-                //    _gVal = "M";
-                //    $(".panelContactLost").show();
-            } else if (_fatherSts == "1" && _motherSts != "1") {//พ่อมีชีวิต แม่ตาย 
-                /*            } else if (_fatherSts == "1" && _motherSts != "1" && (_stayFather == "1" && _stayMother != "1")) {//พ่อมีชีวิต แม่ตาย อาศัยอยู่กับพ่อ*/
-                _warrantBy = "father";
-                _guaranteeBy = "";
-                _gVal = "-"; // 2020/12/14 ปรับจากค่าว่างเป็น "-" anussara.wan
-                $(".panelContactTolaw").show();
-            } else if (_fatherSts != "1" && _motherSts == "1") {//แม่มีชีวิต พ่อตาย 
-                /*            } else if ((_fatherSts != "1" && _motherSts == "1") && (_stayFather != "1" && _stayMother == "1")) {//แม่มีชีวิต พ่อตาย อาศัยอยู่กับแม่*/
-                _warrantBy = "mother";
-                _guaranteeBy = "";
-                _gVal = "M";
-                $(".panelContactLost").show();
-            } else {
-                _warrantBy = "other";
-                _guaranteeBy = "ohter";
-                _gVal = "N";
                 $(".panelContactTolaw").show();
             }
         }
 
-        var beforeCheckedStayLostWarrant = _warrantBy;
-        var beforeCheckedStayLostGuarantee = _guaranteeBy;
-        var beforeCheckedStayLostGVal = _gVal;
+        //หม้าย 
+        if (married == "5") {
+            //พ่อมีชีวิต แม่ตาย
+            if (fatherSts == "1" &&
+                motherSts != "1") {
+                /*
+                //พ่อมีชีวิต แม่ตาย และอาศัยอยู่กับพ่อ
+                if ((fatherSts == "1" && motherSts != "1") &&
+                    (stayFather == "1" && stayMother != "1")) {
+                */
+                warrantBy = "father";
+                guaranteeBy = "";
+                gVal = "F";
 
-        //Start Event Check/Uncheck ไม่สามารถติดต่อผู้ค้ำประกันได้
+                $(".panelContactLost").show();
+            }
+            else {
+                //แม่มีชีวิต พ่อตาย 
+                if (fatherSts != "1" &&
+                    motherSts == "1") {
+                /*
+                } else
+                    //แม่มีชีวิต พ่อตาย และอาศัยอยู่กับแม่
+                    if (fatherSts != "1" &&
+                        motherSts == "1" &&
+                        (stayFather != "1" && _stayMother == "1")) {
+                */
+                    warrantBy = "mother";
+                    guaranteeBy = "";
+                    gVal = "M";
+
+                    $(".panelContactLost").show();
+                }
+                /*
+                } else
+                    //อาศัยอยู่กับบุคคลอื่น
+                    if (stayFather != "1" &&
+                        stayMother != "1") { 
+                        _warrantBy = "other";
+                        guaranteeBy = "ohter";
+                        gVal = "N";
+                        $(".panelContactTolaw").show();
+                    }
+                */
+            }
+        }
+
+        //โสด
+        if (married == "6") {
+            //พ่อและแม่ มีชีวิต อาศัยอยู่ด้วยกัน
+            if (fatherSts == "1" &&
+                motherSts == "1") {
+                /*
+                //พ่อและแม่ มีชีวิต อาศัยอยู่ด้วยกัน
+                if ((fatherSts == "1" && motherSts == "1") &&
+                    (stayFather == "1" && stayMother == "1")) {
+                */
+                warrantBy = "mother";
+                guaranteeBy = "";
+                gVal = "M";
+                //warrantBy = "mother_father";
+                //guaranteeBy = "mother_father";
+                //gVal = "M";
+                $(".panelContactLost").show();
+                /*
+                }
+                else {
+                    //พ่อและแม่ มีชีวิต อาศัยอยู่กับพ่อ
+                    if ((fatherSts == "1" && motherSts == "1") &&
+                        (stayFather == "1" && stayMother != "1")) {
+                        warrantBy = "father";
+                        guaranteeBy = "";
+                        gVal = "-"; // 2020/12/14 ปรับจากค่าว่างเป็น "-" anussara.wan
+
+                        $(".panelContactTolaw").show();
+                    }
+                    else {
+                        //พ่อและแม่ มีชีวิต อาศัยอยู่กับแม่
+                        if ((fatherSts == "1" && motherSts == "1") &&
+                            (stayFather != "1" && stayMother == "1")) {
+                            warrantBy = "mother";
+                            guaranteeBy = "";
+                            gVal = "M";
+
+                            $(".panelContactLost").show();
+                        }
+                    }
+                }
+                */
+            }
+            else {
+                //พ่อมีชีวิต แม่ตาย
+                if (fatherSts == "1" &&
+                    motherSts != "1") {
+                /*
+                }
+                else {
+                    //พ่อมีชีวิต แม่ตาย อาศัยอยู่กับพ่อ
+                    if (fatherSts == "1" &&
+                        motherSts != "1" &&
+                        (stayFather == "1" && stayMother != "1")) {
+                */
+                    warrantBy = "father";
+                    guaranteeBy = "";
+                    gVal = "-"; //2020/12/14 ปรับจากค่าว่างเป็น "-" anussara.wan
+
+                    $(".panelContactTolaw").show();
+                }
+                else {
+                    //แม่มีชีวิต พ่อตาย 
+                    if (fatherSts != "1" &&
+                        motherSts == "1") {
+                    /*
+                    } else
+                        //แม่มีชีวิต พ่อตาย อาศัยอยู่กับแม่
+                        if ((fatherSts != "1" && motherSts == "1") &&
+                            (stayFather != "1" && stayMother == "1")) {
+                    */
+                        warrantBy = "mother";
+                        guaranteeBy = "";
+                        gVal = "M";
+
+                        $(".panelContactLost").show();
+                    }
+                    else {
+                        warrantBy = "other";
+                        guaranteeBy = "ohter";
+                        gVal = "N";
+
+                        $(".panelContactTolaw").show();
+                    }
+                }
+            }
+        }
+
+        var beforeCheckedStayLostWarrant = warrantBy;
+        var beforeCheckedStayLostGuarantee = guaranteeBy;
+        var beforeCheckedStayLostGVal = gVal;
+
+        //start event check/uncheck ไม่สามารถติดต่อผู้ค้ำประกันได้
         $("#chkStayLost").click(function () {
             if ($(this).is(':checked')) {
                 $('chkStayLost').prop('checked', true);
                 //alert("checked");
-                _warrantBy = "other";
-                _guaranteeBy = "ohter";
-                _gVal = "N";
+                warrantBy = "other";
+                guaranteeBy = "ohter";
+                gVal = "N";
 
-                UISPWarrant(_warrantBy);
+                uiSPWarrant(warrantBy);
 
-                var _htmlG = "<p>บุคคลอื่น</p>";
+                var htmlG = "<p>บุคคลอื่น</p>";
+
                 $('.spConsent').html(_htmlG);
-
                 $('#txtConsentBy').val(_gVal);
                 $(".panelContactTolaw").show();
-            } else {
+            }
+            else {
                 $('chkStayLost').prop('checked', false);
                 //alert("unchecked");
-                _warrantBy = beforeCheckedStayLostWarrant;
-                _guaranteeBy = beforeCheckedStayLostGuarantee;
-                _gVal = beforeCheckedStayLostGVal;
+                warrantBy = beforeCheckedStayLostWarrant;
+                guaranteeBy = beforeCheckedStayLostGuarantee;
+                gVal = beforeCheckedStayLostGVal;
 
+                uiSPWarrant(warrantBy);
 
-                UISPWarrant(_warrantBy);
-                var _htmlG = "";
-                if (_guaranteeBy == "mother_father") {
-                    if (_married == "3") {
-                        _htmlG = "<p>มารดา</p>";
-                    } else {
-                        _htmlG = "<p>บิดา</p>";
+                var htmlG = "";
+
+                if (guaranteeBy == "mother_father") {
+                    if (married == "3") {
+                        htmlG = "<p>มารดา</p>";
                     }
-                    // script when select father or mother After Event Click chkStayLost
+                    else {
+                        htmlG = "<p>บิดา</p>";
+                    }
+
+                    //script when select father or mother after event click chkStayLost
                     $(".rdoWarrant").click(function () {
-                        var _warVal = $(this).val();
-                        var _guaTxt = "";
-                        var _gVal2 = "";
-                        /*                        alert("Click : " + _warVal);*/
-                        //Check Status For Father
-                        if (_warVal == "F" && (_married == "1" || _married == "2")) {
+                        var warVal = $(this).val();
+                        var guaTxt = "";
+                        var gVal2 = "";
 
-                            _guaTxt = "<p>มารดา</p>";
-                            _gVal2 = "M";
-
-                        } else if (_warVal == "F" && _married != "1" && _married != "2" && _married != "4") {//หย่าร้าง เลือกพ่อเป็นผู้ค้ำ
-                            _guaTxt = "<p>บิดา</p>";
-                            _gVal2 = "F";
-                        } else if (_warVal == "F" && _married == "4") {//แยกกันอยู่ เลือกพ่อเป็นคนค้ำ
-                            _guaTxt = "<p>มารดา</p>";
-                            _gVal2 = "M";
+                        //alert("Click : " + _warVal);
+                        //check status for father
+                        if (warVal == "F" &&
+                            (married == "1" || married == "2")) {
+                            guaTxt = "<p>มารดา</p>";
+                            gVal2 = "M";
+                        }
+                        else {
+                            //หย่าร้าง เลือกพ่อเป็นผู้ค้ำ
+                            if (warVal == "F" &&
+                                married != "1" &&
+                                married != "2" &&
+                                married != "4") {
+                                guaTxt = "<p>บิดา</p>";
+                                gVal2 = "F";
+                            }
+                            else {
+                                //แยกกันอยู่ เลือกพ่อเป็นคนค้ำ
+                                if (warVal == "F" &&
+                                    married == "4") {
+                                    guaTxt = "<p>มารดา</p>";
+                                    gVal2 = "M";
+                                }
+                            }
                         }
 
-                        //Check Status For Mother
-                        if (_warVal == "M" && (_married == "1" || _married == "2")) {
-
-                            _guaTxt = "<p>บิดา</p>";
-                            _gVal2 = "F";
-                        } else if (_warVal == "M" && _married != "1" && _married != "2" && _married != "4") {//หย่าร้าง เลือกแม่เป็นผู้ค้ำ
-                            _guaTxt = "<p>มารดา</p>";
-                            _gVal2 = "M";
-                        } else if (_warVal == "M" && _married == "4") {//แยกกันอยู่ เลือกแม่เป็นคนค้ำ
-                            _guaTxt = "<p>บิดา</p>";
-                            _gVal2 = "F";
+                        //check status for mother
+                        if (warVal == "M" &&
+                            (married == "1" || married == "2")) {
+                            guaTxt = "<p>บิดา</p>";
+                            gVal2 = "F";
                         }
-                        $('.spConsent').html(_guaTxt);
+                        else {
+                            //หย่าร้าง เลือกแม่เป็นผู้ค้ำ
+                            if (warVal == "M" &&
+                                married != "1" &&
+                                married != "2" &&
+                                married != "4") {
+                                guaTxt = "<p>มารดา</p>";
+                                gVal2 = "M";
+                            }
+                            else {
+                                //แยกกันอยู่ เลือกแม่เป็นคนค้ำ
+                                if (warVal == "M" &&
+                                    married == "4") {
+                                    guaTxt = "<p>บิดา</p>";
+                                    gVal2 = "F";
+                                }
+                            }
+                        }
 
-                        $('#txtConsentBy').val(_gVal2);
-
+                        $('.spConsent').html(guaTxt);
+                        $('#txtConsentBy').val(gVal2);
                     });
-                } else if (_guaranteeBy == "mother") {
-                    _htmlG = "<p>มารดา</p>";
-                } else if (_guaranteeBy == "father") {
-                    _htmlG = "<p>บิดา</p>";
-                } else if (_guaranteeBy == "other") {
-                    _htmlG = "<p>บุคคลอื่น</p>";
-                } else {
-                    _htmlG = "<p>-</p>";
+                }
+                else {
+                    if (guaranteeBy == "mother") {
+                        htmlG = "<p>มารดา</p>";
+                    }
+                    else {
+                        if (guaranteeBy == "father") {
+                            htmlG = "<p>บิดา</p>";
+                        }
+                        else {
+                            if (guaranteeBy == "other") {
+                                htmlG = "<p>บุคคลอื่น</p>";
+                            }
+                            else {
+                                htmlG = "<p>-</p>";
+                            }
+                        }
+                    }
                 }
 
-                $('.spConsent').html(_htmlG);
-                $('#txtConsentBy').val(_gVal);
+                $('.spConsent').html(htmlG);
+                $('#txtConsentBy').val(gVal);
                 $(".panelContactTolaw").hide();
             }
         });
-        //End Event Check/Uncheck ไม่สามารถติดต่อผู้ค้ำประกันได้
+        //end event check/uncheck ไม่สามารถติดต่อผู้ค้ำประกันได้
 
-        UISPWarrant(_warrantBy);
+        uiSPWarrant(_warrantBy);
 
-        var _htmlG = "";
-        if (_guaranteeBy == "mother_father") {
-            if (_married == "3") {
-                _htmlG = "<p>มารดา</p>";
+        var htmlG = "";
+
+        if (guaranteeBy == "mother_father") {
+            if (married == "3") {
+                htmlG = "<p>มารดา</p>";
             } else {
-                _htmlG = "<p>บิดา</p>";
+                htmlG = "<p>บิดา</p>";
             }
 
-            // script when select father or mother Never Click chkStayLost
+            //script when select father or mother Never Click chkStayLost
             $(".rdoWarrant").click(function () {
-                var _warVal = $(this).val();
-                var _guaTxt = "";
-                var _gVal2 = "";
-                /*                alert("Not Click : " + _warVal);*/
+                var warVal = $(this).val();
+                var guaTxt = "";
+                var gVal2 = "";
 
-                //Check Status For Father
-                if (_warVal == "F" && (_married == "1" || _married == "2")) {
-
-                    _guaTxt = "<p>มารดา</p>";
-                    _gVal2 = "M";
-
-                } else if (_warVal == "F" && _married != "1" && _married != "2" && _married != "4") {//หย่าร้าง เลือกพ่อเป็นผู้ค้ำ
-                    _guaTxt = "<p>บิดา</p>";
-                    _gVal2 = "F";
-                } else if (_warVal == "F" && _married == "4") {//แยกกันอยู่ เลือกพ่อเป็นคนค้ำ
-                    _guaTxt = "<p>มารดา</p>";
-                    _gVal2 = "M";
+                //alert("Not Click : " + _warVal);
+                //check status for father
+                if (warVal == "F" &&
+                    (married == "1" || married == "2")) {
+                    guaTxt = "<p>มารดา</p>";
+                    gVal2 = "M";
+                }
+                else {
+                    //หย่าร้าง เลือกพ่อเป็นผู้ค้ำ
+                    if (warVal == "F" &&
+                        married != "1" &&
+                        married != "2" &&
+                        married != "4") {
+                        guaTxt = "<p>บิดา</p>";
+                        gVal2 = "F";
+                    }
+                    else {
+                        //แยกกันอยู่ เลือกพ่อเป็นคนค้ำ
+                        if (warVal == "F" &&
+                            married == "4") {
+                            guaTxt = "<p>มารดา</p>";
+                            gVal2 = "M";
+                        }
+                    }
                 }
 
-                //Check Status For Mother
-                if (_warVal == "M" && (_married == "1" || _married == "2")) {
-
-                    _guaTxt = "<p>บิดา</p>";
-                    _gVal2 = "F";
-                } else if (_warVal == "M" && _married != "1" && _married != "2" && _married != "4") {//หย่าร้าง เลือกแม่เป็นผู้ค้ำ
-                    _guaTxt = "<p>มารดา</p>";
-                    _gVal2 = "M";
-                } else if (_warVal == "M" && _married == "4") {//แยกกันอยู่ เลือกแม่เป็นคนค้ำ
-                    _guaTxt = "<p>บิดา</p>";
-                    _gVal2 = "F";
+                //check status for mother
+                if (warVal == "M" &&
+                    (married == "1" || married == "2")) {
+                    guaTxt = "<p>บิดา</p>";
+                    gVal2 = "F";
                 }
-                $('.spConsent').html(_guaTxt);
+                else {
+                    //หย่าร้าง เลือกแม่เป็นผู้ค้ำ
+                    if (warVal == "M" &&
+                        married != "1" &&
+                        married != "2" &&
+                        married != "4") {
+                        guaTxt = "<p>มารดา</p>";
+                        gVal2 = "M";
+                    }
+                    else {
+                        //แยกกันอยู่ เลือกแม่เป็นคนค้ำ
+                        if (warVal == "M" &&
+                            married == "4") {
+                            guaTxt = "<p>บิดา</p>";
+                            gVal2 = "F";
+                        }
+                    }
+                }
 
-                $('#txtConsentBy').val(_gVal2);
-
+                $('.spConsent').html(guaTxt);
+                $('#txtConsentBy').val(gVal2);
             });
-        } else if (_guaranteeBy == "mother") {
-            _htmlG = "<p>มารดา</p>";
-        } else if (_guaranteeBy == "father") {
-            _htmlG = "<p>บิดา</p>";
-        } else if (_guaranteeBy == "other") {
-            _htmlG = "<p>บุคคลอื่น</p>";
-        } else {
-            _htmlG = "<p>-</p>";
+        }
+        else {
+            if (guaranteeBy == "mother") {
+                htmlG = "<p>มารดา</p>";
+            }
+            else {
+                if (guaranteeBy == "father") {
+                    htmlG = "<p>บิดา</p>";
+                }
+                else {
+                    if (guaranteeBy == "other") {
+                        htmlG = "<p>บุคคลอื่น</p>";
+                    }
+                    else {
+                        htmlG = "<p>-</p>";
+                    }
+                }
+            }
         }
 
-        $('.spConsent').html(_htmlG);
-        $('#txtConsentBy').val(_gVal);
-
+        $('.spConsent').html(htmlG);
+        $('#txtConsentBy').val(gVal);
     }
 
-    function uiPreviewStudentContract(_this) {
-
-        //After Click btnConfirmInfo
-        var _userType = $('#txtUserTypeActive').val();
+    function uiPreviewStudentContract(this) {
+        //after click btnConfirmInfo
+        var userType = $('#txtUserTypeActive').val();
         var warrantyBy = $('input:radio[name=rdoWarrant]:checked').val();
         var consentBy = $('#txtConsentBy').val();
-        var _arrData = getParentStatusCondition();
+        var arrData = getParentStatusCondition();
+        var arrSts = _arrData[0].arrSts[0];
+        //var arrStay = arrData[0].arrStay[0];
+        var errTh = "";
+        var errEn = "";
 
-        var _arrSts = _arrData[0].arrSts[0];
-        /*        var _arrStay = _arrData[0].arrStay[0];*/
-        var _errTh = "", _errEn = "";
-
-
-        if (_arrSts.married == null || _arrSts.fatherSts == null || _arrSts.motherSts == null) {
-            _errTh += "- กรุณาเลือกสถานะ บิดา/มารดา ให้ครบถ้วน<br><br>";
-            _errEn += "- Please specify status info<br><br>";
-
+        if (arrSts.married == null ||
+            arrSts.fatherSts == null ||
+            arrSts.motherSts == null) {
+            errTh += "- กรุณาเลือกสถานะ บิดา/มารดา ให้ครบถ้วน<br><br>";
+            errEn += "- Please specify status info<br><br>";
         }
 
+        /*
+        if (arrStay.father == "0" &&
+            arrStay.mother == "0" &&
+            arrStay.other == "0") {
+            errTh += "- กรุณาเลือกข้อมูล อาศัยอยู่กับ<br><br>";
+            errEn += "- Please specify stay with<br><br>";
+        }
+        */
 
-        //if (_arrStay.father == "0" && _arrStay.mother == "0" && _arrStay.other == "0") {
-        //    _errTh += "- กรุณาเลือกข้อมูล อาศัยอยู่กับ<br><br>";
-        //    _errEn += "- Please specify stay with<br><br>";
-        //}
+        //alert(errEn);
+        if (errTh != "") {
+            myDialog(errTh, errEn);
 
-        // alert(_errEn);
-        if (_errTh != "") {
-            myDialog(_errTh, _errEn);
             return false;
         }
 
-        //Gus Edited
-        //if (_arrStay.contactLost == "1") {
+        /*
+        if (arrStay.contactLost == "1") {
+            myDialog("นักศึกษาเลือก ไม่สามารติดต่อผู้ค้ำประกันตามเงื่อนไขได้<BR>- กรุณาติดต่อทำสัญญาที่กองกฏหมาย เพื่อให้ผู้อื่นค้ำประกัน", "Lost Contact");
+        }
+        */
 
-        //    myDialog("นักศึกษาเลือก ไม่สามารติดต่อผู้ค้ำประกันตามเงื่อนไขได้<BR>- กรุณาติดต่อทำสัญญาที่กองกฏหมาย เพื่อให้ผู้อื่นค้ำประกัน", "Lost Contact");
-        //}
-
-
-
-        var _post = "&userType=" + _userType + "&warranty=" + warrantyBy + "&consent=" + consentBy;
-        //alert(_post);
+        var post = ("&userType=" + userType + "&warranty=" + warrantyBy + "&consent=" + consentBy);
+        //alert(post);
         $.ajax({
             type: "POST",
             url: "ContractHandler.ashx",
-            data: "action=UiPreviewContrat" + _post,
+            data: ("action=UiPreviewContrat" + post),
             charset: 'tis-620',
             beforeSend: function () {
-                _this.hide();
+                this.hide();
                 //myDialog("กำลังดำเนินการ กรุณารอสักครู่...", "System Processing. Please Wait...");
             },
             error: function (err) {
                 //alert(err);
-                _btnLogin.show();
+                btnLogin.show();
             },
             success: function (data) {
                 //$('#modalMsg').Modal("hide");
-                _this.show();
+                this.show();
                 //alert(data);
                 $("#divParentStatus").hide();
                 $("#divContractView").html(data);
@@ -1073,135 +1384,136 @@
                     $("#divContractView").html("");
                 });
 
-                //$('#submit_confirmRequest').click(function () {
-                //    $('form#form1').attr('action', 'confirmRequest.aspx');
-                //    $('form#form1').submit();
-                //});
-
+                /*
+                $('#submit_confirmRequest').click(function () {
+                    $('form#form1').attr('action', 'confirmRequest.aspx');
+                    $('form#form1').submit();
+                });
+                */
             }
         });
-
-
     }
 
+    /*
+    Auther  : Odd.Nopparat
+    Date    : 20-11-2015
+    Perpose : re login
+    Method  :
+    */
+    function signLoginContract(this) {
+        //student login..
+        //var no = this.data("options").no;
+        //alert(no);
+        var btnLogin = this;
+        var userType = $('#txtUserTypeActive').val();
+        var username = $.trim($('#username').val());
+        var password = $.trim($('#password').val());
+        var arrData = new Array();
+        var arrInput = new Array();
 
-
-
-    /// <summary>
-    /// Auther : Odd.Nopparat
-    /// Date   : 2015-11-20.
-    /// Perpose: re login
-    /// Method :
-    /// </summary>
-
-    function signLoginContract(_this) {
-        // student login..
-        //var _no = _this.data("options").no;
-        //alert(_no);
-        var _btnLogin = _this;
-        var _userType = $('#txtUserTypeActive').val();
-        var _username = $.trim($('#username').val());
-        var _password = $.trim($('#password').val());
-        var _arrData = new Array();
-        var _arrInput = new Array();
-
-        _arrData.push({
-            username: _username
-            , password: _password
-            , userType: _userType
+        arrData.push({
+            username: username,
+            password: password,
+            userType: userType
         });
 
-        if (_userType == "STUDENT") {
-            // get data form student contract
-            var _arrInfo = getParentStatusCondition();
-            //console.log(_arrInfo);
-            var _arrSts = _arrInfo[0].arrSts[0];
-            var _arrStay = _arrInfo[0].arrStay[0];
-            var _warrantBy = $('input:radio[name=rdoWarrant]:checked').val();
-            var _consentBy = $('#txtConsentBy').val();
-            if (_warrantBy == null || _consentBy == null) {
+        if (userType == "STUDENT") {
+            //get data form student contract
+            var arrInfo = getParentStatusCondition();
+            //console.log(arrInfo);
+            var arrSts = arrInfo[0].arrSts[0];
+            var arrStay = arrInfo[0].arrStay[0];
+            var warrantBy = $('input:radio[name=rdoWarrant]:checked').val();
+            var consentBy = $('#txtConsentBy').val();
+
+            if (warrantBy == null ||
+                consentBy == null) {
                 myDialog('ระบบไม่พบข้อมูลผู้ค้ำประกัน/ยินยอม<br>- กรุณาเลือกเงื่อนไขสถานะผู้ปกครองอีกครั้ง', 'Data Incorrect!!!<BR>Please Specify Status Again.');
+
                 return false
             }
-            _arrInput.push({
-                warrantBy: _warrantBy
-                , consentBy: _consentBy
-                , marriage: _arrSts.married
-                , aliveM: _arrSts.motherSts
-                , aliveF: _arrSts.fatherSts
-                //, liveWithM: _arrStay.mother
-                //, liveWithF: _arrStay.father
-                //, liveWithOther: _arrStay.other
-                , liveWithM: null
-                , liveWithF: null
-                , liveWithOther: null
-                , contactFm: _arrStay.contactLost //ไม่สามารติดต่อผู้ค้ำประกันตามเงื่อนไขได้
-            });
 
-        } else {
-            // form parent not use this data
-            _arrInput.push({
-                warrantBy: null
-                , consentBy: null
-                , marriage: null
-                , aliveM: null
-                , aliveF: null
-                , liveWithM: null
-                , liveWithF: null
-                , liveWithOther: null
-                , contactFm: null
+            arrInput.push({
+                warrantBy: warrantBy,
+                consentBy: consentBy,
+                marriage: arrSts.married,
+                aliveM: arrSts.motherSts,
+                aliveF: arrSts.fatherSts,
+                //liveWithM: arrStay.mother
+                //liveWithF: arrStay.father
+                //liveWithOther: arrStay.other
+                liveWithM: null,
+                liveWithF: null,
+                liveWithOther: null,
+                contactFm: arrStay.contactLost //ไม่สามารติดต่อผู้ค้ำประกันตามเงื่อนไขได้
             });
-
+        }
+        else {
+            //form parent not use this data
+            arrInput.push({
+                warrantBy: null,
+                consentBy: null,
+                marriage: null,
+                aliveM: null,
+                aliveF: null,
+                liveWithM: null,
+                liveWithF: null,
+                liveWithOther: null,
+                contactFm: null
+            });
         }
 
-
-
-        if (_username === '' || (_password === '' && _userType == "PARENT")) {
-            if (_userType == "PARENT") {
+        if (username === '' ||
+            (password === '' && userType == "PARENT")) {
+            if (userType == "PARENT") {
                 myDialog('กรุณารหัสผู้ใช้ และรหัสผ่าน ให้ถูกต้อง', 'Please specify username and password');
-            } else if (_userType == "STUDENT") {
-                myDialog('กรุณาระบุรหัสนักศึกษา และรหัสผ่าน ให้ถูกต้อง', 'Please specify student ID and password');
-            } else {
-                myDialog('รูปแบบข้อมูลไม่ถูกต้อง!!! กรุณา log in ใหม่', 'Data Incorrect!!! Please log in');
             }
+            else {
+                if (userType == "STUDENT") {
+                    myDialog('กรุณาระบุรหัสนักศึกษา และรหัสผ่าน ให้ถูกต้อง', 'Please specify student ID and password');
+                } else {
+                    myDialog('รูปแบบข้อมูลไม่ถูกต้อง!!! กรุณา log in ใหม่', 'Data Incorrect!!! Please log in');
+                }
+            }
+
             return false;
         }
         else {
             //$('#form1').submit();
-            var _post = "&strSign=" + JSON.stringify(_arrData) + "&strInput=" + JSON.stringify(_arrInput);
-            //console.log(_post);
-            //alert(_post);
+            var post = ("&strSign=" + JSON.stringify(arrData) + "&strInput=" + JSON.stringify(arrInput));
+            //console.log(post);
+            //alert(post);
             $.ajax({
                 type: "POST",
                 url: "ContractHandler.ashx",
-                data: "action=SignLogin" + _post,
+                data: ("action=SignLogin" + post),
                 charset: 'tis-620',
                 beforeSend: function () {
-                    _btnLogin.hide();
+                    btnLogin.hide();
                     //myDialog("กำลังดำเนินการบันทึกสัญญา กรุณารอสักครู่", "System Processing. Please Wait.");
                 },
                 error: function (err) {
                     alert(err);
-                    _btnLogin.show();
+                    btnLogin.show();
                 },
                 success: function (data) {
                     //console.log(data);
-                    _btnLogin.show();
-                    //$('.modal').closeModal();
+                    btnLogin.show();
+                    // $('.modal').closeModal();
                     $("#divResult").html(data);
                     //$("#divResult").show();
                     //$('#submit_confirmRequest').show();
-                    var _txtProcess = $("#divResult .txtProcessStatus");
-                    var _msgTh = "";
-                    var _msgEn = "";
-                    var _processStatus = "0";
+                    var txtProcess = $("#divResult .txtProcessStatus");
+                    var msgTH = "";
+                    var msgEN = "";
+                    var processStatus = "0";
 
-
-                    if (typeof (_txtProcess) != "undefined") {
-                        _processStatus = _txtProcess.val();
-                        _msgEn = _txtProcess.data("msg_en");
-                        _msgTh = _txtProcess.data("msg_th");
-                        if (_processStatus == "1") {
+                    if (typeof (txtProcess) != "undefined") {
+                        processStatus = _txtProcess.val();
+                        msgTH = txtProcess.data("msg_th");
+                        msgEN = txtProcess.data("msg_en");
+                        
+                        if (processStatus == "1") {
                             $("#divContractView").html("");
                             $("#divComplete").html(data);
                             $("#divComplete").show();
@@ -1210,46 +1522,39 @@
                                 $('form#form1').submit();
                             });
                         }
-
-                    } else {
-                        _msgEn = "Transaction Error!!! Please Press F5 to Reprocees";
-                        _msgTh = "การสื่อสารขัดข้อง!!! กรุณากดปุ่ม F5 เพื่อประมวลผลใหม่";
-
-
+                    }
+                    else {
+                        msgTH = "การสื่อสารขัดข้อง!!! กรุณากดปุ่ม F5 เพื่อประมวลผลใหม่";
+                        msgEN = "Transaction Error!!! Please Press F5 to Reprocees";
                     }
 
-                    if (_processStatus == "0") {
-                        myDialog(_msgTh, _msgEn);
+                    if (processStatus == "0") {
+                        myDialog(msgTh, msgEN);
                     }
 
-                    //alert("res=" + _processStatus);
+                    //alert("res=" + processStatus);
                     //alert(data);
-
-
                 }
             });
-
         }
-
-
-
     }
-
-
 
     function menuStd() {
         $("#divParentStatus").hide();
         $("#divComplete").hide();
         $('#submit_frmContract').click(function () {
-            //Hide Menu Student
+            //hide menu student
             $('#divMenuStd').html("");
+
             if ($('#hidStatusViewComplete').val() == "1") {
                 $("#divComplete").show();
+
                 $('button#submit_confirmRequest').click(function () {
                     $('form#form1').attr('action', 'confirmRequest.aspx');
                     $('form#form1').submit();
                 });
-            } else {
+            }
+            else {
                 $("#divParentStatus").show();
             }
         });
@@ -1258,28 +1563,27 @@
             $('form#form1').attr('action', 'confirmRequest.aspx');
             $('form#form1').submit();
         });
-
     }
 
-    /// <summary>
-    /// Auther : anussara.wan
-    /// Date   : 2019-08-20
-    /// Perpose: สำหรับส่งค่าหน้า confirm Parent ไปบันทึกยังตาราง ectParentAndStaff
-    /// Method : confirmParent
-    /// </summary>
-    function SetConfirmParent() {
+    /*
+    Auther  : anussara.wan
+    Date    : 2019-08-20
+    Perpose : สำหรับส่งค่าหน้า confirm Parent ไปบันทึกยังตาราง ectParentAndStaff
+    Method  : confirmParent
+    */
+    function setConfirmParent() {
+        var errTH1 = "";
+        var errEN1 = "";
+        var userType = $('#txtUserTypeActive').val();
+        var post = ("&userType=" + userType);
 
-        var _errTh1 = "", _errEn1 = "";
-        var _userType = $('#txtUserTypeActive').val();
-        var _post = "&userType=" + _userType;
         if ($('#chkConP').is(':checked')) {
             $.ajax({
                 type: "POST",
                 url: "ContractHandler.ashx",
-                data: "action=SetConfirmParent" + _post,
+                data: ("action=SetConfirmParent" + post),
                 charset: 'tis-620',
                 beforeSend: function () {
-
                 },
                 error: function (err) {
                     alert(err);
@@ -1288,79 +1592,78 @@
                     $("#divLogin").hide();
                     $("#divContractView").html(data);
                     $('#divContractView .btnReLogin').unbind();
+
                     $('#divContractView .btnReLogin').click(function () {
                         signLoginContract($(this));
                     });
                 }
             });
+        }
+        else {
+            errTH1 += "- กรุณาทำเครื่องหมายถูกหน้าข้อความดังกล่าว<br><br>";
+            errEN1 += "- Please Checkbox status info<br><br>";
 
-        } else {
-            _errTh1 += "- กรุณาทำเครื่องหมายถูกหน้าข้อความดังกล่าว<br><br>";
-            _errEn1 += "- Please Checkbox status info<br><br>";
-            if (_errTh1 != "") {
-                myDialog(_errTh1, _errEn1);
+            if (errTH1 != "") {
+                myDialog(errTH1, errEN1);
+
                 return false;
             }
         }
     }
 
     function disabledStayWith() {
-        //Start Disable checkStay with Onload event
         $("#chkStayF").attr("disabled", true);
         $("#chkStayM").attr("disabled", true);
         $("#chkStayO").attr("disabled", true);
-        //End Disable checkStay with Onload event
     }
 
     function enabledStayWith() {
-        //Start Enabled checkStay with onchangeRdoMarried event
         $("#chkStayF").attr("disabled", false);
         $("#chkStayM").attr("disabled", false);
         $("#chkStayO").attr("disabled", false);
-        //End Enabled checkStay with onchangeRdoMarried event
     }
 
     function disabledAlive() {
-        //Start Disable Alive with Onload event
         $(".rdoFatherSts").attr("disabled", true);
         $(".rdoMotherSts").attr("disabled", true);
-        //End Disable Alive with Onload event
     }
 
     function enabledAlive() {
-        //Start Disable Alive with Onload event
         var rdoMarried = $('input:radio[name=rdoMarried]:checked').val();
-        if (rdoMarried == "1") { //จดทะเบียน
+
+        //จดทะเบียน
+        if (rdoMarried == "1") {
             $("#rdoFatherStsNo").attr("disabled", true);
             $("#rdoMotherStsNo").attr("disabled", true);
             $("#rdoFatherStsYes").attr("disabled", false);
             $("#rdoMotherStsYes").attr("disabled", false);
-        } else if (rdoMarried == "4") { //แยกกันอยู่
-            $("#rdoFatherStsNo").attr("disabled", true);
-            $("#rdoMotherStsNo").attr("disabled", true);
-            $("#rdoFatherStsYes").attr("disabled", false);
-            $("#rdoMotherStsYes").attr("disabled", false);
-        } else { //ohter type
-            $(".rdoFatherSts").attr("disabled", false);
-            $(".rdoMotherSts").attr("disabled", false);
         }
-        //End Disable Alive with Onload event
+        else {
+            //แยกกันอยู่
+            if (rdoMarried == "4") {
+                $("#rdoFatherStsNo").attr("disabled", true);
+                $("#rdoMotherStsNo").attr("disabled", true);
+                $("#rdoFatherStsYes").attr("disabled", false);
+                $("#rdoMotherStsYes").attr("disabled", false);
+            }
+            else {
+                //ohter type
+                $(".rdoFatherSts").attr("disabled", false);
+                $(".rdoMotherSts").attr("disabled", false);
+            }
+        }
     }
 
     function disabledWarrant() {
-        //Start Disable checkStay with Onload event
         $("#rdoWF").attr("disabled", true);
         $("#rdoWM").attr("disabled", true);
         $("#rdoWO").attr("disabled", true);
-        //End Disable checkStay with Onload event
     }
 
     function enabledWarrant() {
-        //Start Enabled checkStay with onchangeRdoMarried event
         $("#rdoWF").attr("disabled", false);
         $("#rdoWM").attr("disabled", false);
         $("#rdoWO").attr("disabled", false);
-        //End Enabled checkStay with onchangeRdoMarried event
     }
 
     function resetAlive() {
@@ -1369,23 +1672,26 @@
     }
 
     function resetStayWith() {
-        //Start reset checkStay with onchangeRdoMarried event
         $("#chkStayF").prop('checked', false);
         $("#chkStayM").prop('checked', false);
         $("#chkStayO").prop('checked', false);
         $("#chkStayF").prop('disabled', false);
         $("#chkStayM").prop('disabled', false);
         $("#chkStayO").prop('disabled', false);
-        //Start reset checkStay with onchangeRdoMarried event
     }
 
     function initialWarrant() {
-        var htmlForpPanelContactLost = "<span class='title'><span class='th red-text'>สถานะติดต่อ :&nbsp;" +
-            "<input class='chkStay' name='chkStay' type='checkbox' id='chkStayLost' value='1' />" +
-            "<label for='chkStayLost'>" +
-            "<span class='th red-text'>ไม่สามารถติดต่อ ผู้ค้ำประกันได้</span><span class='en hide red-text'>Family not found</span>" +
-            "</label>" +
-            "</span>";
+        var htmlForpPanelContactLost = ("" +
+            "<span class='title'>" +
+            "   <span class='th red-text'>สถานะติดต่อ :&nbsp;</span>" +
+            "   <input class='chkStay' name='chkStay' type='checkbox' id='chkStayLost' value='1' />" +
+            "   <label for='chkStayLost'>" +
+            "       <span class='th red-text'>ไม่สามารถติดต่อ ผู้ค้ำประกันได้</span>" +
+            "       <span class='en hide red-text'>Family not found</span>" +
+            "   </label>" +
+            "</span>"
+        );
+
         $(".panelContactLost").html(htmlForpPanelContactLost);
         $(".spWarrant").html("");
         $(".panelContactLost").hide();
@@ -1393,332 +1699,407 @@
     }
 
     function resetWarrant() {
-        //Start reset Warrant with onchangeRdoMarried 
-        var htmlForpPanelContactLost = "<span class='title'><span class='th red-text'>สถานะติดต่อ :&nbsp;" +
-            "<input class='chkStay' name='chkStay' type='checkbox' id='chkStayLost' value='1' />" +
-            "<label for='chkStayLost'>" +
-            "<span class='th red-text'>ไม่สามารถติดต่อ ผู้ค้ำประกันได้</span><span class='en hide red-text'>Family not found</span>" +
-            "</label>" +
-            "</span>";
+        var htmlForpPanelContactLost = ("" +
+            "<span class='title'>" +
+            "   <span class='th red-text'>สถานะติดต่อ :&nbsp;</span>" +
+            "   <input class='chkStay' name='chkStay' type='checkbox' id='chkStayLost' value='1' />" +
+            "   <label for='chkStayLost'>" +
+            "       <span class='th red-text'>ไม่สามารถติดต่อ ผู้ค้ำประกันได้</span>" +
+            "       <span class='en hide red-text'>Family not found</span>" +
+            "   </label>" +
+            "</span>"
+        );
+
         $('.panelContactLost').html(htmlForpPanelContactLost);
         $('.spWarrant').html("");
         $('.spConsent').html("");
         $(".panelContactLost").hide();
         $(".panelContactTolaw").hide();
-        //Start reset Warrant with onchangeRdoMarried event
     }
 
     function onchangeAlive(id) {
         var rdoMarried = $('input:radio[name=rdoMarried]:checked').val();
         var dadAlive = $('input:radio[name=rdoFatherSts]:checked').val();
         var momAlive = $('input:radio[name=rdoMotherSts]:checked').val();
-        if (rdoMarried == "5") { //หม้าย
+
+        //หม้าย
+        if (rdoMarried == "5") {
             if (id == "rdoFatherStsYes") {
                 if ($("#rdoFatherStsYes").is(':checked')) {
-                    //Dad Alive Checked
+                    //dad alive checked
                     $('#rdoMotherStsYes').prop('checked', false);
                     $('#rdoMotherStsYes').prop('disabled', true);
 
                     $('#rdoMotherStsNo').prop('checked', true);
                     $('#rdoMotherStsNo').prop('disabled', false);
 
-                    //Can Stay with Dad
-                    /*                    $("#chkStayF").attr("disabled", false);*/
+                    //can stay with dad
+                    //$("#chkStayF").attr("disabled", false);
 
-                    //Can't Stay with Mom
+                    //can't stay with mom
                     //$("#chkStayM").prop('checked', false);
                     //$("#chkStayM").attr("disabled", true);
                 }
-            } else if (id == "rdoFatherStsNo") {
-                if ($("#rdoFatherStsNo").is(':checked')) {
-                    //Dad Died Checked
-                    $('#rdoMotherStsYes').prop('checked', true);
-                    $('#rdoMotherStsYes').prop('disabled', false);
+            }
+            else {
+                if (id == "rdoFatherStsNo") {
+                    if ($("#rdoFatherStsNo").is(':checked')) {
+                        //dad died checked
+                        $('#rdoMotherStsYes').prop('checked', true);
+                        $('#rdoMotherStsYes').prop('disabled', false);
 
-                    $('#rdoMotherStsNo').prop('disabled', true);
-                    $('#rdoMotherStsNo').prop('checked', false);
+                        $('#rdoMotherStsNo').prop('disabled', true);
+                        $('#rdoMotherStsNo').prop('checked', false);
 
-                    //Can't Stay with Dad
-                    //$("#chkStayF").prop('checked', false);
-                    //$("#chkStayF").attr("disabled", true);
+                        //can't stay with dad
+                        //$("#chkStayF").prop('checked', false);
+                        //$("#chkStayF").attr("disabled", true);
 
-                    //Can Stay With Mom
-                    /*                    $("#chkStayM").attr("disabled", false);*/
+                        //can stay with mom
+                        //$("#chkStayM").attr("disabled", false);
+                    }
                 }
             }
+
             if (id == "rdoMotherStsYes") {
                 if ($("#rdoMotherStsYes").is(':checked')) {
-                    //Dad Alive Checked
+                    //dad alive checked
                     $('#rdoFatherStsYes').prop('checked', false);
                     $('#rdoFatherStsYes').prop('disabled', true);
 
                     $('#rdoFatherStsNo').prop('checked', true);
                     $('#rdoFatherStsNo').prop('disabled', false);
 
-                    //Can Stay with Mom
-                    /*                    $("#chkStayM").attr("disabled", false);*/
+                    //can stay with mom
+                    //$("#chkStayM").attr("disabled", false);
 
-                    //Can't Stay with Dad
+                    //can't stay with dad
                     //$("#chkStayF").prop('checked', false);
                     //$("#chkStayF").attr("disabled", true);
                 }
-            } else if (id == "rdoMotherStsNo") {
-                if ($("#rdoFatherStsNo").is(':checked')) {
-                    //Dad Died Checked
-                    $('#rdoFatherStsYes').prop('checked', true);
-                    $('#rdoFatherStsYes').prop('disabled', false);
+            }
+            else {
+                if (id == "rdoMotherStsNo") {
+                    if ($("#rdoFatherStsNo").is(':checked')) {
+                        //dad died checked
+                        $('#rdoFatherStsYes').prop('checked', true);
+                        $('#rdoFatherStsYes').prop('disabled', false);
 
-                    $('#rdoFatherStsNo').prop('disabled', true);
-                    $('#rdoFatherStsNo').prop('checked', false);
+                        $('#rdoFatherStsNo').prop('disabled', true);
+                        $('#rdoFatherStsNo').prop('checked', false);
 
-                    //Can't Stay with Mom
-                    //$("#chkStayM").prop('checked', false);
-                    //$("#chkStayM").attr("disabled", true);
+                        //can't stay with mom
+                        //$("#chkStayM").prop('checked', false);
+                        //$("#chkStayM").attr("disabled", true);
 
-                    //Can Stay with Dad
-                    /*                    $("#chkStayF").attr("disabled", false);*/
+                        //can stay with dad
+                        //$("#chkStayF").attr("disabled", false);
+                    }
                 }
             }
         }
-        //} else {
-        //    if (dadAlive == "2") { //Dad Died
-        //        $("#chkStayF").prop('checked', false);
-        //        $("#chkStayF").attr("disabled", true);
+        /*
+        }
+        else {
+            //dad died
+            if (dadAlive == "2") {
+                $("#chkStayF").prop('checked', false);
+                $("#chkStayF").attr("disabled", true);
+            }
+            else {
+                //dad alive
+                if (dadAlive == "1") {
+                    $("#chkStayF").attr("disabled", false);
+                }
 
-        //    } else if (dadAlive == "1") { //Dad Alive
-        //        $("#chkStayF").attr("disabled", false);
-        //    }
-        //    if (momAlive == "2") { //Mom Died
-        //        $("#chkStayM").prop('checked', false);
-        //        $("#chkStayM").attr("disabled", true);
-        //    } else if (momAlive == "1") { //Mom Alive
-        //        $("#chkStayM").attr("disabled", false);
-        //    }
-        //}
+                //mom died
+                if (momAlive == "2") { 
+                    $("#chkStayM").prop('checked', false);
+                    $("#chkStayM").attr("disabled", true);
+                }
+                else {
+                    //mom alive
+                    if (momAlive == "1") { 
+                        $("#chkStayM").attr("disabled", false);
+                    }
+                }
+            }
+        }
+        */
     }
 
     function onchangeStayWith(id) {
         var rdoMarried = $('input:radio[name=rdoMarried]:checked').val();
         var dadAlive = $('input:radio[name=rdoFatherSts]:checked').val();
         var momAlive = $('input:radio[name=rdoMotherSts]:checked').val();
-        if (rdoMarried == "4" || rdoMarried == "3") { //หย่าร้างและแยกกันอยู่
+
+        //หย่าร้างและแยกกันอยู่
+        if (rdoMarried == "4" ||
+            rdoMarried == "3") {
             if (id == "chkStayF") {
                 if ($("#chkStayF").is(':checked')) {
                     $('#chkStayM').prop('checked', false);
                     $('#chkStayM').prop('disabled', true);
                     $('#chkStayO').prop('checked', false);
                     $('#chkStayO').prop('disabled', true);
-                } else {
-                    if (dadAlive == "1") { //Dad Alive
+                }
+                else {
+                    //dad alive
+                    if (dadAlive == "1") {
                         $('#chkStayF').prop('disabled', false);
-                    } else if (momAlive == "1") { //Mom Alive
-                        $('#chkStayM').prop('disabled', false);
                     }
+                    else {
+                        //mom alive
+                        if (momAlive == "1") {
+                            $('#chkStayM').prop('disabled', false);
+                        }
+                    }
+
                     $('#chkStayO').prop('checked', false);
                     $('#chkStayO').prop('disabled', false);
                 }
             }
+
             if (id == "chkStayM") {
                 if ($("#chkStayM").is(':checked')) {
                     $('#chkStayF').prop('checked', false);
                     $('#chkStayF').prop('disabled', true);
                     $('#chkStayO').prop('checked', false);
                     $('#chkStayO').prop('disabled', true);
-                } else {
-                    if (dadAlive == "1") { //Dad Alive
+                }
+                else {
+                    //dad alive
+                    if (dadAlive == "1") {
                         $('#chkStayF').prop('disabled', false);
-                    } else if (momAlive == "1") { //Mom Alive
-                        $('#chkStayM').prop('disabled', false);
+                    }
+                    else {
+                        //mom alive
+                        if (momAlive == "1") {
+                            $('#chkStayM').prop('disabled', false);
+                        }
                     }
 
                     $('#chkStayO').prop('checked', false);
                     $('#chkStayO').prop('disabled', false);
                 }
-
             }
+
             if (id == "chkStayO") {
                 if ($("#chkStayO").is(':checked')) {
                     $('#chkStayF').prop('checked', false);
                     $('#chkStayF').prop('disabled', true);
                     $('#chkStayM').prop('checked', false);
                     $('#chkStayM').prop('disabled', true);
-                } else {
-                    if (dadAlive == "1") { //Dad Alive
+                }
+                else {
+                    //dad alive
+                    if (dadAlive == "1") {
                         $('#chkStayF').prop('disabled', false);
-                    } else if (momAlive == "1") { //Mom Alive
-                        $('#chkStayM').prop('disabled', false);
+                    }
+                    else {
+                        //mom alive
+                        if (momAlive == "1") {
+                            $('#chkStayM').prop('disabled', false);
+                        }
                     }
                 }
             }
         }
-        if (rdoMarried == "5") {//หม้าย
+
+        //หม้าย
+        if (rdoMarried == "5") {
             if (id == "chkStayO") {
                 if ($("#chkStayO").is(':checked')) {
-                    //Checked Stay with Other
+                    //checked stay with other
                     $('#chkStayF').prop('checked', false);
                     $('#chkStayF').prop('disabled', true);
                     $('#chkStayM').prop('checked', false);
                     $('#chkStayM').prop('disabled', true);
-                } else {
-                    //Uncheck Stay with Other
-                    if (dadAlive == "1") { //Dad Alive
+                }
+                else {
+                    //uncheck stay with other
+                    //dad alive
+                    if (dadAlive == "1") { 
                         $('#chkStayF').prop('disabled', false);
-                    } else { //Mom Alive
+                    }
+                    else {
+                        //mom alive
                         $('#chkStayM').prop('disabled', false);
                     }
                 }
-
             }
-
         }
-        if (rdoMarried == "6") { //โสด
+
+        //โสด
+        if (rdoMarried == "6") { 
             if (id == "chkStayF") {
                 if ($("#chkStayF").is(':checked')) {
                     $('#chkStayM').prop('checked', false);
                     $('#chkStayM').prop('disabled', true);
                     $('#chkStayO').prop('checked', false);
                     $('#chkStayO').prop('disabled', true);
-                } else {
-                    if (momAlive == "1") { //mom Alive
+                }
+                else {
+                    //mom alive
+                    if (momAlive == "1") { 
                         $('#chkStayM').prop('disabled', false);
                         $('#chkStayM').prop('checked', false);
                     }
+
                     $('#chkStayO').prop('checked', false);
                     $('#chkStayO').prop('disabled', false);
                 }
             }
+
             if (id == "chkStayM") {
                 if ($("#chkStayM").is(':checked')) {
                     $('#chkStayF').prop('checked', false);
                     $('#chkStayF').prop('disabled', true);
                     $('#chkStayO').prop('checked', false);
                     $('#chkStayO').prop('disabled', true);
-                } else {
-                    if (dadAlive == "1") { //Dad Alive
+                }
+                else {
+                    //dad alive
+                    if (dadAlive == "1") { 
                         $('#chkStayF').prop('disabled', false);
                         $('#chkStayF').prop('checked', false);
                     }
+
                     $('#chkStayO').prop('checked', false);
                     $('#chkStayO').prop('disabled', false);
                 }
-
             }
+
             if (id == "chkStayO") {
                 if ($("#chkStayO").is(':checked')) {
                     $('#chkStayF').prop('checked', false);
                     $('#chkStayF').prop('disabled', true);
                     $('#chkStayM').prop('checked', false);
                     $('#chkStayM').prop('disabled', true);
-                } else {
-                    if (dadAlive == "1") { //Dad Alive
+                }
+                else {
+                    //dad alive
+                    if (dadAlive == "1") {
                         $('#chkStayF').prop('disabled', false);
                         $('#chkStayF').prop('checked', false);
-                    } else if (momAlive == "1") { //Mom Alive
-                        $('#chkStayM').prop('disabled', false);
-                        $('#chkStayM').prop('checked', false);
+                    }
+                    else {
+                        //mom alive
+                        if (momAlive == "1") {
+                            $('#chkStayM').prop('disabled', false);
+                            $('#chkStayM').prop('checked', false);
+                        }
                     }
                 }
             }
         }
     }
 
-    function UISPWarrant(_warrantBy) {
-        var _htmlW = "";
-        var _stsF = "";
-        var _stsM = "";
-        var _stsO = "";
-        var _styF = "";
-        var _styM = "";
-        var _styO = "";
+    function uiSPWarrant(warrantBy) {
+        var htmlW = "";
+        var stsF = "";
+        var stsM = "";
+        var stsO = "";
+        var styF = "";
+        var styM = "";
+        var styO = "";
 
-
-        //Change style By Select
-        if (_warrantBy == "mother_father") {
-            _stsO = " disabled ";
-            _stsM = " checked ";
-            _styO = " style='text-decoration: line-through;' "
-
-
-        } else if (_warrantBy == "mother") {
-            _stsF = " disabled '";
-            _stsM = " checked ";
-            _stsO = " disabled ";
-            _styF = " style='text-decoration: line-through;' "
-            _styO = " style='text-decoration: line-through;' "
-
-
-        } else if (_warrantBy == "father") {
-            _stsF = " checked ";
-            _stsM = " disabled ";
-            _stsO = " disabled ";
-            _styM = " style='text-decoration: line-through;' "
-            _styO = " style='text-decoration: line-through;' "
-
-
-        } else if (_warrantBy == "other") {
-            _stsF = " disabled ";
-            _stsM = " disabled ";
-            _stsO = " checked ";
-            _styF = " style='text-decoration: line-through;' "
-            _styM = " style='text-decoration: line-through;' "
+        if (warrantBy == "mother_father") {
+            stsO = " disabled ";
+            stsM = " checked ";
+            styO = " style='text-decoration: line-through;' "
+        }
+        else {
+            if (warrantBy == "mother") {
+                stsF = " disabled '";
+                stsM = " checked ";
+                stsO = " disabled ";
+                styF = " style='text-decoration: line-through;' ";
+                styO = " style='text-decoration: line-through;' ";
+            }
+            else {
+                if (warrantBy == "father") {
+                    stsF = " checked ";
+                    stsM = " disabled ";
+                    stsO = " disabled ";
+                    styM = " style='text-decoration: line-through;' ";
+                    styO = " style='text-decoration: line-through;' ";
+                }
+                else {
+                    if (warrantBy == "other") {
+                        stsF = " disabled ";
+                        stsM = " disabled ";
+                        stsO = " checked ";
+                        styF = " style='text-decoration: line-through;' ";
+                        styM = " style='text-decoration: line-through;' ";
+                    }
+                }
+            }
         }
 
+        htmlW = ("" +
+            "<p>" +
+            "   <input class='rdoWarrant' name='rdoWarrant' type='radio' id='rdoWF' value='F' " + stsF + " />" +
+            "   <label for='rdoWF'>" +
+            "       <span class='th' " + styF + ">บิดา</span>" +
+            "       <span class='en hide'>Father</span>" +
+            "   </label>&nbsp;&nbsp;" +
+            "   <input class='rdoWarrant' name='rdoWarrant' type='radio' id='rdoWM' value='M' " + stsM + " />" +
+            "   <label for='rdoWM'>" +
+            "       <span class='th' " + styM + ">มารดา</span>" +
+            "       <span class='en hide'>Mother</span>" +
+            "   </label>" +
+            "   <input class='rdoWarrant' name='rdoWarrant' type='radio' id='rdoWO' value='N' " + stsO + " />" +
+            "   <label for='rdoWO'>" +
+            "       <span class='th' " + styO + ">บุคคลอื่น</span>" +
+            "       <span class='en hide'>Other</span>" +
+            "   </label>&nbsp;&nbsp;" +
+            "</p>"
+        );
 
-
-
-        _htmlW = "<p>" +
-            "<input class='rdoWarrant' name='rdoWarrant' type='radio' id='rdoWF' value='F' " + _stsF + " />" +
-            "<label for='rdoWF'>" +
-            "<span class='th' " + _styF + ">บิดา</span><span class='en hide'>Father</span>" +
-            "</label>&nbsp;&nbsp;" +
-            "<input class='rdoWarrant' name='rdoWarrant' type='radio' id='rdoWM' value='M' " + _stsM + " />" +
-            "<label for='rdoWM'>" +
-            "<span class='th' " + _styM + ">มารดา</span><span class='en hide'>Mother</span>" +
-            "</label>" +
-            "<input class='rdoWarrant' name='rdoWarrant' type='radio' id='rdoWO' value='N' " + _stsO + " />" +
-            "<label for='rdoWO'>" +
-            "<span class='th' " + _styO + ">บุคคลอื่น</span><span class='en hide'>Other</span>" +
-            "</label>&nbsp;&nbsp;" +
-            "</p>";
-
-        $('.spWarrant').html(_htmlW);
+        $('.spWarrant').html(htmlW);
     }
 
     function onclickRdoWarrant(text) {
-
         $(".rdoWarrant").click(function () {
             //alert(text);
-            var _warVal = $(this).val();
-            var _guaTxt = "";
-            var _gVal2 = "";
-            //alert(_warVal);
-            if (_warVal == "F" && (_married == "1" || _married == "2")) {
+            var warVal = $(this).val();
+            var guaTxt = "";
+            var gVal2 = "";
+            //alert(warVal);
 
-                _guaTxt = "<p>มารดา</p>";
-                _gVal2 = "M";
-
-            } else if (_warVal == "F" && _married != "1" && _married != "2") {//หย่าร้าง เลือกพ่อเป็นผู้ค้ำ
-
-                _guaTxt = "<p>บิดา</p>";
-                _gVal2 = "F";
-
+            if (warVal == "F" &&
+                (married == "1" || married == "2")) {
+                guaTxt = "<p>มารดา</p>";
+                gVal2 = "M";
+            }
+            else {
+                //หย่าร้าง เลือกพ่อเป็นผู้ค้ำ
+                if (warVal == "F" &&
+                    married != "1" &&
+                    married != "2") {
+                    guaTxt = "<p>บิดา</p>";
+                    gVal2 = "F";
+                }
             }
 
-            if (_warVal == "M" && (_married == "1" || _married == "2")) {
-
-                _guaTxt = "<p>บิดา</p>";
-                _gVal2 = "F";
-            } else if (_warVal == "M" && _married != "1" && _married != "2") {//หย่าร้าง เลือกแม่เป็นผู้ค้ำ
-
-                _guaTxt = "<p>มารดา</p>";
-                _gVal2 = "M";
+            if (warVal == "M" &&
+                (married == "1" || married == "2")) {
+                guaTxt = "<p>บิดา</p>";
+                gVal2 = "F";
             }
-            $('.spConsent').html(_guaTxt);
+            else {
+                //หย่าร้าง เลือกแม่เป็นผู้ค้ำ
+                if (warVal == "M" &&
+                    married != "1" &&
+                    married != "2") {
+                    guaTxt = "<p>มารดา</p>";
+                    gVal2 = "M";
+                }
+            }
 
-            $('#txtConsentBy').val(_gVal2);
-
+            $('.spConsent').html(guaTxt);
+            $('#txtConsentBy').val(gVal2);
         });
     }
-
-
 </script>
